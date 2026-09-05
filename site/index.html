@@ -2,19 +2,192 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PrimeLevel</title>
-<meta http-equiv="refresh" content="0; url=dashboard.html">
-<link rel="canonical" href="dashboard.html">
+<title>PrimeLevel Welcome</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
+    --info:#3D5A80; --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; padding:22px 48px; max-width:1180px; margin:0 auto; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{ width:32px;height:32px;border-radius:8px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:17px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--text); }
+  .header-actions{ display:flex; align-items:center; gap:18px; }
+  .link-btn{ font-size:13.5px; font-weight:600; color:var(--text-soft); text-decoration:none; }
+  .cta-small{ background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px; padding:10px 18px; font-weight:600; font-size:13px; cursor:pointer; text-decoration:none; display:inline-block; }
+  :root[data-theme="dark"] .cta-small{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .cta-small{ background:var(--brand-gold); color:#1A1406; } }
+
+  .hero{ max-width:820px; margin:64px auto 8px; padding:0 24px; text-align:center; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--brand-gold); background:var(--surface-2); border:1px solid var(--border); padding:6px 14px; border-radius:100px; margin-bottom:22px; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:44px; line-height:1.12; margin:0 0 18px; text-wrap:balance; }
+  h1 em{ font-style:normal; color:var(--brand-gold); }
+  .sub{ font-size:16px; color:var(--text-soft); line-height:1.6; max-width:56ch; margin:0 auto 34px; }
+
+  .signup-card{ max-width:400px; margin:0 auto 14px; background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:24px 26px 26px; text-align:left; }
+  .signup-card .field-lbl{ font-size:11.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 6px; }
+  .signup-card input{ width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:'Archivo',sans-serif; font-size:13.5px; margin-bottom:14px; }
+  .cta-main{ width:100%; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:10px; padding:13px; font-weight:700; font-size:14.5px; cursor:pointer; }
+  :root[data-theme="dark"] .cta-main{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .cta-main{ background:var(--brand-gold); color:#1A1406; } }
+  .card-note{ text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:10px; }
+  .trust-line{ text-align:center; font-size:12.5px; color:var(--text-faint); margin-bottom:70px; }
+  .trust-line b{ color:var(--text-soft); font-weight:600; }
+
+  .section-label{ text-align:center; font-size:11.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:14px; }
+  .section-h{ text-align:center; font-family:'Fraunces',serif; font-weight:500; font-size:26px; margin:0 0 44px; }
+
+  .steps{ max-width:1020px; margin:0 auto 90px; padding:0 24px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .step-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 22px; box-shadow:var(--shadow); position:relative; }
+  .step-num{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; font-weight:700; color:var(--brand-gold); margin-bottom:10px; }
+  .step-card h3{ font-size:15.5px; font-weight:700; margin:0 0 8px; }
+  .step-card p{ font-size:13px; color:var(--text-soft); line-height:1.55; margin:0; }
+
+  .moat-band{ background:var(--brand-navy); padding:70px 24px; }
+  @media (prefers-color-scheme:dark){ .moat-band{ background:var(--surface-2); } }
+  :root[data-theme="dark"] .moat-band{ background:var(--surface-2); }
+  .moat-inner{ max-width:920px; margin:0 auto; text-align:center; color:#F1EEE6; }
+  .moat-inner .section-label{ color:var(--brand-gold-soft); }
+  .moat-inner h2{ font-family:'Fraunces',serif; font-weight:500; font-size:28px; margin:0 0 18px; }
+  .moat-inner p{ font-size:15px; line-height:1.7; color:#C7CDD9; max-width:64ch; margin:0 auto; }
+  .moat-inner p b{ color:#F1EEE6; font-weight:600; }
+  .moat-tags{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:30px; }
+  .moat-tag{ font-size:12px; font-weight:600; color:#EFE9DC; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); padding:8px 14px; border-radius:100px; }
+
+  .feature-grid{ max-width:1020px; margin:80px auto; padding:0 24px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .feature-card{ background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:18px; box-shadow:var(--shadow); }
+  .feature-card .ic{ font-size:18px; margin-bottom:10px; }
+  .feature-card h4{ font-size:13.5px; font-weight:700; margin:0 0 6px; }
+  .feature-card p{ font-size:12px; color:var(--text-soft); line-height:1.5; margin:0; }
+
+  .final-cta{ max-width:640px; margin:0 auto 90px; padding:0 24px; text-align:center; }
+  .final-cta h2{ font-family:'Fraunces',serif; font-weight:500; font-size:26px; margin:0 0 12px; }
+  .final-cta p{ font-size:14px; color:var(--text-soft); margin:0 0 26px; }
+
+  footer{ border-top:1px solid var(--border); padding:26px 48px; text-align:center; font-size:12px; color:var(--text-faint); }
+
+  @media (max-width:820px){
+    h1{ font-size:32px; }
+    .steps, .feature-grid{ grid-template-columns:1fr; }
+    header{ padding:18px 22px; }
+  }
+</style>
 </head>
 <body>
-<!--
-  Placeholder entry point. Once the real public Welcome/signup page is
-  built (see the Upgrade/Welcome Claude Artifact links in ORIGINAL_BRIEF.md,
-  not yet pulled into local files), it belongs here at index.html instead
-  of this redirect. For now, the dashboard is the natural "front page" to
-  land the click-through prototype on, per explicit request to link the
-  five internal mockups together first.
--->
-<p>Redirecting to <a href="dashboard.html">the dashboard</a>…</p>
+
+  <header>
+    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <div class="header-actions">
+      <a class="link-btn" href="dashboard.html">Log in</a>
+      <a class="cta-small" href="dashboard.html">Start free trial</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">★ The intelligence platform for UK trades</span>
+    <h1>Run your trade business. <em>Get smarter</em> every invoice.</h1>
+    <p class="sub">PrimeLevel handles your invoicing and chasing payments — then turns every job into pricing intelligence no other tool can give you. Built to grow with you, from a one-van operation to a full team.</p>
+
+    <form class="signup-card" id="signupForm">
+      <div class="field-lbl">Business name</div>
+      <input type="text" placeholder="Reeve Plumbing & Heating">
+      <div class="field-lbl">Email</div>
+      <input type="email" placeholder="you@yourbusiness.co.uk">
+      <div class="field-lbl">Password</div>
+      <input type="password" placeholder="••••••••">
+      <button type="submit" class="cta-main">Start my free 14-day trial →</button>
+      <div class="card-note">No card required · full access from day one</div>
+    </form>
+    <p class="trust-line">Your data is <b>always yours</b> — export any time. Never sold to anyone outside PrimeLevel customers.</p>
+  </section>
+
+  <div class="section-label">How it works</div>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <h3>Sign up in a minute</h3>
+      <p>No card, no sales call. Create your account and you're straight into a working dashboard.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <h3>Run your invoicing</h3>
+      <p>Send invoices, chase payments automatically, track renewals — the everyday tool your business actually needs.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <h3>Unlock real intelligence</h3>
+      <p>See how your pricing compares locally, when demand peaks, and where to find your next best client — upgrade yourself, any time.</p>
+    </div>
+  </div>
+
+  <div class="moat-band">
+    <div class="moat-inner">
+      <div class="section-label">Built to scale</div>
+      <h2>A platform, not just a tool</h2>
+      <p>PrimeLevel isn't a static app — it's a growing platform. Every invoice makes the whole system smarter for every tradesperson on it, while your own data stays entirely yours. <b>One flat price, unlimited users, no volume caps</b> — designed from the ground up for a business that's growing, not shrinking to fit a per-seat bill.</p>
+      <div class="moat-tags">
+        <span class="moat-tag">Unlimited users, always</span>
+        <span class="moat-tag">Data never sold outside PrimeLevel</span>
+        <span class="moat-tag">Cancel or downgrade anytime</span>
+        <span class="moat-tag">Export your data, any time</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card"><div class="ic">📄</div><h4>Invoicing</h4><p>Create, send, and track invoices in seconds.</p></div>
+    <div class="feature-card"><div class="ic">🔔</div><h4>Auto payment chasing</h4><p>Multi-step reminders so you don't have to.</p></div>
+    <div class="feature-card"><div class="ic">🛡️</div><h4>Renewal tracking</h4><p>Licenses, insurance, MOT — never miss a deadline.</p></div>
+    <div class="feature-card"><div class="ic">📊</div><h4>Pricing intelligence</h4><p>See how you compare to trades near you.</p></div>
+  </div>
+
+  <div class="final-cta">
+    <h2>Try it free for 14 days</h2>
+    <p>No card required. See your dashboard in under a minute.</p>
+    <a class="cta-small" style="padding:13px 26px; font-size:14px;" href="dashboard.html">Start free trial →</a>
+  </div>
+
+  <footer>PrimeLevel · Built for UK tradespeople · primelevel.co.uk</footer>
+
+  <script>
+    // No real signup/auth yet (see DECISIONS_LOG.md) -- submitting just
+    // takes you straight to the dashboard so the whole flow can be seen
+    // end to end. Once real Supabase auth exists, this becomes a genuine
+    // account-creation call instead, landing on the same page.
+    document.getElementById('signupForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+
 </body>
 </html>
