@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel Renewals</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
+    --info:#3D5A80; --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
+  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
+  :root[data-theme="dark"] .sidebar{ background:var(--surface-2); }
+  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface-2); } }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
+  .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
+  .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
+  .tab.active .dot{background:var(--brand-gold);}
+  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
+
+  main{ padding:32px 40px 64px; max-width:1040px; }
+  .page-head{ margin-bottom:26px; }
+  .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; }
+  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; max-width:60ch; line-height:1.5; }
+
+  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:22px 24px; margin-bottom:22px; }
+  .panel h2{ font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin:0 0 4px; }
+  .panel .desc{ font-size:12.5px; color:var(--text-faint); margin:0 0 18px; line-height:1.5; }
+
+  .renewal-row{ display:flex; align-items:center; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); }
+  .renewal-row:last-child{ border-bottom:none; }
+  .renewal-row .name{ flex:1; font-size:13.5px; font-weight:600; }
+  .renewal-row .type{ font-size:11.5px; color:var(--text-faint); margin-top:2px; }
+  .countdown{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:100px; flex:none; }
+  .countdown.ok{ background:var(--good-bg); color:var(--good); }
+  .countdown.soon{ background:var(--warn-bg); color:var(--warn); }
+  .add-renewal{ margin-top:14px; background:none; border:1px dashed var(--border); color:var(--text-soft); border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; cursor:pointer; width:100%; text-align:center; }
+
+  /* add-item form, matches the panel's own visual language -- no new
+     colors/fonts introduced, just the existing tokens */
+  .add-form{ margin-top:14px; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:10px; }
+  .add-form[hidden]{ display:none; }
+  .add-form .field-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .add-form label{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); display:block; margin-bottom:4px; }
+  .add-form input{
+    flex:1; min-width:140px; height:36px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:8px; padding:0 11px; font-size:13px; color:var(--text); font-family:'Archivo',sans-serif;
+  }
+  .add-form input:focus{ outline:2px solid var(--brand-gold); outline-offset:1px; }
+  .add-form .btn-row{ display:flex; gap:8px; justify-content:flex-end; }
+  .add-form .save-btn{ background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:8px; padding:9px 16px; font-weight:600; font-size:12.5px; cursor:pointer; }
+  :root[data-theme="dark"] .add-form .save-btn{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .add-form .save-btn{ background:var(--brand-gold); color:#1A1406; } }
+  .add-form .cancel-btn{ background:none; border:1px solid var(--border); color:var(--text-soft); border-radius:8px; padding:9px 16px; font-weight:600; font-size:12.5px; cursor:pointer; }
+  .add-form .form-error{ font-size:12px; color:var(--warn); }
+
+  @media (max-width:920px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
+    nav.tabs{ flex-direction:row; }
+    .sidebar-foot{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <nav class="tabs">
+      <a class="tab" href="dashboard.html"><span class="dot"></span>Dashboard</a>
+      <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
+      <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
+      <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
+      <a class="tab active" href="renewals.html"><span class="dot"></span>Renewals</a>
+      <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
+    </nav>
+    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+  </aside>
+
+  <main>
+    <div class="page-head">
+      <h1>Renewals &amp; compliance</h1>
+      <p>Track licenses, certifications, and cover that need renewing — see them coming well before they lapse. No competitor tracks this for you; it's included free with every plan.</p>
+    </div>
+
+    <div class="panel">
+      <div id="renewalsList">
+        <div class="renewal-row">
+          <div><div class="name">Gas Safe registration</div><div class="type">License</div></div>
+          <span class="countdown ok">88 days</span>
+        </div>
+        <div class="renewal-row">
+          <div><div class="name">Public liability insurance</div><div class="type">Insurance</div></div>
+          <span class="countdown soon">25 days</span>
+        </div>
+        <div class="renewal-row">
+          <div><div class="name">Van MOT</div><div class="type">Vehicle</div></div>
+          <span class="countdown ok">142 days</span>
+        </div>
+        <div class="renewal-row">
+          <div><div class="name">PAT testing certificate</div><div class="type">Certification</div></div>
+          <span class="countdown soon">17 days</span>
+        </div>
+      </div>
+
+      <button class="add-renewal" id="addRenewalToggle">+ Add something to track</button>
+
+      <form class="add-form" id="addRenewalForm" hidden>
+        <div class="field-row">
+          <div style="flex:1; min-width:140px;">
+            <label for="renewalName">Name</label>
+            <input type="text" id="renewalName" placeholder="e.g. Gas Safe registration" required>
+          </div>
+          <div style="flex:1; min-width:140px;">
+            <label for="renewalType">Type</label>
+            <input type="text" id="renewalType" placeholder="e.g. License, Insurance, Vehicle" required>
+          </div>
+          <div style="flex:1; min-width:140px;">
+            <label for="renewalDate">Expires on</label>
+            <input type="date" id="renewalDate" required>
+          </div>
+        </div>
+        <div class="form-error" id="renewalFormError" hidden></div>
+        <div class="btn-row">
+          <button type="button" class="cancel-btn" id="cancelRenewalBtn">Cancel</button>
+          <button type="submit" class="save-btn">Save</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+<script>
+  // Client-side only for now, per this project's phasing (layout/mechanism
+  // first, Supabase wiring later -- see DECISIONS_LOG.md). A newly added
+  // item shows immediately and behaves exactly like the seeded ones, but
+  // resets on page reload until real persistence exists. When that lands,
+  // this same add-row logic stays -- only the "where it's saved" part
+  // changes, from appending to the DOM to also writing a real row.
+  const toggleBtn = document.getElementById('addRenewalToggle');
+  const form = document.getElementById('addRenewalForm');
+  const cancelBtn = document.getElementById('cancelRenewalBtn');
+  const list = document.getElementById('renewalsList');
+  const errorEl = document.getElementById('renewalFormError');
+
+  function showForm() {
+    form.hidden = false;
+    toggleBtn.hidden = true;
+    document.getElementById('renewalName').focus();
+  }
+  function hideForm() {
+    form.reset();
+    errorEl.hidden = true;
+    form.hidden = true;
+    toggleBtn.hidden = false;
+  }
+
+  toggleBtn.addEventListener('click', showForm);
+  cancelBtn.addEventListener('click', hideForm);
+
+  function daysUntil(dateStr) {
+    // Whole-day difference, ignoring time-of-day on both sides so
+    // "today" and "the expiry date" compare as calendar days, not
+    // fractional hours.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(dateStr + 'T00:00:00');
+    return Math.round((target - today) / 86400000);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('renewalName').value.trim();
+    const type = document.getElementById('renewalType').value.trim();
+    const dateStr = document.getElementById('renewalDate').value;
+
+    if (!name || !type || !dateStr) {
+      errorEl.textContent = 'Please fill in all three fields.';
+      errorEl.hidden = false;
+      return;
+    }
+    const days = daysUntil(dateStr);
+    if (days < 0) {
+      errorEl.textContent = 'That date has already passed -- pick a future date.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    const row = document.createElement('div');
+    row.className = 'renewal-row';
+    // Same "soon" threshold already visible in the seeded data (17/25 days
+    // read as "soon", 88/142 read as "ok") -- 30 days is the natural
+    // dividing line between those real examples.
+    const urgency = days <= 30 ? 'soon' : 'ok';
+    row.innerHTML =
+      '<div><div class="name"></div><div class="type"></div></div>' +
+      '<span class="countdown ' + urgency + '"></span>';
+    row.querySelector('.name').textContent = name;
+    row.querySelector('.type').textContent = type;
+    row.querySelector('.countdown').textContent = days + (days === 1 ? ' day' : ' days');
+    list.appendChild(row);
+
+    hideForm();
+  });
+</script>
+</body>
+</html>

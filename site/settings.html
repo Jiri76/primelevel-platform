@@ -119,6 +119,7 @@
       <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
       <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
       <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
+      <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab active" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
@@ -176,28 +177,6 @@
     </div>
 
     <div class="panel">
-      <h2>Renewals &amp; compliance</h2>
-      <p class="desc">Track licenses, certifications, and cover that need renewing — see them coming well before they lapse.</p>
-      <div class="renewal-row">
-        <div><div class="name">Gas Safe registration</div><div class="type">License</div></div>
-        <span class="countdown ok">88 days</span>
-      </div>
-      <div class="renewal-row">
-        <div><div class="name">Public liability insurance</div><div class="type">Insurance</div></div>
-        <span class="countdown soon">25 days</span>
-      </div>
-      <div class="renewal-row">
-        <div><div class="name">Van MOT</div><div class="type">Vehicle</div></div>
-        <span class="countdown ok">142 days</span>
-      </div>
-      <div class="renewal-row">
-        <div><div class="name">PAT testing certificate</div><div class="type">Certification</div></div>
-        <span class="countdown soon">17 days</span>
-      </div>
-      <button class="add-renewal">+ Add something to track</button>
-    </div>
-
-    <div class="panel">
       <h2>Your data</h2>
       <p class="desc">Your data is always yours — export it any time, no request needed.</p>
       <div class="row-item">
@@ -205,7 +184,7 @@
           <div class="t">Export everything</div>
           <div class="d">All invoices, clients, and job history, in a usable format. Available any time, not gated behind a support request.</div>
         </div>
-        <button class="export-btn">Export data ↓</button>
+        <button class="export-btn" id="exportInvoicesBtn">Export data ↓</button>
       </div>
     </div>
 
@@ -234,5 +213,47 @@
     </div>
   </main>
 </div>
+<script>
+  // Real CSV export -- genuinely produces and downloads a file. The rows
+  // below are the same illustrative invoices shown on the Invoices page
+  // (this is a static prototype, no backend yet -- see DATA_MODEL.md);
+  // once real Supabase data exists, this array is replaced by a real
+  // query for the signed-in account's own invoices, and everything else
+  // in this function (CSV building, the actual download) stays the same.
+  const EXAMPLE_INVOICES = [
+    { invoice: '#0142', client: 'M. Okafor',  job: 'Combi boiler install',        sent: '2026-09-01', status: 'Due 8 Sep',      amount: 1840.00 },
+    { invoice: '#0141', client: 'S. Whitfield', job: 'Annual boiler service',     sent: '2026-08-29', status: 'Paid',           amount: 78.00 },
+    { invoice: '#0140', client: 'R. Patel',    job: 'Radiator replacement x2',    sent: '2026-08-21', status: 'Overdue 5 days', amount: 530.00 },
+    { invoice: '#0139', client: 'J. Carrick',  job: 'Bathroom re-pipe',           sent: '2026-08-18', status: 'Paid',           amount: 1120.00 },
+    { invoice: '#0138', client: 'A. Novak',    job: 'Emergency callout - no heat',sent: '2026-08-16', status: 'Overdue 9 days', amount: 185.00 },
+    { invoice: '#0137', client: 'Draft - no client yet', job: 'Kitchen tap replacement', sent: '',    status: 'Draft',          amount: 95.00 },
+    { invoice: '#0136', client: 'L. Higgins',  job: 'Full central heating service', sent: '2026-08-09', status: 'Paid',        amount: 310.00 },
+  ];
+
+  function csvField(value) {
+    const s = String(value);
+    // Quote any field containing a comma, quote, or newline, doubling
+    // internal quotes -- the standard CSV escaping rule, not a guess.
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function downloadInvoicesCsv() {
+    const header = ['Invoice', 'Client', 'Job', 'Sent', 'Status', 'Amount (GBP)'];
+    const rows = EXAMPLE_INVOICES.map(inv => [inv.invoice, inv.client, inv.job, inv.sent, inv.status, inv.amount.toFixed(2)]);
+    const csv = [header, ...rows].map(row => row.map(csvField).join(',')).join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'primelevel-invoices-export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('exportInvoicesBtn').addEventListener('click', downloadInvoicesCsv);
+</script>
 </body>
 </html>

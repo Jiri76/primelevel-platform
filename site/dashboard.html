@@ -70,7 +70,8 @@
     flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px;
     padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer;
   }
-  :root[data-theme="dark"] .new-invoice, @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
+  :root[data-theme="dark"] .new-invoice{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
 
   /* stat row */
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
@@ -141,6 +142,7 @@
       <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
       <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
       <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
+      <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
