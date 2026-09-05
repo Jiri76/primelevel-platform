@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel — New Invoice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- App shell -- identical design system to every other page ---------- */
+  :root{
+    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
+    --info:#3D5A80; --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
+  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
+  :root[data-theme="dark"] .sidebar{ background:var(--surface-2); }
+  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface-2); } }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
+  .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
+  .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
+  .tab.active .dot{background:var(--brand-gold);}
+  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
+
+  main{ padding:32px 40px 64px; }
+  #formView{ max-width:640px; }
+  .page-head{ margin-bottom:26px; }
+  .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; }
+  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
+
+  /* ---------- Form -- same fields as JobFormScreen.js in the app, deliberately identical ---------- */
+  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:26px 28px 28px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:12px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+  .field input, .field textarea{
+    width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; font-size:14px; color:var(--text); font-family:'Archivo',sans-serif;
+  }
+  .field input:focus, .field textarea:focus{ outline:2px solid var(--brand-gold); outline-offset:1px; }
+  .field textarea{ resize:vertical; min-height:70px; }
+  .char-count{ text-align:right; font-size:11px; color:var(--text-faint); margin-top:4px; }
+  .field .err{ font-size:12px; color:var(--warn); margin-top:5px; }
+  .status-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .status-btn{
+    flex:1; min-width:120px; padding:10px 12px; border-radius:9px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-soft); font-size:13px; font-weight:600; cursor:pointer; text-align:center;
+  }
+  .status-btn.active{ background:var(--brand-navy); color:#F7F4EC; border-color:var(--brand-navy); }
+  :root[data-theme="dark"] .status-btn.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); }
+  @media (prefers-color-scheme:dark){ .status-btn.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); } }
+  .submit-btn{
+    width:100%; margin-top:8px; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:10px;
+    padding:13px; font-weight:700; font-size:14.5px; cursor:pointer;
+  }
+  :root[data-theme="dark"] .submit-btn{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .submit-btn{ background:var(--brand-gold); color:#1A1406; } }
+  .note{ font-size:12px; color:var(--text-faint); margin-top:14px; line-height:1.5; }
+
+  /* ---------- The real invoice output -- deliberately its OWN design, not the app's navy/gold UI.
+     A printed invoice is the tradesperson's own client-facing document, not a PrimeLevel-branded
+     screen -- copied from the real "PrimeLevel invoice — final template" design (Montserrat,
+     near-black/white, A4), not reinvented. ---------- */
+  .invoice-wrap{ display:none; }
+  .invoice-wrap.showing{ display:block; }
+  .invoice-toolbar{ max-width:794px; margin:0 auto 16px; display:flex; justify-content:space-between; align-items:center; }
+  .invoice-toolbar .back-link{ font-size:13px; font-weight:600; color:var(--info); text-decoration:none; }
+  .print-btn{
+    background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px; padding:10px 18px;
+    font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer;
+  }
+  :root[data-theme="dark"] .print-btn{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .print-btn{ background:var(--brand-gold); color:#1A1406; } }
+
+  .a4-wrap{ overflow-x:auto; width:100%; display:flex; justify-content:center; padding-bottom:24px; }
+  .a4-frame{
+    width:794px; min-height:1123px; flex-shrink:0;
+    background:#FFFFFF; color:#1A1A1A;
+    box-shadow:0 1px 3px rgba(0,0,0,0.14), 0 10px 28px rgba(0,0,0,0.10);
+    padding:3.125rem;
+    font-family:'Montserrat',sans-serif;
+  }
+  .a4-frame .head{ display:flex; align-items:flex-start; justify-content:space-between; }
+  .a4-frame .biz-block{ display:flex; align-items:center; gap:20px; }
+  .a4-frame .logo{
+    width:100px; height:100px; border:1.5px solid #1A1A1A; border-radius:4px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:400; letter-spacing:0.02em; flex-shrink:0;
+  }
+  .a4-frame .eyebrow{ font-size:25px; letter-spacing:0.14em; text-transform:uppercase; color:#8A8A8A; font-weight:400; margin:0 0 25px; }
+  .a4-frame .biz-name{ font-size:25px; font-weight:400; margin:0; letter-spacing:-0.01em; }
+  .a4-frame .meta{ text-align:right; font-size:15px; color:#1A1A1A; line-height:1.5; }
+  .a4-frame .rule{ height:1.5px; background:#8A8A8A; border:none; margin:25px 0; }
+  .a4-frame .cols{ display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; font-size:15px; line-height:1.5; }
+  .a4-frame .col-label{ font-size:18px; letter-spacing:0.05em; text-transform:uppercase; color:#8A8A8A; font-weight:400; margin:0 0 10px; }
+  .a4-frame .addr-line{ margin:0 0 5px; }
+  .a4-frame .addr-line:last-child{ margin-bottom:0; }
+  .a4-frame .cols .right{ text-align:right; }
+  .a4-frame .job-desc{ margin-top:50px; font-size:15px; line-height:1.5; }
+  .a4-frame .amount{ margin-top:50px; display:flex; justify-content:space-between; align-items:baseline; }
+  .a4-frame .amount .lbl{ font-size:18px; letter-spacing:0.05em; text-transform:uppercase; color:#8A8A8A; font-weight:400; }
+  .a4-frame .amount .amt{ font-size:15px; font-weight:700; letter-spacing:-0.01em; }
+  .a4-frame .footer{ margin-top:25px; font-size:15px; color:#1A1A1A; line-height:1.5; }
+  .a4-frame .footer strong{ color:#1A1A1A; font-weight:700; }
+  .a4-frame .footer p{ margin:0 0 5px; }
+  .a4-frame .footer p:first-child{ margin-bottom:25px; }
+  .a4-frame .footer p:last-child{ margin-top:25px; }
+
+  @media print{
+    .sidebar, .invoice-toolbar, .page-head{ display:none !important; }
+    main{ padding:0; max-width:none; }
+    .a4-wrap{ padding:0; }
+    .a4-frame{ box-shadow:none; width:auto; min-height:0; }
+  }
+
+  @media (max-width:920px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
+    nav.tabs{ flex-direction:row; }
+    .sidebar-foot{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <nav class="tabs">
+      <a class="tab" href="dashboard.html"><span class="dot"></span>Dashboard</a>
+      <a class="tab active" href="invoices.html"><span class="dot"></span>Invoices</a>
+      <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
+      <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
+      <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
+      <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
+    </nav>
+    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+  </aside>
+
+  <main>
+    <!-- ============ THE FORM ============ -->
+    <div id="formView">
+      <div class="page-head">
+        <h1>New invoice</h1>
+        <p>Same fields as the PrimeLevel app — fill in on a computer, generate a real printable invoice.</p>
+      </div>
+
+      <form class="panel" id="invoiceForm" novalidate>
+        <div class="field">
+          <label for="clientName">Client Name</label>
+          <input type="text" id="clientName" placeholder="e.g. John Smith">
+          <div class="err" id="err-clientName" hidden></div>
+        </div>
+        <div class="field">
+          <label for="clientPhone">Client Phone</label>
+          <input type="text" id="clientPhone" placeholder="07123456789" maxlength="11" inputmode="numeric">
+          <div class="err" id="err-clientPhone" hidden></div>
+        </div>
+        <div class="field">
+          <label for="clientEmail">Client Email</label>
+          <input type="email" id="clientEmail" placeholder="client@example.com">
+          <div class="err" id="err-clientEmail" hidden></div>
+        </div>
+        <div class="field">
+          <label for="jobDescription">Job Description</label>
+          <textarea id="jobDescription" maxlength="250" placeholder="Describe the work carried out..."></textarea>
+          <div class="char-count"><span id="descCount">0</span>/250</div>
+          <div class="err" id="err-jobDescription" hidden></div>
+        </div>
+        <div class="field">
+          <label for="amount">Amount (£)</label>
+          <input type="text" id="amount" placeholder="0.00" inputmode="decimal">
+          <div class="err" id="err-amount" hidden></div>
+        </div>
+        <div class="field">
+          <label for="jobDate">Job Date</label>
+          <input type="date" id="jobDate">
+          <div class="err" id="err-jobDate" hidden></div>
+        </div>
+        <div class="field">
+          <label>Payment Status</label>
+          <div class="status-row" id="statusRow">
+            <button type="button" class="status-btn active" data-status="Unpaid">Unpaid</button>
+            <button type="button" class="status-btn" data-status="Paid Cash">Paid Cash</button>
+            <button type="button" class="status-btn" data-status="Paid Bank Transfer">Paid Bank Transfer</button>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">Create invoice →</button>
+        <p class="note">This creates a real printable invoice below, using the same layout as PrimeLevel's actual invoice template. No backend yet — nothing is saved once you leave this page (see DECISIONS_LOG.md).</p>
+      </form>
+    </div>
+
+    <!-- ============ THE REAL PRINTABLE INVOICE ============ -->
+    <div class="invoice-wrap" id="invoiceView">
+      <div class="invoice-toolbar">
+        <a href="#" class="back-link" id="backToForm">← Edit / create another</a>
+        <button class="print-btn" id="printBtn">Print / Save as PDF ↓</button>
+      </div>
+      <div class="a4-wrap">
+        <div class="a4-frame">
+          <div class="head">
+            <div>
+              <p class="eyebrow">Invoice</p>
+              <div class="biz-block">
+                <div class="logo" id="logoInitials">RP</div>
+                <p class="biz-name">Reeve Plumbing &amp; Heating</p>
+              </div>
+            </div>
+            <div class="meta">
+              <p class="addr-line" id="outInvoiceNumber">INV-0000</p>
+              <p class="addr-line" id="outDate">1 January 2026</p>
+            </div>
+          </div>
+          <hr class="rule" />
+          <div class="cols">
+            <div>
+              <p class="col-label">From</p>
+              <p class="addr-line">Reeve Plumbing &amp; Heating</p>
+              <p class="addr-line">14 Foundry Lane, Croydon, CR0 2QW</p>
+              <p class="addr-line">020 7946 0958</p>
+            </div>
+            <div class="right">
+              <p class="col-label">Bill to</p>
+              <span id="outClientName">Client name</span>
+            </div>
+          </div>
+          <div class="job-desc" id="outJobDescription">Job description.</div>
+          <div class="amount">
+            <span class="lbl">Total due</span>
+            <span class="amt num" id="outAmount">£0.00</span>
+          </div>
+          <div class="footer">
+            <p>When paying by bank transfer, use the following details:</p>
+            <p>Sort code: <strong>00-00-00</strong></p>
+            <p>Account number: <strong>00000000</strong></p>
+            <p>Payment reference: <span id="outRefNumber">INV-0000</span></p>
+            <p>Thank you for your business.</p>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="max-width:794px; margin:0 auto;">
+        Business details ("From" address, bank sort code/account) are placeholders — these belong in a real
+        Business Profile section in Settings, not yet built (flagged in DATA_MODEL.md as a real gap this
+        surfaced). Everything else here — layout, fields, wording — matches the actual "PrimeLevel invoice —
+        final template" design exactly.
+      </p>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ---- Same validation rules as JobFormScreen.js in the app, kept identical ----
+  const UK_PHONE_REGEX = /^07\d{9}$/;
+  const EMAIL_REGEX = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+  const DESCRIPTION_MAX_LENGTH = 250;
+
+  const form = document.getElementById('invoiceForm');
+  const descInput = document.getElementById('jobDescription');
+  const descCount = document.getElementById('descCount');
+  const statusRow = document.getElementById('statusRow');
+  let selectedStatus = 'Unpaid';
+
+  descInput.addEventListener('input', () => {
+    descCount.textContent = descInput.value.length;
+  });
+
+  statusRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.status-btn');
+    if (!btn) return;
+    statusRow.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedStatus = btn.dataset.status;
+  });
+
+  // Same amount sanitiser as the app: strips non-numeric chars, allows at
+  // most one decimal point, caps the fractional part at 2 digits.
+  const amountInput = document.getElementById('amount');
+  amountInput.addEventListener('input', () => {
+    const v = amountInput.value;
+    const cleaned = v.replace(/[^0-9.]/g, '');
+    const firstDot = cleaned.indexOf('.');
+    if (firstDot === -1) { amountInput.value = cleaned; return; }
+    const wholePart = cleaned.slice(0, firstDot + 1);
+    const fractionalPart = cleaned.slice(firstDot + 1).replace(/\./g, '');
+    amountInput.value = wholePart + fractionalPart.slice(0, 2);
+  });
+
+  function showError(field, message) {
+    const el = document.getElementById('err-' + field);
+    el.textContent = message;
+    el.hidden = false;
+  }
+  function clearErrors() {
+    document.querySelectorAll('.err').forEach(el => { el.hidden = true; el.textContent = ''; });
+  }
+
+  function validate() {
+    clearErrors();
+    let ok = true;
+    const clientName = document.getElementById('clientName').value.trim();
+    const clientPhone = document.getElementById('clientPhone').value.trim();
+    const clientEmail = document.getElementById('clientEmail').value.trim();
+    const jobDescription = descInput.value.trim();
+    const amount = amountInput.value.trim();
+    const jobDate = document.getElementById('jobDate').value;
+
+    if (!clientName) { showError('clientName', 'Client name is required.'); ok = false; }
+    if (!clientPhone) { showError('clientPhone', 'Phone number is required.'); ok = false; }
+    else if (!UK_PHONE_REGEX.test(clientPhone)) { showError('clientPhone', 'Phone must be 11 digits starting with 07.'); ok = false; }
+    if (!clientEmail) { showError('clientEmail', 'Email is required.'); ok = false; }
+    else if (!EMAIL_REGEX.test(clientEmail)) { showError('clientEmail', 'Please enter a valid email address (e.g., name@example.com)'); ok = false; }
+    if (!jobDescription) { showError('jobDescription', 'Job description is required.'); ok = false; }
+    else if (jobDescription.length > DESCRIPTION_MAX_LENGTH) { showError('jobDescription', 'Description max 250 characters.'); ok = false; }
+    if (!amount) { showError('amount', 'Amount is required.'); ok = false; }
+    else if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) { showError('amount', 'Amount must be greater than £0.'); ok = false; }
+    if (!jobDate) { showError('jobDate', 'Job date is required.'); ok = false; }
+
+    return ok ? { clientName, clientPhone, clientEmail, jobDescription, amount: parseFloat(amount), jobDate, paymentStatus: selectedStatus } : null;
+  }
+
+  // Simple prototype invoice numbering -- localStorage-backed counter,
+  // continuing from the Invoices list's last shown number (#0142). No
+  // backend exists yet (see DECISIONS_LOG.md); once Supabase does, this
+  // becomes a real per-account sequential number instead.
+  function nextInvoiceNumber() {
+    const key = 'primelevel_prototype_invoice_counter';
+    let n = parseInt(localStorage.getItem(key) || '142', 10);
+    n += 1;
+    localStorage.setItem(key, String(n));
+    return 'INV-' + String(n).padStart(4, '0');
+  }
+
+  function formatMoney(n) {
+    return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // "19 July 2026" style, matching the real template exactly.
+  function formatLongDate(isoDateStr) {
+    const d = new Date(isoDateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = validate();
+    if (!data) return;
+
+    const invNumber = nextInvoiceNumber();
+    document.getElementById('outInvoiceNumber').textContent = invNumber;
+    document.getElementById('outRefNumber').textContent = invNumber;
+    document.getElementById('outDate').textContent = formatLongDate(data.jobDate);
+    document.getElementById('outClientName').textContent = data.clientName;
+    document.getElementById('outJobDescription').textContent = data.jobDescription;
+    document.getElementById('outAmount').textContent = formatMoney(data.amount);
+
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('invoiceView').classList.add('showing');
+    window.scrollTo(0, 0);
+  });
+
+  document.getElementById('backToForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('invoiceView').classList.remove('showing');
+    document.getElementById('formView').style.display = '';
+  });
+
+  document.getElementById('printBtn').addEventListener('click', () => {
+    window.print();
+  });
+</script>
+</body>
+</html>
