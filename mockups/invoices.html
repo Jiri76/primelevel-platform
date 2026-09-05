@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel Invoices</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
+    --info:#3D5A80; --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
+  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
+  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface-2); } }
+  :root[data-theme="dark"] .sidebar{ background:var(--surface-2); }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
+  .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
+  .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
+  .tab.active .dot{background:var(--brand-gold);}
+  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
+
+  main{ padding:32px 40px 64px; max-width:1120px; }
+  .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:22px; }
+  .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; }
+  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
+  .new-invoice{ flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px; padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+  :root[data-theme="dark"] .new-invoice{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
+
+  /* toolbar */
+  .toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .filter-pills{ display:flex; gap:6px; }
+  .fpill{ font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:100px; border:1px solid var(--border); background:var(--surface); color:var(--text-soft); cursor:pointer; }
+  .fpill.active{ background:var(--brand-navy); color:#F7F4EC; border-color:var(--brand-navy); }
+  :root[data-theme="dark"] .fpill.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); }
+  .search{ margin-left:auto; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:8px 12px; font-size:13px; color:var(--text-faint); min-width:220px; }
+
+  .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px; }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{ text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); padding:13px 18px; border-bottom:1px solid var(--border); }
+  tbody td{ padding:13px 18px; font-size:13.5px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover td{ background:var(--surface-2); }
+  td.amt{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; text-align:right; }
+  td.job-cell .client{ font-weight:600; color:var(--text); }
+  td.job-cell .desc{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  td.inv-no{ font-family:'IBM Plex Mono',ui-monospace,monospace; color:var(--text-faint); font-size:12px; }
+  .status{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; padding:4px 9px; border-radius:100px; }
+  .status.paid{ color:var(--good); background:var(--good-bg); }
+  .status.due{ color:var(--info); background:var(--info-bg); }
+  .status.overdue{ color:var(--warn); background:var(--warn-bg); }
+  .status.draft{ color:var(--text-faint); background:var(--surface-2); }
+  .row-action{ font-size:12px; color:var(--info); font-weight:600; text-decoration:none; }
+
+  .pager{ display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--text-faint); }
+  .pager .btns{ display:flex; gap:6px; }
+  .pgbtn{ border:1px solid var(--border); background:var(--surface); border-radius:7px; padding:6px 11px; color:var(--text-soft); font-size:12.5px; cursor:pointer; }
+
+  @media (max-width:920px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
+    nav.tabs{ flex-direction:row; }
+    .sidebar-foot{ display:none; }
+    table{ font-size:12.5px; }
+    .search{ min-width:140px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <nav class="tabs">
+      <a class="tab" href="#"><span class="dot"></span>Dashboard</a>
+      <a class="tab active" href="#"><span class="dot"></span>Invoices</a>
+      <a class="tab" href="#"><span class="dot"></span>Payments</a>
+      <a class="tab" href="#"><span class="dot"></span>Insights</a>
+      <a class="tab" href="#"><span class="dot"></span>Settings</a>
+    </nav>
+    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+  </aside>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>Invoices</h1>
+        <p>Every invoice you've sent, all in one place.</p>
+      </div>
+      <button class="new-invoice">+ New invoice</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-pills">
+        <button class="fpill active">All (52)</button>
+        <button class="fpill">Due (6)</button>
+        <button class="fpill">Overdue (4)</button>
+        <button class="fpill">Paid (41)</button>
+        <button class="fpill">Draft (1)</button>
+      </div>
+      <div class="search">🔍 Search client or job…</div>
+    </div>
+
+    <div class="invoice-panel">
+      <table>
+        <thead>
+          <tr><th>Invoice</th><th>Client &amp; job</th><th>Sent</th><th>Status</th><th style="text-align:right;">Amount</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="inv-no">#0142</td>
+            <td class="job-cell"><div class="client">M. Okafor</div><div class="desc">Combi boiler install</div></td>
+            <td>1 Sep</td>
+            <td><span class="status due">Due 8 Sep</span></td>
+            <td class="amt">£1,840.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0141</td>
+            <td class="job-cell"><div class="client">S. Whitfield</div><div class="desc">Annual boiler service</div></td>
+            <td>29 Aug</td>
+            <td><span class="status paid">Paid</span></td>
+            <td class="amt">£78.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0140</td>
+            <td class="job-cell"><div class="client">R. Patel</div><div class="desc">Radiator replacement ×2</div></td>
+            <td>21 Aug</td>
+            <td><span class="status overdue">Overdue 5 days</span></td>
+            <td class="amt">£530.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0139</td>
+            <td class="job-cell"><div class="client">J. Carrick</div><div class="desc">Bathroom re-pipe</div></td>
+            <td>18 Aug</td>
+            <td><span class="status paid">Paid</span></td>
+            <td class="amt">£1,120.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0138</td>
+            <td class="job-cell"><div class="client">A. Novak</div><div class="desc">Emergency callout — no heat</div></td>
+            <td>16 Aug</td>
+            <td><span class="status overdue">Overdue 9 days</span></td>
+            <td class="amt">£185.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0137</td>
+            <td class="job-cell"><div class="client">Draft — no client yet</div><div class="desc">Kitchen tap replacement</div></td>
+            <td>—</td>
+            <td><span class="status draft">Draft</span></td>
+            <td class="amt">£95.00</td>
+            <td><a class="row-action" href="#">Edit →</a></td>
+          </tr>
+          <tr>
+            <td class="inv-no">#0136</td>
+            <td class="job-cell"><div class="client">L. Higgins</div><div class="desc">Full central heating service</div></td>
+            <td>9 Aug</td>
+            <td><span class="status paid">Paid</span></td>
+            <td class="amt">£310.00</td>
+            <td><a class="row-action" href="#">View →</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing 1–7 of 52 invoices</span>
+      <div class="btns"><button class="pgbtn">← Previous</button><button class="pgbtn">Next →</button></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

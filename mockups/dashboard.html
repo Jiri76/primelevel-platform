@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F9F9FA;
+    --surface:#FFFFFF;
+    --surface-2:#F1EFE9;
+    --border:#E3DFD3;
+    --text:#1E2633;
+    --text-soft:#5C6472;
+    --text-faint:#8B92A0;
+    --brand-navy:#1E2633;
+    --brand-gold:#B29B68;
+    --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B;
+    --good-bg:#E6F1EB;
+    --warn:#B4552B;
+    --warn-bg:#F6E7DE;
+    --info:#3D5A80;
+    --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
+
+  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
+  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface-2); } }
+  :root[data-theme="dark"] .sidebar{ background:var(--surface-2); }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
+  .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
+  .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
+  .tab.active .dot{background:var(--brand-gold);}
+  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
+
+  main{ padding:32px 40px 64px; max-width:1120px; }
+  .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:26px; }
+  .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; text-wrap:balance; }
+  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
+  .new-invoice{
+    flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px;
+    padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer;
+  }
+  :root[data-theme="dark"] .new-invoice, @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
+
+  /* stat row */
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
+  .stat-card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
+  .stat-card .lbl{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); margin-bottom:8px; }
+  .stat-card .val{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; color:var(--text); }
+  .stat-card .sub{ font-size:11.5px; color:var(--good); margin-top:4px; font-weight:600; }
+  .stat-card .sub.warn{ color:var(--warn); }
+  .stat-card .sub.neutral{ color:var(--text-faint); font-weight:500; }
+
+  .section-label{ display:flex; align-items:baseline; justify-content:space-between; margin:0 0 14px; }
+  .section-label span.t{ font-size:11.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-faint); }
+  .section-label a{ font-size:12.5px; color:var(--info); text-decoration:none; font-weight:600; }
+
+  /* invoice table */
+  .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:40px; }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{ text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); padding:13px 18px; border-bottom:1px solid var(--border); }
+  tbody td{ padding:13px 18px; font-size:13.5px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  td.amt{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; text-align:right; }
+  td.job-cell .client{ font-weight:600; color:var(--text); }
+  td.job-cell .desc{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  .status{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; padding:4px 9px; border-radius:100px; }
+  .status.paid{ color:var(--good); background:var(--good-bg); }
+  .status.due{ color:var(--info); background:var(--info-bg); }
+  .status.overdue{ color:var(--warn); background:var(--warn-bg); }
+
+  /* insights grid */
+  .insight-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .insight-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:16px 17px;
+    box-shadow:var(--shadow); text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:10px;
+  }
+  .insight-card .top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .insight-card .icon{ width:26px;height:26px;border-radius:7px; display:flex;align-items:center;justify-content:center; font-size:13px; flex:none; }
+  .insight-card .title{ font-size:13px; font-weight:600; color:var(--text); }
+  .insight-card .stat{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:19px; font-weight:600; }
+  .insight-card .stat.good{ color:var(--good); }
+  .insight-card .stat.warn{ color:var(--warn); }
+  .insight-card .stat.info{ color:var(--info); }
+  .insight-card .caption{ font-size:12px; color:var(--text-soft); line-height:1.5; }
+  .insight-card .locked-caption{ font-size:12px; color:var(--text-faint); line-height:1.5; }
+  .insight-card.locked{ opacity:0.72; }
+  .insight-card.locked .stat{ color:var(--text-faint); font-size:13px; font-family:'Archivo',sans-serif; font-weight:600; }
+
+  @media (max-width:920px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
+    nav.tabs{ flex-direction:row; }
+    .sidebar-foot{ display:none; }
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .insight-grid{ grid-template-columns:1fr; }
+    table{ font-size:12.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div class="brand-word">PrimeLevel</div>
+    </div>
+    <nav class="tabs">
+      <a class="tab active" href="#"><span class="dot"></span>Dashboard</a>
+      <a class="tab" href="#"><span class="dot"></span>Invoices</a>
+      <a class="tab" href="#"><span class="dot"></span>Payments</a>
+      <a class="tab" href="#"><span class="dot"></span>Insights</a>
+      <a class="tab" href="#"><span class="dot"></span>Settings</a>
+    </nav>
+    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+  </aside>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>Good morning, Dan</h1>
+        <p>Here's how things stand today — 3 September</p>
+      </div>
+      <button class="new-invoice">+ New invoice</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="lbl">Outstanding</div>
+        <div class="val">£1,940</div>
+        <div class="sub warn">4 invoices unpaid</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Paid this month</div>
+        <div class="val">£6,215</div>
+        <div class="sub">↑ 9% vs. August</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Avg. time to paid</div>
+        <div class="val">4.6 days</div>
+        <div class="sub neutral">Across last 30 days</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Jobs this month</div>
+        <div class="val">27</div>
+        <div class="sub neutral">18 complete · 9 open</div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="t">Recent invoices</span><a href="#">View all invoices →</a></div>
+    <div class="invoice-panel">
+      <table>
+        <thead>
+          <tr><th>Client &amp; job</th><th>Sent</th><th>Status</th><th style="text-align:right;">Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="job-cell"><div class="client">M. Okafor</div><div class="desc">Combi boiler install</div></td>
+            <td>1 Sep</td>
+            <td><span class="status due">Due 8 Sep</span></td>
+            <td class="amt">£1,840.00</td>
+          </tr>
+          <tr>
+            <td class="job-cell"><div class="client">S. Whitfield</div><div class="desc">Annual boiler service</div></td>
+            <td>29 Aug</td>
+            <td><span class="status paid">Paid</span></td>
+            <td class="amt">£78.00</td>
+          </tr>
+          <tr>
+            <td class="job-cell"><div class="client">R. Patel</div><div class="desc">Radiator replacement ×2</div></td>
+            <td>21 Aug</td>
+            <td><span class="status overdue">Overdue 5 days</span></td>
+            <td class="amt">£530.00</td>
+          </tr>
+          <tr>
+            <td class="job-cell"><div class="client">J. Carrick</div><div class="desc">Bathroom re-pipe</div></td>
+            <td>18 Aug</td>
+            <td><span class="status paid">Paid</span></td>
+            <td class="amt">£1,120.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-label"><span class="t">Insights</span><a href="#">Open Insights tab →</a></div>
+    <div class="insight-grid">
+
+      <a class="insight-card" href="#">
+        <div class="top"><div class="title">Pricing</div><div class="icon" style="background:var(--warn-bg);color:var(--warn);">£</div></div>
+        <div class="stat warn">£14 under</div>
+        <div class="caption">Boiler services are priced below your local average — see where.</div>
+      </a>
+
+      <a class="insight-card" href="#">
+        <div class="top"><div class="title">Seasonal demand</div><div class="icon" style="background:var(--info-bg);color:var(--info);">◐</div></div>
+        <div class="stat info">Peak in 6 wks</div>
+        <div class="caption">Boiler-install demand for your trade typically rises from mid-October.</div>
+      </a>
+
+      <a class="insight-card" href="#">
+        <div class="top"><div class="title">Where to advertise</div><div class="icon" style="background:var(--good-bg);color:var(--good);">◎</div></div>
+        <div class="stat good">Redbridge ↑</div>
+        <div class="caption">Highest-value nearby jobs are coming from an area you're not targeting yet.</div>
+      </a>
+
+      <a class="insight-card" href="#">
+        <div class="top"><div class="title">Growth vs. peers</div><div class="icon" style="background:var(--good-bg);color:var(--good);">▲</div></div>
+        <div class="stat good">+9% vs +7%</div>
+        <div class="caption">You're growing faster this quarter than similar trades businesses.</div>
+      </a>
+
+      <a class="insight-card locked" href="#">
+        <div class="top"><div class="title">Cross-sell opportunities</div><div class="icon" style="background:var(--surface-2);color:var(--text-faint);">＋</div></div>
+        <div class="stat">Unlocks soon</div>
+        <div class="locked-caption">A few more jobs logged and we'll show job pairings you might be missing.</div>
+      </a>
+
+      <a class="insight-card" href="#">
+        <div class="top"><div class="title">Your best clients</div><div class="icon" style="background:var(--surface-2);color:var(--brand-gold);">★</div></div>
+        <div class="stat">14% repeat</div>
+        <div class="caption">Repeat clients are worth 2.6× a one-off job — see your top 10.</div>
+      </a>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>
