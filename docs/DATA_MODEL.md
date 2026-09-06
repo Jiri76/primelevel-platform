@@ -74,7 +74,7 @@ allow even if they inspect network requests):
 |---|---|---|
 | Create & send an invoice | ✅ | ✅ (attributed to them — see `created_by` below) |
 | View the account's invoices/dashboard | ✅ | ✅ |
-| Mark an invoice as paid / change payment status | ✅ | ❌ |
+| Mark an invoice as paid / change payment status | ✅ | ✅ (see note below) |
 | Edit or delete an invoice | ✅ | own invoices only, while still `draft`/unsent — never after sending, matching a real audit-trail expectation |
 | Manage team (invite/revoke members) | ✅ | ❌ |
 | Change account settings (business details, consent toggle) | ✅ | ❌ |
@@ -85,6 +85,23 @@ allow even if they inspect network requests):
 *(This table is a first proposal, flagged explicitly as such — confirm
 before it's locked in, especially the Insights/export rows, since the
 brief didn't specify those two.)*
+
+**2026-09-06 revision — "mark as paid" opened to any team member:**
+originally Owner-only, changed after a real scenario the user raised:
+two employees are out on jobs, get paid cash on the spot, and need to
+record that themselves rather than waiting for the Owner to do it later.
+**Any active member can now mark any invoice in the account as paid** —
+not just their own. To keep this safe, it's narrowly scoped and fully
+tracked: a new `invoices.paid_by` column records exactly who marked it
+paid (stamped server-side from their real session, never trusted from
+what the client sends), separate from `created_by` (who made the
+invoice). A database trigger enforces that this specific action can
+*only* flip a `sent` invoice to `paid` — it can never be used to sneak
+through a change to the amount, description, or any other field on
+someone else's invoice. This gives the Owner exactly what was asked for:
+freedom for the team to record payment on the spot, with a genuine,
+tamper-proof way to see who did it and follow up if something looks
+wrong.
 
 ### `clients` — the tradesperson's own customers
 | Column | Notes |

@@ -158,6 +158,27 @@ reasoning behind anything that seems to have changed.
   `primelevel-platform-auth-pdf` memory note for the exact verification
   step to run first, before anything is built.
 
+## Roles — "mark as paid" reopened to any team member
+
+- **Reversed from the original Owner-only rule**, based on a real
+  scenario: two employees are out on jobs, get paid cash on the spot by
+  the customer, and need to record that themselves rather than making
+  the customer wait for the Owner to do it later. Reasoning given:
+  "everyone should be able to mark as paid, then the owner can always
+  look into it who marked as paid and chase for it."
+- **Decided**: any active team member (Owner or Member) can mark any
+  invoice in the account as paid. The trade-off is made safe by making
+  it fully trackable — a new `paid_by` field records exactly who did it,
+  stamped by the database itself from their real session (never
+  something the app or a dishonest client could fake), separate from
+  `created_by` (who made the invoice in the first place). Enforced by a
+  database trigger so this specific action can only flip a sent invoice
+  to paid — never a backdoor to edit anything else on someone else's
+  invoice. Full technical detail in `DATA_MODEL.md`.
+- Every other role restriction is unchanged: only the Owner can edit or
+  delete someone else's invoice, manage the team, change settings, or
+  export data.
+
 ## What's still genuinely open (see `DATA_MODEL.md` §5 for the live list)
 
 - The real job-category list per trade (needs a dedicated session, can't
