@@ -60,6 +60,10 @@
   :root[data-theme="dark"] .cta-main{ background:var(--brand-gold); color:#1A1406; }
   @media (prefers-color-scheme:dark){ .cta-main{ background:var(--brand-gold); color:#1A1406; } }
   .card-note{ text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:10px; }
+  .form-msg{ font-size:12.5px; border-radius:8px; padding:10px 12px; margin-bottom:14px; display:none; text-align:left; }
+  .form-msg.show{ display:block; }
+  .form-msg.err{ background:var(--warn-bg); color:var(--warn); }
+  .form-msg.ok{ background:var(--good-bg); color:var(--good); }
   .trust-line{ text-align:center; font-size:12.5px; color:var(--text-faint); margin-bottom:70px; }
   .trust-line b{ color:var(--text-soft); font-weight:600; }
 
@@ -107,24 +111,25 @@
   <header>
     <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
     <div class="header-actions">
-      <a class="link-btn" href="dashboard.html">Log in</a>
-      <a class="cta-small" href="dashboard.html">Start free trial</a>
+      <a class="link-btn" href="signin.html">Log in</a>
+      <a class="cta-small" href="#signup">Start free trial</a>
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero" id="signup">
     <span class="eyebrow">★ The intelligence platform for UK trades</span>
     <h1>Run your trade business. <em>Get smarter</em> every invoice.</h1>
     <p class="sub">PrimeLevel handles your invoicing and chasing payments — then turns every job into pricing intelligence no other tool can give you. Built to grow with you, from a one-van operation to a full team.</p>
 
     <form class="signup-card" id="signupForm">
+      <div class="form-msg" id="signupMsg"></div>
       <div class="field-lbl">Business name</div>
-      <input type="text" placeholder="Reeve Plumbing & Heating">
+      <input type="text" id="businessName" placeholder="Reeve Plumbing & Heating" required>
       <div class="field-lbl">Email</div>
-      <input type="email" placeholder="you@yourbusiness.co.uk">
+      <input type="email" id="signupEmail" placeholder="you@yourbusiness.co.uk" required autocomplete="email">
       <div class="field-lbl">Password</div>
-      <input type="password" placeholder="••••••••">
-      <button type="submit" class="cta-main">Start my free 14-day trial →</button>
+      <input type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password" minlength="8">
+      <button type="submit" class="cta-main" id="signupBtn">Start my free 14-day trial →</button>
       <div class="card-note">No card required · full access from day one</div>
     </form>
     <p class="trust-line">Your data is <b>always yours</b> — export any time. Never sold to anyone outside PrimeLevel customers.</p>
@@ -178,14 +183,55 @@
 
   <footer>PrimeLevel · Built for UK tradespeople · primelevel.co.uk</footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
   <script>
-    // No real signup/auth yet (see DECISIONS_LOG.md) -- submitting just
-    // takes you straight to the dashboard so the whole flow can be seen
-    // end to end. Once real Supabase auth exists, this becomes a genuine
-    // account-creation call instead, landing on the same page.
-    document.getElementById('signupForm').addEventListener('submit', (e) => {
+    const signupMsg = document.getElementById('signupMsg');
+    function showSignupMsg(text, kind) {
+      signupMsg.textContent = text;
+      signupMsg.className = 'form-msg show ' + kind;
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      window.location.href = 'dashboard.html';
+      const submitBtn = document.getElementById('signupBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating your account…';
+
+      const businessName = document.getElementById('businessName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: { data: { business_name: businessName } },
+      });
+
+      if (error) {
+        showSignupMsg(
+          error.message.includes('already registered') || error.message.includes('already exists')
+            ? 'That email already has a PrimeLevel account — try signing in instead.'
+            : error.message,
+          'err'
+        );
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Start my free 14-day trial →';
+        return;
+      }
+
+      if (data.session) {
+        // Email confirmation is off for this project — straight in.
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      // Email confirmation required: no session yet until they click the
+      // link in their inbox.
+      showSignupMsg('Almost there — check your email and click the confirmation link, then come back and sign in.', 'ok');
+      document.getElementById('signupForm').reset();
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Start my free 14-day trial →';
     });
   </script>
 

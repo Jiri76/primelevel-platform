@@ -145,7 +145,7 @@
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -257,5 +257,18 @@
     </div>
   </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+  (async () => {
+    const result = await requireSession();
+    if (!result) return; // requireSession already redirected
+
+    const businessName = result.membership.accounts?.business_name || 'Your business';
+    document.getElementById('sidebarBusinessName').textContent = businessName;
+    wireSignOut();
+  })();
+</script>
 </body>
 </html>
