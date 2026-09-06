@@ -121,7 +121,7 @@
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -133,80 +133,148 @@
     <div class="stats">
       <div class="stat-card">
         <div class="lbl">Outstanding</div>
-        <div class="val">£1,940</div>
-        <div class="sub warn">4 invoices unpaid</div>
+        <div class="val" id="statOutstanding">£0</div>
+        <div class="sub warn" id="statOutstandingSub">0 invoices unpaid</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Collected this month</div>
-        <div class="val">£6,215</div>
-        <div class="sub">↑ 9% vs. August</div>
+        <div class="val" id="statCollected">£0</div>
+        <div class="sub neutral" id="statCollectedSub">This calendar month</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Avg. time to paid</div>
-        <div class="val">4.6 days</div>
-        <div class="sub neutral">Across last 30 days</div>
+        <div class="val" id="statAvgDays">—</div>
+        <div class="sub neutral">From sent to paid, all time</div>
       </div>
     </div>
 
-    <div class="section-label"><span class="t">Automated payment chasing — active</span></div>
-    <div class="chase-panel">
-      <div class="chase-row">
-        <div class="who"><div class="client">R. Patel — Radiator replacement ×2</div><div class="inv">Overdue 5 days · £530.00</div></div>
-        <div class="chase-steps">
-          <div class="step done">1</div><div class="step done">2</div><div class="step current">3</div><div class="step">4</div>
-        </div>
-        <div class="chase-amt">£530.00</div>
-        <div class="chase-next">Next: 2 days</div>
-      </div>
-      <div class="chase-row">
-        <div class="who"><div class="client">A. Novak — Emergency callout</div><div class="inv">Overdue 9 days · £185.00</div></div>
-        <div class="chase-steps">
-          <div class="step done">1</div><div class="step done">2</div><div class="step done">3</div><div class="step current">4</div>
-        </div>
-        <div class="chase-amt">£185.00</div>
-        <div class="chase-next">Final notice sent</div>
-      </div>
-      <div class="chase-row">
-        <div class="who"><div class="client">M. Okafor — Combi boiler install</div><div class="inv">Due in 4 days · £1,840.00</div></div>
-        <div class="chase-steps">
-          <div class="step current">1</div><div class="step">2</div><div class="step">3</div><div class="step">4</div>
-        </div>
-        <div class="chase-amt">£1,840.00</div>
-        <div class="chase-next">Reminder sent</div>
-      </div>
+    <div class="section-label"><span class="t">Needs chasing</span></div>
+    <div class="chase-panel" id="chasePanel">
+      <div class="chase-row"><div class="who"><div class="client">Loading…</div></div></div>
     </div>
+    <p style="font-size:12px; color:var(--text-faint); margin:-24px 0 36px;">Automated multi-step reminders aren't built yet (see Settings → your plan) — this is a real, live list of what's actually overdue right now.</p>
 
     <div class="section-label"><span class="t">How clients pay you</span></div>
-    <div class="methods-grid">
-      <div class="method-card">
-        <div class="name">Bank transfer</div>
-        <div class="pct">58%</div>
-        <div class="note">Fastest — paid in 2.1 days on average</div>
-      </div>
-      <div class="method-card">
-        <div class="name">Card payment</div>
-        <div class="pct">31%</div>
-        <div class="note">Paid in 3.4 days on average</div>
-      </div>
-      <div class="method-card">
-        <div class="name">Cash / cheque</div>
-        <div class="pct">11%</div>
-        <div class="note">Slowest — paid in 9.8 days on average</div>
-      </div>
+    <div class="methods-grid" id="methodsGrid">
+      <div class="method-card"><div class="name">Not enough paid invoices yet</div></div>
     </div>
 
     <div class="section-label"><span class="t">Recently paid</span></div>
     <div class="invoice-panel">
       <table>
         <thead><tr><th>Client &amp; job</th><th>Paid on</th><th>Method</th><th style="text-align:right;">Amount</th></tr></thead>
-        <tbody>
-          <tr><td>S. Whitfield — Annual boiler service</td><td>31 Aug</td><td>Bank transfer</td><td class="amt">£78.00</td></tr>
-          <tr><td>J. Carrick — Bathroom re-pipe</td><td>20 Aug</td><td>Card</td><td class="amt">£1,120.00</td></tr>
-          <tr><td>L. Higgins — Full central heating service</td><td>11 Aug</td><td>Bank transfer</td><td class="amt">£310.00</td></tr>
+        <tbody id="recentlyPaidRows">
+          <tr><td colspan="4" style="text-align:center; color:var(--text-faint);">Loading…</td></tr>
         </tbody>
       </table>
     </div>
   </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+  function fmtMoney(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  function fmtMoney2(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+  function daysOverdue(dueDate) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate + 'T00:00:00');
+    return Math.round((today - due) / 86400000);
+  }
+  const METHOD_LABEL = { cash: 'Cash', bank_transfer: 'Bank transfer', card: 'Card payment' };
+
+  async function loadPayments(accountId) {
+    const { data: invoices, error } = await supabaseClient
+      .from('invoices')
+      .select('id, job_description, amount, due_date, status, payment_method, paid_at, created_at, clients(name)')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false });
+
+    if (error || !invoices) return;
+
+    // ---- Outstanding ----
+    const unpaid = invoices.filter((i) => i.status === 'sent');
+    const outstandingTotal = unpaid.reduce((sum, i) => sum + Number(i.amount), 0);
+    document.getElementById('statOutstanding').textContent = fmtMoney(outstandingTotal);
+    document.getElementById('statOutstandingSub').textContent = `${unpaid.length} invoice${unpaid.length === 1 ? '' : 's'} unpaid`;
+
+    // ---- Collected this month ----
+    const now = new Date();
+    const paid = invoices.filter((i) => i.status === 'paid' && i.paid_at);
+    const collectedThisMonth = paid
+      .filter((i) => { const d = new Date(i.paid_at); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); })
+      .reduce((sum, i) => sum + Number(i.amount), 0);
+    document.getElementById('statCollected').textContent = fmtMoney(collectedThisMonth);
+
+    // ---- Avg time to paid ----
+    if (paid.length) {
+      const avgMs = paid.reduce((sum, i) => sum + (new Date(i.paid_at) - new Date(i.created_at)), 0) / paid.length;
+      document.getElementById('statAvgDays').textContent = (avgMs / 86400000).toFixed(1) + ' days';
+    }
+
+    // ---- Needs chasing (real overdue, no fake automation) ----
+    const overdue = unpaid.filter((i) => daysOverdue(i.due_date) > 0).sort((a, b) => daysOverdue(b.due_date) - daysOverdue(a.due_date));
+    const chasePanel = document.getElementById('chasePanel');
+    if (!overdue.length) {
+      chasePanel.innerHTML = '<div class="chase-row"><div class="who"><div class="client" style="color:var(--text-faint); font-weight:500;">Nothing overdue right now.</div></div></div>';
+    } else {
+      chasePanel.innerHTML = overdue.map((i) => `
+        <div class="chase-row">
+          <div class="who"><div class="client">${i.clients?.name || 'Unknown client'} — ${i.job_description}</div><div class="inv">Overdue ${daysOverdue(i.due_date)} days</div></div>
+          <div class="chase-amt">${fmtMoney2(i.amount)}</div>
+        </div>`).join('');
+    }
+
+    // ---- How clients pay you ----
+    const methodsGrid = document.getElementById('methodsGrid');
+    if (paid.length < 3) {
+      methodsGrid.innerHTML = '<div class="method-card"><div class="name" style="color:var(--text-faint);">Not enough paid invoices yet to show a real breakdown.</div></div>';
+    } else {
+      const counts = {};
+      paid.forEach((i) => { const m = i.payment_method || 'unknown'; counts[m] = (counts[m] || 0) + 1; });
+      methodsGrid.innerHTML = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([method, count]) => `
+          <div class="method-card">
+            <div class="name">${METHOD_LABEL[method] || method}</div>
+            <div class="pct">${Math.round((count / paid.length) * 100)}%</div>
+            <div class="note">${count} of ${paid.length} paid invoices</div>
+          </div>`).join('');
+    }
+
+    // ---- Recently paid ----
+    const recentlyPaid = paid.sort((a, b) => new Date(b.paid_at) - new Date(a.paid_at)).slice(0, 10);
+    const rowsEl = document.getElementById('recentlyPaidRows');
+    if (!recentlyPaid.length) {
+      rowsEl.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-faint); padding:20px;">Nothing paid yet.</td></tr>';
+    } else {
+      rowsEl.innerHTML = recentlyPaid.map((i) => `
+        <tr>
+          <td>${i.clients?.name || 'Unknown client'} — ${i.job_description}</td>
+          <td>${fmtDate(i.paid_at)}</td>
+          <td>${METHOD_LABEL[i.payment_method] || '—'}</td>
+          <td class="amt">${fmtMoney2(i.amount)}</td>
+        </tr>`).join('');
+    }
+  }
+
+  (async () => {
+    const result = await requireSession();
+    if (!result) return;
+
+    document.getElementById('sidebarBusinessName').textContent = result.membership.accounts?.business_name || 'Your business';
+    wireSignOut();
+    showTrialBannerIfNeeded(result.membership.account_id);
+
+    loadPayments(result.membership.account_id);
+  })();
+</script>
 </body>
 </html>
