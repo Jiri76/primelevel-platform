@@ -179,6 +179,25 @@ reasoning behind anything that seems to have changed.
   delete someone else's invoice, manage the team, change settings, or
   export data.
 
+## Read-only-when-lapsed, actually enforced (not just documented)
+
+- The account lifecycle already described a `read_only_lapsed` state
+  ("can view + export own data, cannot create/send invoices or
+  reminders, data never deleted") — but the actual database rule
+  enforcing that was missing until now. User caught this explicitly:
+  "if someone stops paying... they cannot create anymore invoices...
+  however they can still download their own work."
+- **Now enforced by RLS itself**, not just documented intent: a
+  `read_only_lapsed` or `cancelled` account can still be freely viewed
+  and exported (nothing about SELECT changed), but every write —
+  creating or editing an invoice, adding a client, adding a renewal
+  item, inviting a new team member — is refused by the database. Live-
+  tested: attempted to insert a client on a lapsed test account, got a
+  real RLS rejection; reading the same account's data succeeded fine.
+- **Deliberate exception**: revoking a team member's access is never
+  blocked by this, even on a lapsed account — that's a safety action,
+  not "using the paid product," and should always be possible.
+
 ## What's still genuinely open (see `DATA_MODEL.md` §5 for the live list)
 
 - The real job-category list per trade (needs a dedicated session, can't
