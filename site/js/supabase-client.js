@@ -95,6 +95,14 @@ function wirePasswordToggles() {
     if (input.dataset.toggleWired) return;
     input.dataset.toggleWired = '1';
 
+    // A generous ceiling, not a restrictive one: bcrypt (what Supabase Auth
+    // hashes passwords with) only ever processes the first 72 characters
+    // anyway, so anything longer adds no real security and only risks a
+    // trivially large request. 64 comfortably fits any real passphrase.
+    if (!input.maxLength || input.maxLength < 0 || input.maxLength > 64) {
+      input.maxLength = 64;
+    }
+
     const wrap = document.createElement('div');
     wrap.style.position = 'relative';
     input.parentNode.insertBefore(wrap, input);
