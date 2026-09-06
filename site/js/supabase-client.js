@@ -99,6 +99,17 @@ function wirePasswordToggles() {
     wrap.style.position = 'relative';
     input.parentNode.insertBefore(wrap, input);
     wrap.appendChild(input);
+
+    // The input's own margin-bottom (14px, from the shared `input{}` rule)
+    // was being included in wrap's auto height, so the button's
+    // top:50%/translateY(-50%) centered against a box 14px taller than the
+    // input itself — shifting the icon 7px (half the margin) below the
+    // input's real vertical center. Move the margin onto wrap instead, so
+    // wrap's height exactly matches the input's own box with no ambiguity.
+    const inputMarginBottom = getComputedStyle(input).marginBottom;
+    input.style.marginBottom = '0';
+    wrap.style.marginBottom = inputMarginBottom;
+
     // The button's own right edge sits at the same 13px inset as the
     // input's own left text-padding (see each page's `input{ padding:11px
     // 13px }` rule), so the icon's gap from the right edge visually
