@@ -110,7 +110,7 @@
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -123,14 +123,14 @@
     </div>
 
     <div class="toolbar">
-      <div class="filter-pills">
-        <button class="fpill active">All (52)</button>
-        <button class="fpill">Due (6)</button>
-        <button class="fpill">Overdue (4)</button>
-        <button class="fpill">Paid (41)</button>
-        <button class="fpill">Draft (1)</button>
+      <div class="filter-pills" id="filterPills">
+        <button class="fpill active" data-filter="all">All (0)</button>
+        <button class="fpill" data-filter="sent">Due (0)</button>
+        <button class="fpill" data-filter="overdue">Overdue (0)</button>
+        <button class="fpill" data-filter="paid">Paid (0)</button>
+        <button class="fpill" data-filter="draft">Draft (0)</button>
       </div>
-      <div class="search">🔍 Search client or job…</div>
+      <div class="search" style="padding:0;"><input id="searchInput" type="text" placeholder="🔍 Search client or job…" style="border:none; background:none; color:var(--text); font-family:inherit; font-size:13px; width:100%; padding:8px 12px; outline:none;"></div>
     </div>
 
     <div class="invoice-panel">
@@ -138,72 +138,185 @@
         <thead>
           <tr><th>Invoice</th><th>Client &amp; job</th><th>Sent</th><th>Status</th><th style="text-align:right;">Amount</th><th></th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="inv-no">#0142</td>
-            <td class="job-cell"><div class="client">M. Okafor</div><div class="desc">Combi boiler install</div></td>
-            <td>1 Sep</td>
-            <td><span class="status due">Due 8 Sep</span></td>
-            <td class="amt">£1,840.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0141</td>
-            <td class="job-cell"><div class="client">S. Whitfield</div><div class="desc">Annual boiler service</div></td>
-            <td>29 Aug</td>
-            <td><span class="status paid">Paid</span></td>
-            <td class="amt">£78.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0140</td>
-            <td class="job-cell"><div class="client">R. Patel</div><div class="desc">Radiator replacement ×2</div></td>
-            <td>21 Aug</td>
-            <td><span class="status overdue">Overdue 5 days</span></td>
-            <td class="amt">£530.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0139</td>
-            <td class="job-cell"><div class="client">J. Carrick</div><div class="desc">Bathroom re-pipe</div></td>
-            <td>18 Aug</td>
-            <td><span class="status paid">Paid</span></td>
-            <td class="amt">£1,120.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0138</td>
-            <td class="job-cell"><div class="client">A. Novak</div><div class="desc">Emergency callout — no heat</div></td>
-            <td>16 Aug</td>
-            <td><span class="status overdue">Overdue 9 days</span></td>
-            <td class="amt">£185.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0137</td>
-            <td class="job-cell"><div class="client">Draft — no client yet</div><div class="desc">Kitchen tap replacement</div></td>
-            <td>—</td>
-            <td><span class="status draft">Draft</span></td>
-            <td class="amt">£95.00</td>
-            <td><a class="row-action" href="#">Edit →</a></td>
-          </tr>
-          <tr>
-            <td class="inv-no">#0136</td>
-            <td class="job-cell"><div class="client">L. Higgins</div><div class="desc">Full central heating service</div></td>
-            <td>9 Aug</td>
-            <td><span class="status paid">Paid</span></td>
-            <td class="amt">£310.00</td>
-            <td><a class="row-action" href="#">View →</a></td>
-          </tr>
+        <tbody id="invoiceRows">
+          <tr><td colspan="6" style="text-align:center; color:var(--text-faint);">Loading…</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="pager">
-      <span>Showing 1–7 of 52 invoices</span>
-      <div class="btns"><button class="pgbtn">← Previous</button><button class="pgbtn">Next →</button></div>
+      <span id="pagerText">Showing 0 invoices</span>
     </div>
   </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+  let allInvoices = [];
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let currentAccountId = null;
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+  function fmtMoney(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function daysOverdue(dueDate) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate + 'T00:00:00');
+    return Math.round((today - due) / 86400000);
+  }
+  function effectiveStatus(inv) {
+    if (inv.status === 'sent' && daysOverdue(inv.due_date) > 0) return 'overdue';
+    return inv.status;
+  }
+
+  async function loadInvoices() {
+    const { data, error } = await supabaseClient
+      .from('invoices')
+      .select('id, invoice_number, job_description, amount, job_date, due_date, status, sent_at, created_at, clients(name)')
+      .eq('account_id', currentAccountId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      document.getElementById('invoiceRows').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--warn);">Could not load invoices right now.</td></tr>';
+      return;
+    }
+    allInvoices = data || [];
+    updateFilterCounts();
+    render();
+  }
+
+  function updateFilterCounts() {
+    const counts = { all: allInvoices.length, sent: 0, overdue: 0, paid: 0, draft: 0 };
+    allInvoices.forEach((inv) => {
+      const st = effectiveStatus(inv);
+      if (st === 'sent') counts.sent++;
+      else if (st === 'overdue') counts.overdue++;
+      else if (st === 'paid') counts.paid++;
+      else if (st === 'draft') counts.draft++;
+    });
+    document.querySelectorAll('#filterPills .fpill').forEach((btn) => {
+      const key = btn.dataset.filter;
+      const label = { all: 'All', sent: 'Due', overdue: 'Overdue', paid: 'Paid', draft: 'Draft' }[key];
+      btn.textContent = `${label} (${counts[key]})`;
+    });
+  }
+
+  function render() {
+    let rows = allInvoices;
+    if (currentFilter !== 'all') rows = rows.filter((inv) => effectiveStatus(inv) === currentFilter);
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      rows = rows.filter((inv) =>
+        (inv.clients?.name || '').toLowerCase().includes(q) ||
+        (inv.job_description || '').toLowerCase().includes(q)
+      );
+    }
+
+    const tbody = document.getElementById('invoiceRows');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-faint); padding:24px;">No invoices to show yet.</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map((inv) => {
+        const st = effectiveStatus(inv);
+        const statusHtml = st === 'paid' ? '<span class="status paid">Paid</span>'
+          : st === 'overdue' ? `<span class="status overdue">Overdue ${daysOverdue(inv.due_date)} days</span>`
+          : st === 'draft' ? '<span class="status draft">Draft</span>'
+          : `<span class="status due">Due ${fmtDate(inv.due_date)}</span>`;
+
+        const actionHtml = st === 'draft'
+          ? `<a class="row-action" href="#" data-send-id="${inv.id}">Send →</a>`
+          : (st === 'sent' || st === 'overdue')
+            ? `<span class="pay-choice" data-row-for="${inv.id}">
+                 <a class="row-action" href="#" data-mark-paid-open="${inv.id}">Mark Paid</a> &nbsp; <a class="row-action" href="invoice-new.html?id=${inv.id}">View →</a>
+               </span>`
+            : `<a class="row-action" href="invoice-new.html?id=${inv.id}">View →</a>`;
+
+        return `<tr>
+          <td class="inv-no">${inv.invoice_number}</td>
+          <td class="job-cell"><div class="client">${inv.clients?.name || 'Unknown client'}</div><div class="desc">${inv.job_description}</div></td>
+          <td>${inv.sent_at ? fmtDate(inv.sent_at.slice(0, 10)) : '—'}</td>
+          <td>${statusHtml}</td>
+          <td class="amt">${fmtMoney(inv.amount)}</td>
+          <td>${actionHtml}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('pagerText').textContent = `Showing ${rows.length} of ${allInvoices.length} invoice${allInvoices.length === 1 ? '' : 's'}`;
+
+    async function markPaid(id, method) {
+      const { error } = await supabaseClient
+        .from('invoices')
+        .update({ status: 'paid', payment_method: method })
+        .eq('id', id);
+      if (error) alert('Could not mark this as paid right now — please try again.');
+      else loadInvoices();
+    }
+
+    tbody.querySelectorAll('[data-mark-paid-open]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = el.getAttribute('data-mark-paid-open');
+        const wrap = el.closest('.pay-choice');
+        wrap.innerHTML = `
+          <span style="font-size:12px; color:var(--text-faint);">Paid by:</span>
+          <a class="row-action" href="#" data-pay-method="cash" data-pay-id="${id}">Cash</a> &nbsp;
+          <a class="row-action" href="#" data-pay-method="bank_transfer" data-pay-id="${id}">Bank transfer</a> &nbsp;
+          <a class="row-action" href="#" data-pay-cancel="1" style="color:var(--text-faint);">Cancel</a>`;
+        wrap.querySelectorAll('[data-pay-method]').forEach((btn) => {
+          btn.addEventListener('click', (e2) => {
+            e2.preventDefault();
+            markPaid(btn.getAttribute('data-pay-id'), btn.getAttribute('data-pay-method'));
+          });
+        });
+        wrap.querySelector('[data-pay-cancel]').addEventListener('click', (e2) => {
+          e2.preventDefault();
+          render();
+        });
+      });
+    });
+
+    tbody.querySelectorAll('[data-send-id]').forEach((el) => {
+      el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const id = el.getAttribute('data-send-id');
+        const { error } = await supabaseClient.from('invoices').update({ status: 'sent' }).eq('id', id);
+        if (!error) loadInvoices();
+      });
+    });
+  }
+
+  document.getElementById('filterPills').addEventListener('click', (e) => {
+    const btn = e.target.closest('.fpill');
+    if (!btn) return;
+    document.querySelectorAll('#filterPills .fpill').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    currentSearch = e.target.value.trim();
+    render();
+  });
+
+  (async () => {
+    const result = await requireSession();
+    if (!result) return;
+
+    currentAccountId = result.membership.account_id;
+    document.getElementById('sidebarBusinessName').textContent = result.membership.accounts?.business_name || 'Your business';
+    wireSignOut();
+    showTrialBannerIfNeeded(currentAccountId);
+
+    loadInvoices();
+  })();
+</script>
 </body>
 </html>

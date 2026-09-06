@@ -162,7 +162,7 @@
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -190,6 +190,11 @@
           <div class="err" id="err-clientEmail" hidden></div>
         </div>
         <div class="field">
+          <label for="clientPostcode">Client Postcode</label>
+          <input type="text" id="clientPostcode" placeholder="SE1 4UX" maxlength="8" style="text-transform:uppercase;">
+          <div class="err" id="err-clientPostcode" hidden></div>
+        </div>
+        <div class="field">
           <label for="jobDescription">Job Description</label>
           <textarea id="jobDescription" maxlength="250" placeholder="Describe the work carried out..."></textarea>
           <div class="char-count"><span id="descCount">0</span>/250</div>
@@ -213,15 +218,16 @@
             <button type="button" class="status-btn" data-status="Paid Bank Transfer">Paid Bank Transfer</button>
           </div>
         </div>
-        <button type="submit" class="submit-btn">Create invoice →</button>
-        <p class="note">This creates a real printable invoice below, using the same layout as PrimeLevel's actual invoice template. No backend yet — nothing is saved once you leave this page (see DECISIONS_LOG.md).</p>
+        <button type="submit" class="submit-btn" id="submitBtn">Create invoice →</button>
+        <div class="err" id="err-form" hidden style="margin-top:10px;"></div>
+        <p class="note">This creates a real invoice, saved to your account — the same layout as PrimeLevel's actual invoice template.</p>
       </form>
     </div>
 
     <!-- ============ THE REAL PRINTABLE INVOICE ============ -->
     <div class="invoice-wrap" id="invoiceView">
       <div class="invoice-toolbar">
-        <a href="#" class="back-link" id="backToForm">← Edit / create another</a>
+        <a href="invoice-new.html" class="back-link" id="backToForm">← Create another</a>
         <button class="print-btn" id="printBtn">Print / Save as PDF ↓</button>
       </div>
       <div class="a4-wrap">
@@ -231,7 +237,7 @@
               <p class="eyebrow">Invoice</p>
               <div class="biz-block">
                 <div class="logo" id="logoInitials">RP</div>
-                <p class="biz-name">Reeve Plumbing &amp; Heating</p>
+                <p class="biz-name" id="outBizName">Reeve Plumbing &amp; Heating</p>
               </div>
             </div>
             <div class="meta">
@@ -243,7 +249,7 @@
           <div class="cols">
             <div>
               <p class="col-label">From</p>
-              <p class="addr-line">Reeve Plumbing &amp; Heating</p>
+              <p class="addr-line" id="outFromBizName">Reeve Plumbing &amp; Heating</p>
               <p class="addr-line">14 Foundry Lane, Croydon, CR0 2QW</p>
               <p class="addr-line">020 7946 0958</p>
             </div>
@@ -276,11 +282,17 @@
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script>
   // ---- Same validation rules as JobFormScreen.js in the app, kept identical ----
   const UK_PHONE_REGEX = /^07\d{9}$/;
   const EMAIL_REGEX = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+  const UK_POSTCODE_REGEX = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
   const DESCRIPTION_MAX_LENGTH = 250;
+
+  let currentAccountId = null;
+  let currentUserId = null;
 
   const form = document.getElementById('invoiceForm');
   const descInput = document.getElementById('jobDescription');
@@ -328,6 +340,7 @@
     const clientName = document.getElementById('clientName').value.trim();
     const clientPhone = document.getElementById('clientPhone').value.trim();
     const clientEmail = document.getElementById('clientEmail').value.trim();
+    const clientPostcode = document.getElementById('clientPostcode').value.trim();
     const jobDescription = descInput.value.trim();
     const amount = amountInput.value.trim();
     const jobDate = document.getElementById('jobDate').value;
@@ -337,25 +350,19 @@
     else if (!UK_PHONE_REGEX.test(clientPhone)) { showError('clientPhone', 'Phone must be 11 digits starting with 07.'); ok = false; }
     if (!clientEmail) { showError('clientEmail', 'Email is required.'); ok = false; }
     else if (!EMAIL_REGEX.test(clientEmail)) { showError('clientEmail', 'Please enter a valid email address (e.g., name@example.com)'); ok = false; }
+    if (!clientPostcode) { showError('clientPostcode', 'Postcode is required.'); ok = false; }
+    else if (!UK_POSTCODE_REGEX.test(clientPostcode)) { showError('clientPostcode', 'Please enter a valid UK postcode (e.g., SE1 4UX).'); ok = false; }
     if (!jobDescription) { showError('jobDescription', 'Job description is required.'); ok = false; }
     else if (jobDescription.length > DESCRIPTION_MAX_LENGTH) { showError('jobDescription', 'Description max 250 characters.'); ok = false; }
     if (!amount) { showError('amount', 'Amount is required.'); ok = false; }
     else if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) { showError('amount', 'Amount must be greater than £0.'); ok = false; }
     if (!jobDate) { showError('jobDate', 'Job date is required.'); ok = false; }
 
-    return ok ? { clientName, clientPhone, clientEmail, jobDescription, amount: parseFloat(amount), jobDate, paymentStatus: selectedStatus } : null;
+    return ok ? { clientName, clientPhone, clientEmail, clientPostcode: clientPostcode.toUpperCase(), jobDescription, amount: parseFloat(amount), jobDate, paymentStatus: selectedStatus } : null;
   }
 
-  // Simple prototype invoice numbering -- localStorage-backed counter,
-  // continuing from the Invoices list's last shown number (#0142). No
-  // backend exists yet (see DECISIONS_LOG.md); once Supabase does, this
-  // becomes a real per-account sequential number instead.
-  function nextInvoiceNumber() {
-    const key = 'primelevel_prototype_invoice_counter';
-    let n = parseInt(localStorage.getItem(key) || '142', 10);
-    n += 1;
-    localStorage.setItem(key, String(n));
-    return 'INV-' + String(n).padStart(4, '0');
+  function initials(name) {
+    return name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   }
 
   function formatMoney(n) {
@@ -368,33 +375,140 @@
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = validate();
-    if (!data) return;
-
-    const invNumber = nextInvoiceNumber();
-    document.getElementById('outInvoiceNumber').textContent = invNumber;
-    document.getElementById('outRefNumber').textContent = invNumber;
-    document.getElementById('outDate').textContent = formatLongDate(data.jobDate);
-    document.getElementById('outClientName').textContent = data.clientName;
-    document.getElementById('outJobDescription').textContent = data.jobDescription;
-    document.getElementById('outAmount').textContent = formatMoney(data.amount);
+  function renderInvoiceView(invoice, clientName, businessName) {
+    document.getElementById('outInvoiceNumber').textContent = invoice.invoice_number;
+    document.getElementById('outRefNumber').textContent = invoice.invoice_number;
+    document.getElementById('outDate').textContent = formatLongDate(invoice.job_date);
+    document.getElementById('outClientName').textContent = clientName;
+    document.getElementById('outJobDescription').textContent = invoice.job_description;
+    document.getElementById('outAmount').textContent = formatMoney(Number(invoice.amount));
+    document.getElementById('outBizName').textContent = businessName;
+    document.getElementById('outFromBizName').textContent = businessName;
+    document.getElementById('logoInitials').textContent = initials(businessName);
 
     document.getElementById('formView').style.display = 'none';
     document.getElementById('invoiceView').classList.add('showing');
     window.scrollTo(0, 0);
-  });
+  }
 
-  document.getElementById('backToForm').addEventListener('click', (e) => {
+  async function findOrCreateClient(data) {
+    const { data: existing } = await supabaseClient
+      .from('clients')
+      .select('id')
+      .eq('account_id', currentAccountId)
+      .eq('phone', data.clientPhone)
+      .maybeSingle();
+
+    if (existing) {
+      await supabaseClient
+        .from('clients')
+        .update({ name: data.clientName, email: data.clientEmail, postcode: data.clientPostcode })
+        .eq('id', existing.id);
+      return existing.id;
+    }
+
+    const { data: created, error } = await supabaseClient
+      .from('clients')
+      .insert({ account_id: currentAccountId, name: data.clientName, phone: data.clientPhone, email: data.clientEmail, postcode: data.clientPostcode })
+      .select('id')
+      .single();
+
+    if (error) throw error;
+    return created.id;
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    document.getElementById('invoiceView').classList.remove('showing');
-    document.getElementById('formView').style.display = '';
+    const data = validate();
+    if (!data) return;
+
+    const submitBtn = document.getElementById('submitBtn');
+    const formErr = document.getElementById('err-form');
+    formErr.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating…';
+
+    try {
+      const clientId = await findOrCreateClient(data);
+
+      const isPaid = data.paymentStatus !== 'Unpaid';
+      const paymentMethod = data.paymentStatus === 'Paid Cash' ? 'cash'
+        : data.paymentStatus === 'Paid Bank Transfer' ? 'bank_transfer'
+        : null;
+
+      const { data: invoice, error } = await supabaseClient
+        .from('invoices')
+        .insert({
+          account_id: currentAccountId,
+          client_id: clientId,
+          created_by: currentUserId,
+          job_description: data.jobDescription,
+          amount: data.amount,
+          job_date: data.jobDate,
+          status: isPaid ? 'paid' : 'sent',
+          payment_method: paymentMethod,
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      const { data: account } = await supabaseClient
+        .from('accounts')
+        .select('business_name')
+        .eq('id', currentAccountId)
+        .maybeSingle();
+
+      renderInvoiceView(invoice, data.clientName, account?.business_name || 'Your business');
+    } catch (err) {
+      formErr.textContent = err.message?.includes('permission denied') || err.code === '42501'
+        ? 'Your account is currently read-only, so new invoices can’t be created. Sign in and subscribe to resume.'
+        : 'Something went wrong creating this invoice — please try again.';
+      formErr.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create invoice →';
+    }
   });
 
   document.getElementById('printBtn').addEventListener('click', () => {
     window.print();
   });
+
+  async function viewExistingInvoice(invoiceId) {
+    const { data: invoice, error } = await supabaseClient
+      .from('invoices')
+      .select('*, clients(name), accounts(business_name)')
+      .eq('id', invoiceId)
+      .maybeSingle();
+
+    if (error || !invoice) {
+      document.querySelector('#formView .page-head p').textContent = 'That invoice could not be found, or you don’t have access to it.';
+      return;
+    }
+
+    document.getElementById('formView').style.display = 'none';
+    renderInvoiceView(invoice, invoice.clients?.name || 'Client', invoice.accounts?.business_name || 'Your business');
+    document.getElementById('backToForm').textContent = '← Back to invoices';
+    document.getElementById('backToForm').href = 'invoices.html';
+  }
+
+  (async () => {
+    const result = await requireSession();
+    if (!result) return;
+
+    currentAccountId = result.membership.account_id;
+    currentUserId = result.session.user.id;
+    document.getElementById('sidebarBusinessName').textContent = result.membership.accounts?.business_name || 'Your business';
+    wireSignOut();
+    showTrialBannerIfNeeded(currentAccountId);
+
+    const params = new URLSearchParams(window.location.search);
+    const viewId = params.get('id');
+    if (viewId) {
+      viewExistingInvoice(viewId);
+    }
+  })();
 </script>
 </body>
 </html>
