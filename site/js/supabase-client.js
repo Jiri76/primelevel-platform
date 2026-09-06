@@ -70,8 +70,8 @@ async function showTrialBannerIfNeeded(accountId) {
   const hasRealData = (invoiceCount || 0) + (clientCount || 0) + (renewalCount || 0) > 0;
 
   const message = hasRealData
-    ? "Your 14-day trial has ended. Your account is now read-only — sign in anytime to view or export your invoices and clients. <b>Nothing is ever deleted.</b> Subscribe to start creating invoices again."
-    : "Your 14-day trial has ended. Since nothing's been added yet, this account will be <b>automatically cleared after 30 days</b> if it stays inactive — come back anytime before then to keep it.";
+    ? "Your 14-day trial has ended. Your account is now read-only — sign in anytime to view or export your invoices and clients. <b>Your account will be permanently deleted after 30 days</b> if you don't subscribe. Subscribe to start creating invoices again."
+    : "Your 14-day trial has ended. Since nothing's been added yet, this account will be <b>automatically deleted in 7 days</b> if it stays inactive — come back anytime before then to keep it.";
 
   const banner = document.createElement('div');
   banner.setAttribute('role', 'status');

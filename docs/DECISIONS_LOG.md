@@ -198,6 +198,39 @@ reasoning behind anything that seems to have changed.
   blocked by this, even on a lapsed account — that's a safety action,
   not "using the paid product," and should always be possible.
 
+## Real deletion policy, tightened from the original "never delete" stance
+
+- **Reversed the original "data never deleted, ever" principle** stated
+  at project kickoff — user's explicit call, made deliberately, not an
+  oversight: "someone could just create one invoice, two invoices, go
+  away, and the data will be there forever. That's wrong... we need to
+  be strict here."
+- **Final policy**:
+  - Genuinely empty account (nothing ever created) → deleted **7 days**
+    after the trial ends.
+  - Any account with real data, once it lapses/cancels → deleted **30
+    days** after it became read-only (`accounts.read_only_since`, set
+    automatically the moment `subscription_status` enters
+    `read_only_lapsed`/`cancelled` — not measured from the original
+    signup date, so someone who paid for months keeps a fair 30-day
+    window from their real cancellation).
+  - Both cases are backed by a real, working "export your data" button
+    in Settings — the warning is only fair because someone can actually
+    act on it.
+- **A real, working notification email is sent the moment a trial ends**,
+  covering both cases (empty and has-data) — see `send-trial-ended-emails`
+  Edge Function on the Supabase project, sent via Resend
+  (`primelevel-platform` API key, scoped to `primelevel.co.uk`, kept
+  completely separate from the existing app's own Resend key — never
+  touched or reused). Scheduled to run daily via `pg_cron`; live-tested
+  both message variants by actually sending real emails through Resend,
+  not just reviewing the code.
+- Two cleanup functions exist on the database (`cleanup_abandoned_trial_
+  accounts` for the empty/7-day case, `cleanup_lapsed_accounts_with_data`
+  for the 30-day case) — both default to a safe dry-run preview, neither
+  is exposed to the app, and neither is scheduled automatically yet
+  (manual for now, deliberately, given the tiny current scale).
+
 ## What's still genuinely open (see `DATA_MODEL.md` §5 for the live list)
 
 - The real job-category list per trade (needs a dedicated session, can't
