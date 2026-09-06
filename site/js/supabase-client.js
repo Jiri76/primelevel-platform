@@ -99,12 +99,18 @@ function wirePasswordToggles() {
     wrap.style.position = 'relative';
     input.parentNode.insertBefore(wrap, input);
     wrap.appendChild(input);
-    input.style.paddingRight = '40px';
+    // The button's own right edge sits at the same 13px inset as the
+    // input's own left text-padding (see each page's `input{ padding:11px
+    // 13px }` rule), so the icon's gap from the right edge visually
+    // matches the text's gap from the left edge. paddingRight leaves room
+    // for that gap plus the button's own box (18px icon + 4px padding each
+    // side = 26px) plus a small buffer before the typed text.
+    input.style.paddingRight = '45px';
 
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.setAttribute('aria-label', 'Show password');
-    btn.style.cssText = 'position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; padding:4px; display:flex; align-items:center; color:var(--text-faint); opacity:0.75;';
+    btn.style.cssText = 'position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; padding:4px; display:flex; align-items:center; color:var(--text-faint); opacity:0.75;';
     btn.innerHTML = EYE_ICON;
     wrap.appendChild(btn);
 
