@@ -122,6 +122,42 @@ reasoning behind anything that seems to have changed.
   and used for pooling/Insights — the full postcode never leaves that
   business's own private records.
 
+## 2026-09-06 — sign-in method and domain (supersedes the auth line above)
+
+- **Auth method changed: Password + "Forgot password" reset, not magic
+  link.** The auth/multi-user *account model* above (individual logins,
+  membership table, Owner/Member roles) stands unchanged — this only
+  changes *how* someone proves who they are. Reasoning: password sign-up
+  is what customers already expect from "a proper platform," and — once
+  built on Supabase Auth (bcrypt hashing, rate-limited attempts,
+  short-lived single-use reset links) — it's genuinely no less secure
+  than a magic link, just more familiar. A full advantages/disadvantages
+  comparison was written up as `Password_vs_MagicLink_Basics.pdf` for
+  reference.
+- **Domain: the platform will live at a subdomain, `app.primelevel.co.uk`**,
+  once DNS is pointed at GitHub Pages — not the bare `primelevel.co.uk`.
+  Keeps the root domain free for a possible future plain marketing page,
+  and is a single DNS record either way, easily changed later if needed.
+- **Confirmed: no Framer, no React/framework of any kind.** The existing
+  plain HTML/CSS/JS + GitHub Pages + Supabase pattern (same as Renewals
+  and Masterboard) is reliable enough on its own and is what stays.
+
+## Supabase project for real backend wiring
+
+- A **new, dedicated Supabase project** was created for this reason
+  exactly (keeping Renewals/Masterboard's project completely untouched):
+  name `primelevel-platform`, reference `aujxoyyuyjlsjhnzlrpc`, region
+  West Europe (London), free tier. "Automatically expose new tables" was
+  turned **off** and "Enable automatic RLS" turned **on** at creation —
+  both deliberately, so any new table defaults to locked-down rather than
+  open until real access rules exist for it.
+- As of this entry, the schema/RLS/auth-screen build itself has **not
+  started yet** — the Supabase connector needed reconnecting to point at
+  this new project instead of the old one, and that reconnection needs a
+  fresh Claude conversation to actually take effect. See the
+  `primelevel-platform-auth-pdf` memory note for the exact verification
+  step to run first, before anything is built.
+
 ## What's still genuinely open (see `DATA_MODEL.md` §5 for the live list)
 
 - The real job-category list per trade (needs a dedicated session, can't
