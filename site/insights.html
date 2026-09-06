@@ -386,7 +386,7 @@
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -395,148 +395,110 @@
         <h1>Pricing Insights</h1>
         <p>How your quotes compare with real, recent jobs from other tradespeople near you — built from PrimeLevel invoices, updated as new jobs come in.</p>
       </div>
-      <span class="preview-chip">Preview · example account</span>
+      <span class="preview-chip" id="dataChip">Your real data</span>
     </div>
 
-    <div class="digest-strip">
-      <span class="env">✉</span>
-      <span><strong>Your September digest</strong> was sent 3 days ago — average job price up 2.1% across your top 3 trades.</span>
+    <p class="section-label">Your own numbers</p>
+    <div class="grid" id="ownStatsGrid">
+      <div class="card"><div class="job-name">Loading…</div></div>
     </div>
 
-    <p class="section-label">Your job types</p>
-    <div class="grid">
-
-      <div class="card">
-        <div class="card-top">
-          <div>
-            <div class="job-name">Combi boiler install</div>
-            <div class="job-meta">34 jobs invoiced · last 90 days</div>
-          </div>
-          <span class="pill good">On target</span>
-        </div>
-        <div class="your-price">£1,840<sup>you avg</sup></div>
-        <div class="range">
-          <div class="range-track">
-            <div class="range-fill" style="left:18%; width:56%;"></div>
-            <div class="range-mark" style="left:46%;"></div>
-          </div>
-          <div class="range-labels"><span>£1,550</span><span>£2,350</span></div>
-        </div>
-        <div class="range-caption">Local range from <b>41</b> nearby jobs, SE postcode area</div>
-      </div>
-
-      <div class="card">
-        <div class="card-top">
-          <div>
-            <div class="job-name">Annual boiler service</div>
-            <div class="job-meta">61 jobs invoiced · last 90 days</div>
-          </div>
-          <span class="pill warn">Below market</span>
-        </div>
-        <div class="your-price">£78<sup>you avg</sup></div>
-        <div class="range">
-          <div class="range-track">
-            <div class="range-fill" style="left:22%; width:52%;"></div>
-            <div class="range-mark" style="left:14%;"></div>
-          </div>
-          <div class="range-labels"><span>£65</span><span>£120</span></div>
-        </div>
-        <div class="range-caption">You're <b>£14 under</b> the local average of £92</div>
-      </div>
-
-      <div class="card">
-        <div class="card-top">
-          <div>
-            <div class="job-name">Radiator replacement</div>
-            <div class="job-meta">19 jobs invoiced · last 90 days</div>
-          </div>
-          <span class="pill good">On target</span>
-        </div>
-        <div class="your-price">£265<sup>you avg</sup></div>
-        <div class="range">
-          <div class="range-track">
-            <div class="range-fill" style="left:15%; width:60%;"></div>
-            <div class="range-mark" style="left:41%;"></div>
-          </div>
-          <div class="range-labels"><span>£210</span><span>£340</span></div>
-        </div>
-        <div class="range-caption">Local range from <b>27</b> nearby jobs, SE postcode area</div>
-      </div>
-
-      <div class="card">
-        <div class="card-top">
-          <div>
-            <div class="job-name">Bathroom re-pipe</div>
-            <div class="job-meta">8 jobs invoiced · last 90 days</div>
-          </div>
-          <span class="pill info">Above market</span>
-        </div>
-        <div class="your-price">£1,120<sup>you avg</sup></div>
-        <div class="range">
-          <div class="range-track">
-            <div class="range-fill" style="left:20%; width:45%;"></div>
-            <div class="range-mark" style="left:78%;"></div>
-          </div>
-          <div class="range-labels"><span>£760</span><span>£1,340</span></div>
-        </div>
-        <div class="range-caption">You're <b>£190 over</b> the local average of £930</div>
-      </div>
-
-      <div class="card locked">
-        <div class="card-top">
-          <div>
-            <div class="job-name">Emergency callout</div>
-            <div class="job-meta">3 jobs invoiced · last 90 days</div>
-          </div>
-        </div>
-        <div class="lock-body">
-          <div class="lock-icon">🔒</div>
-          <p class="lock-note">Not enough nearby data yet to show a fair comparison — we only show a range once at least 20 similar local jobs are logged.</p>
-          <div class="lock-progress"><div class="lock-progress-fill"></div></div>
-          <div class="lock-progress-label">3 of 20 needed nearby</div>
-        </div>
-      </div>
-
-    </div>
-
-    <p class="section-label">Boiler service — detail view</p>
-    <div class="detail">
-      <div>
-        <h2>Annual boiler service</h2>
-        <p class="sub">Your price over time vs. the local average, SE postcode area</p>
-        <div class="stat-row">
-          <div class="stat"><span class="num">£78</span><span class="lbl">Your average</span></div>
-          <div class="stat"><span class="num">£92</span><span class="lbl">Local average</span></div>
-          <div class="stat"><span class="num">61</span><span class="lbl">Jobs of yours</span></div>
-        </div>
-        <svg class="trend" viewBox="0 0 440 140" preserveAspectRatio="xMidYMid meet">
-          <line x1="0" y1="20" x2="440" y2="20" stroke="var(--border)" stroke-width="1"/>
-          <line x1="0" y1="68" x2="440" y2="68" stroke="var(--border)" stroke-width="1"/>
-          <line x1="0" y1="116" x2="440" y2="116" stroke="var(--border)" stroke-width="1"/>
-          <text x="440" y="24" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--text-faint)">£120</text>
-          <text x="440" y="72" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--text-faint)">£90</text>
-          <text x="440" y="120" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--text-faint)">£60</text>
-
-          <polyline points="10,66 90,64 170,61 250,60 330,58 410,56" fill="none" stroke="var(--info)" stroke-width="2" stroke-dasharray="4 4" opacity="0.85"/>
-          <polyline points="10,96 90,94 170,98 250,92 330,90 410,88" fill="none" stroke="var(--brand-gold)" stroke-width="2.5"/>
-          <circle cx="410" cy="88" r="4.5" fill="var(--brand-gold)"/>
-
-          <text x="10" y="132" font-family="Archivo, sans-serif" font-size="10" fill="var(--text-faint)">Apr</text>
-          <text x="405" y="132" font-family="Archivo, sans-serif" font-size="10" fill="var(--text-faint)">Sep</text>
-        </svg>
-        <p class="trend-note">Gold — your average · Dotted — local average, updated monthly</p>
-      </div>
-
-      <div class="detail-side">
-        <div class="verdict">
-          <span class="pill warn">Below market</span>
-          <p>Similar boiler services nearby average <b>£92</b>. You're charging <b>£78</b> — about 15% under. On 61 services a year, that's roughly <b>£850</b> of headroom.</p>
-        </div>
-        <div class="source-note">Based on 340 anonymised boiler-service invoices from PrimeLevel customers in your postcode area over the last 12 months. Figures only shown once a job type has at least 20 nearby contributors — never traceable to one business.</div>
+    <p class="section-label">Comparing against nearby businesses</p>
+    <div class="card locked" id="pooledCard" style="max-width:520px;">
+      <div class="lock-body">
+        <div class="lock-icon">🔒</div>
+        <p class="lock-note" id="pooledNote">Checking…</p>
+        <div class="lock-progress"><div class="lock-progress-fill" id="pooledProgressFill"></div></div>
+        <div class="lock-progress-label" id="pooledProgressLabel"></div>
       </div>
     </div>
+    <p style="font-size:12px; color:var(--text-faint); max-width:70ch; margin-top:14px;">
+      Per-job-type comparisons (e.g. "your boiler service price vs. nearby boiler services") need a real, agreed job-category list first — that's a genuinely open decision, not guessed here. Once that exists and enough businesses are sharing data, this section becomes real trade-by-trade comparisons like the ones originally mocked up.
+    </p>
 
   </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+  function fmtMoney(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  async function loadInsights(accountId) {
+    const { data: invoices } = await supabaseClient
+      .from('invoices')
+      .select('amount, status, created_at, postcode_area')
+      .eq('account_id', accountId);
+
+    const own = invoices || [];
+    const grid = document.getElementById('ownStatsGrid');
+
+    if (!own.length) {
+      grid.innerHTML = '<div class="card"><div class="job-name" style="color:var(--text-faint);">No invoices yet — Insights fills in as you create real ones.</div></div>';
+    } else {
+      const total = own.reduce((sum, i) => sum + Number(i.amount), 0);
+      const avg = total / own.length;
+      const paidCount = own.filter((i) => i.status === 'paid').length;
+      grid.innerHTML = `
+        <div class="card">
+          <div class="job-meta">TOTAL INVOICED</div>
+          <div class="your-price">${fmtMoney(total)}</div>
+          <div class="range-caption">${own.length} invoice${own.length === 1 ? '' : 's'} total</div>
+        </div>
+        <div class="card">
+          <div class="job-meta">AVERAGE JOB VALUE</div>
+          <div class="your-price">${fmtMoney(avg)}</div>
+          <div class="range-caption">Across all your invoices</div>
+        </div>
+        <div class="card">
+          <div class="job-meta">PAID SO FAR</div>
+          <div class="your-price">${paidCount}<sup style="font-size:16px;">/${own.length}</sup></div>
+          <div class="range-caption">Invoices marked paid</div>
+        </div>`;
+    }
+
+    // Real k-anonymity-gated pooled check — trade/category are null on real
+    // invoices today (no job-category list decided yet), so this checks
+    // what's actually poolable right now: postcode-area-only comparison.
+    const postcodeArea = own.find((i) => i.postcode_area)?.postcode_area || null;
+    const pooledNote = document.getElementById('pooledNote');
+    const progressFill = document.getElementById('pooledProgressFill');
+    const progressLabel = document.getElementById('pooledProgressLabel');
+
+    if (!postcodeArea) {
+      pooledNote.textContent = 'Once you have real invoices with a client postcode, we can check for nearby comparison data.';
+      progressFill.style.width = '0%';
+      progressLabel.textContent = '';
+      return;
+    }
+
+    const { data: benchmark } = await supabaseClient.rpc('get_pooled_benchmarks', { p_postcode_area: postcodeArea });
+    const row = benchmark && benchmark[0];
+    const count = row?.contributor_count || 0;
+
+    if (row?.has_enough_data) {
+      pooledNote.textContent = `Nearby average: ${fmtMoney(row.avg_price)} (from ${count} contributing businesses).`;
+      progressFill.style.width = '100%';
+      progressLabel.textContent = `${count} of 20 needed nearby`;
+    } else {
+      pooledNote.textContent = `Not enough nearby data yet to show a fair, anonymous comparison — this only unlocks once at least 20 different businesses have shared data for your area.`;
+      progressFill.style.width = Math.min(100, (count / 20) * 100) + '%';
+      progressLabel.textContent = `${count} of 20 needed nearby`;
+    }
+  }
+
+  (async () => {
+    const result = await requireSession();
+    if (!result) return;
+
+    document.getElementById('sidebarBusinessName').textContent = result.membership.accounts?.business_name || 'Your business';
+    wireSignOut();
+    showTrialBannerIfNeeded(result.membership.account_id);
+
+    loadInsights(result.membership.account_id);
+  })();
+</script>
 </body>
 </html>
