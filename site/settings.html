@@ -342,19 +342,36 @@
         e.preventDefault();
         const email = document.getElementById('inviteEmail').value.trim();
         const msg = document.getElementById('inviteMsg');
-        const { error } = await supabaseClient.from('account_members').insert({
-          account_id: accountId, invited_email: email, role: 'member', status: 'invited',
-        });
+        const { data: newInvite, error } = await supabaseClient
+          .from('account_members')
+          .insert({ account_id: accountId, invited_email: email, role: 'member', status: 'invited' })
+          .select('id')
+          .single();
+
         if (error) {
           msg.textContent = error.message.includes('duplicate')
             ? 'That email has already been invited.'
             : 'Something went wrong — please try again.';
           msg.style.color = 'var(--warn)';
+          return;
+        }
+
+        document.getElementById('inviteForm').reset();
+        loadTeam(accountId, isOwner, myUserId);
+        msg.textContent = 'Added — sending them an invite email…';
+        msg.style.color = 'var(--good)';
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/send-invite-email', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account_member_id: newInvite.id }),
+        });
+
+        if (res.ok) {
+          msg.textContent = 'Invite email sent — they just need to click the link to join.';
         } else {
-          msg.textContent = 'Added — ask them to sign up using that exact email address to join your team.';
-          msg.style.color = 'var(--good)';
-          document.getElementById('inviteForm').reset();
-          loadTeam(accountId, isOwner, myUserId);
+          msg.textContent = 'Added, but the invite email could not be sent — ask them to sign up using that exact email address instead.';
         }
       });
     }

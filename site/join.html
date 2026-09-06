@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Join your team — PrimeLevel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
+    --info:#3D5A80; --info-bg:#E7ECF2;
+    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+      --info:#87A6CE; --info-bg:#22314A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
+    --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
+    --info:#87A6CE; --info-bg:#22314A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; padding:22px 48px; max-width:1180px; margin:0 auto; }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand-mark{ width:32px;height:32px;border-radius:8px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:17px; flex:none; }
+  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--text); }
+
+  .wrap{ max-width:400px; margin:64px auto; padding:0 24px; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:28px; margin:0 0 8px; text-align:center; }
+  .sub{ font-size:14px; color:var(--text-soft); text-align:center; margin:0 0 28px; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:24px 26px 26px; }
+  .field-lbl{ font-size:11.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 6px; }
+  input{ width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:'Archivo',sans-serif; font-size:13.5px; margin-bottom:14px; }
+  input:disabled{ opacity:0.7; }
+  .cta-main{ width:100%; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:10px; padding:13px; font-weight:700; font-size:14.5px; cursor:pointer; }
+  .cta-main:disabled{ opacity:0.6; cursor:default; }
+  :root[data-theme="dark"] .cta-main{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .cta-main{ background:var(--brand-gold); color:#1A1406; } }
+
+  .msg{ font-size:12.5px; border-radius:8px; padding:10px 12px; margin-bottom:14px; display:none; }
+  .msg.show{ display:block; }
+  .msg.err{ background:var(--warn-bg); color:var(--warn); }
+  .msg.ok{ background:var(--good-bg); color:var(--good); }
+</style>
+</head>
+<body>
+
+  <header>
+    <a class="brand" href="index.html"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></a>
+  </header>
+
+  <div class="wrap">
+    <h1>Join your team</h1>
+    <p class="sub">Set a password to activate your PrimeLevel account.</p>
+
+    <div class="card">
+      <div class="msg" id="msg"></div>
+      <form id="joinForm">
+        <div class="field-lbl">Email</div>
+        <input type="email" id="email" required autocomplete="email">
+        <div class="field-lbl">Password</div>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="new-password" minlength="8">
+        <button type="submit" class="cta-main" id="submitBtn">Join →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    const msg = document.getElementById('msg');
+    function showMsg(text, kind) {
+      msg.textContent = text;
+      msg.className = 'msg show ' + kind;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const prefillEmail = params.get('email');
+    if (prefillEmail) {
+      const emailInput = document.getElementById('email');
+      emailInput.value = prefillEmail;
+      emailInput.readOnly = true;
+      emailInput.style.opacity = '0.7';
+    }
+
+    document.getElementById('joinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Joining…';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Deliberately NO business_name in metadata — this is what tells the
+      // handle_new_user() database trigger to link this signup to an
+      // existing pending invite (matched by email) instead of creating a
+      // brand-new business account. See DATA_MODEL.md.
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+      if (error) {
+        showMsg(error.message, 'err');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join →';
+        return;
+      }
+
+      if (data.session) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      showMsg('Almost there — check your email and click the confirmation link, then sign in.', 'ok');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join →';
+    });
+  </script>
+
+</body>
+</html>
