@@ -268,6 +268,7 @@
     const businessName = result.membership.accounts?.business_name || 'Your business';
     document.getElementById('sidebarBusinessName').textContent = businessName;
     wireSignOut();
+    showTrialBannerIfNeeded(result.membership.account_id);
   })();
 </script>
 </body>
