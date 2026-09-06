@@ -290,7 +290,7 @@
             Dashboard access
             <div class="toggle ${m.web_dashboard_access ? '' : 'off'}" data-toggle-id="${m.id}" data-current="${m.web_dashboard_access}"><div class="knob"></div></div>
           </label>
-          <button class="export-btn" data-remove-id="${m.id}" style="color:var(--warn);">Remove</button>`;
+          <span class="remove-wrap"><button class="export-btn" data-remove-open="${m.id}" style="color:var(--warn);">Remove</button></span>`;
       }
 
       row.innerHTML = `
@@ -308,12 +308,16 @@
       });
     });
 
-    list.querySelectorAll('[data-remove-id]').forEach((b) => {
-      b.addEventListener('click', async () => {
-        if (!window.confirm('Remove this person? They will lose all access to the app and dashboard immediately.')) return;
-        const id = b.getAttribute('data-remove-id');
-        const { error } = await supabaseClient.from('account_members').update({ status: 'revoked', revoked_at: new Date().toISOString() }).eq('id', id);
-        if (!error) loadTeam(accountId, isOwner, myUserId);
+    list.querySelectorAll('[data-remove-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-remove-open');
+        const wrap = btn.closest('.remove-wrap');
+        wrap.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">Remove — they'll lose access immediately.</span> <button class="export-btn" data-remove-confirm="${id}" style="color:var(--warn);">Yes, remove</button> <button class="export-btn" data-remove-cancel="1">Cancel</button>`;
+        wrap.querySelector('[data-remove-confirm]').addEventListener('click', async () => {
+          const { error } = await supabaseClient.from('account_members').update({ status: 'revoked', revoked_at: new Date().toISOString() }).eq('id', id);
+          if (!error) loadTeam(accountId, isOwner, myUserId);
+        });
+        wrap.querySelector('[data-remove-cancel]').addEventListener('click', () => loadTeam(accountId, isOwner, myUserId));
       });
     });
   }

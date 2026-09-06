@@ -63,6 +63,7 @@
   .renewal-row:last-child{ border-bottom:none; }
   .renewal-row .name{ flex:1; font-size:13.5px; font-weight:600; }
   .renewal-row .type{ font-size:11.5px; color:var(--text-faint); margin-top:2px; }
+  .renewal-row .remove-btn{ flex:none; background:none; border:none; color:var(--text-faint); font-size:12px; cursor:pointer; margin-left:8px; text-decoration:underline; }
   .countdown{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:100px; flex:none; }
   .countdown.ok{ background:var(--good-bg); color:var(--good); }
   .countdown.soon{ background:var(--warn-bg); color:var(--warn); }
@@ -107,7 +108,7 @@
       <a class="tab active" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong style="color:#DCD5C4">Reeve Plumbing &amp; Heating</strong></div>
+    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
   <main>
@@ -118,22 +119,7 @@
 
     <div class="panel">
       <div id="renewalsList">
-        <div class="renewal-row">
-          <div><div class="name">Gas Safe registration</div><div class="type">License</div></div>
-          <span class="countdown ok">88 days</span>
-        </div>
-        <div class="renewal-row">
-          <div><div class="name">Public liability insurance</div><div class="type">Insurance</div></div>
-          <span class="countdown soon">25 days</span>
-        </div>
-        <div class="renewal-row">
-          <div><div class="name">Van MOT</div><div class="type">Vehicle</div></div>
-          <span class="countdown ok">142 days</span>
-        </div>
-        <div class="renewal-row">
-          <div><div class="name">PAT testing certificate</div><div class="type">Certification</div></div>
-          <span class="countdown soon">17 days</span>
-        </div>
+        <div class="renewal-row"><div class="name" style="color:var(--text-faint); font-weight:500;">Loading…</div></div>
       </div>
 
       <button class="add-renewal" id="addRenewalToggle">+ Add something to track</button>
@@ -162,18 +148,15 @@
     </div>
   </main>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script>
-  // Client-side only for now, per this project's phasing (layout/mechanism
-  // first, Supabase wiring later -- see DECISIONS_LOG.md). A newly added
-  // item shows immediately and behaves exactly like the seeded ones, but
-  // resets on page reload until real persistence exists. When that lands,
-  // this same add-row logic stays -- only the "where it's saved" part
-  // changes, from appending to the DOM to also writing a real row.
   const toggleBtn = document.getElementById('addRenewalToggle');
   const form = document.getElementById('addRenewalForm');
   const cancelBtn = document.getElementById('cancelRenewalBtn');
   const list = document.getElementById('renewalsList');
   const errorEl = document.getElementById('renewalFormError');
+  let currentAccountId = null;
 
   function showForm() {
     form.hidden = false;
@@ -191,16 +174,54 @@
   cancelBtn.addEventListener('click', hideForm);
 
   function daysUntil(dateStr) {
-    // Whole-day difference, ignoring time-of-day on both sides so
-    // "today" and "the expiry date" compare as calendar days, not
-    // fractional hours.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const target = new Date(dateStr + 'T00:00:00');
     return Math.round((target - today) / 86400000);
   }
 
-  form.addEventListener('submit', (e) => {
+  async function loadRenewals() {
+    const { data, error } = await supabaseClient
+      .from('renewal_items')
+      .select('id, name, type, expires_on')
+      .eq('account_id', currentAccountId)
+      .order('expires_on', { ascending: true });
+
+    if (error || !data) {
+      list.innerHTML = '<div class="renewal-row"><div class="name" style="color:var(--warn);">Could not load renewals right now.</div></div>';
+      return;
+    }
+    if (!data.length) {
+      list.innerHTML = '<div class="renewal-row"><div class="name" style="color:var(--text-faint); font-weight:500;">Nothing tracked yet — add your first license, insurance, or certification below.</div></div>';
+      return;
+    }
+
+    list.innerHTML = data.map((item) => {
+      const days = daysUntil(item.expires_on);
+      const urgency = days <= 30 ? 'soon' : 'ok';
+      const daysLabel = days < 0 ? `Expired ${Math.abs(days)}d ago` : `${days} day${days === 1 ? '' : 's'}`;
+      return `<div class="renewal-row" data-row-id="${item.id}">
+        <div><div class="name">${item.name}</div><div class="type">${item.type || ''}</div></div>
+        <span class="countdown ${days < 0 ? 'soon' : urgency}">${daysLabel}</span>
+        <span class="remove-wrap"><button class="remove-btn" data-remove-open="${item.id}">Remove</button></span>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('[data-remove-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-remove-open');
+        const wrap = btn.closest('.remove-wrap');
+        wrap.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">Remove?</span> <button class="remove-btn" data-remove-confirm="${id}" style="color:var(--warn);">Yes</button> <button class="remove-btn" data-remove-cancel="1">Cancel</button>`;
+        wrap.querySelector('[data-remove-confirm]').addEventListener('click', async () => {
+          const { error } = await supabaseClient.from('renewal_items').delete().eq('id', id);
+          if (!error) loadRenewals();
+        });
+        wrap.querySelector('[data-remove-cancel]').addEventListener('click', loadRenewals);
+      });
+    });
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('renewalName').value.trim();
     const type = document.getElementById('renewalType').value.trim();
@@ -211,29 +232,32 @@
       errorEl.hidden = false;
       return;
     }
-    const days = daysUntil(dateStr);
-    if (days < 0) {
-      errorEl.textContent = 'That date has already passed -- pick a future date.';
+
+    const { error } = await supabaseClient
+      .from('renewal_items')
+      .insert({ account_id: currentAccountId, name, type, expires_on: dateStr });
+
+    if (error) {
+      errorEl.textContent = 'Could not save this right now — please try again.';
       errorEl.hidden = false;
       return;
     }
 
-    const row = document.createElement('div');
-    row.className = 'renewal-row';
-    // Same "soon" threshold already visible in the seeded data (17/25 days
-    // read as "soon", 88/142 read as "ok") -- 30 days is the natural
-    // dividing line between those real examples.
-    const urgency = days <= 30 ? 'soon' : 'ok';
-    row.innerHTML =
-      '<div><div class="name"></div><div class="type"></div></div>' +
-      '<span class="countdown ' + urgency + '"></span>';
-    row.querySelector('.name').textContent = name;
-    row.querySelector('.type').textContent = type;
-    row.querySelector('.countdown').textContent = days + (days === 1 ? ' day' : ' days');
-    list.appendChild(row);
-
     hideForm();
+    loadRenewals();
   });
+
+  (async () => {
+    const result = await requireSession();
+    if (!result) return;
+
+    currentAccountId = result.membership.account_id;
+    document.getElementById('sidebarBusinessName').textContent = result.membership.accounts?.business_name || 'Your business';
+    wireSignOut();
+    showTrialBannerIfNeeded(currentAccountId);
+
+    loadRenewals();
+  })();
 </script>
 </body>
 </html>
