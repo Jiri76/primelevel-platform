@@ -151,8 +151,8 @@
   <main>
     <div class="page-head">
       <div>
-        <h1>Good morning, Dan</h1>
-        <p>Here's how things stand today — 3 September</p>
+        <h1 id="greeting">Welcome back</h1>
+        <p id="dateLine">Here's how things stand today</p>
       </div>
       <a class="new-invoice" href="invoice-new.html" style="text-decoration:none; display:inline-block;">+ New invoice</a>
     </div>
@@ -160,23 +160,23 @@
     <div class="stats">
       <div class="stat-card">
         <div class="lbl">Outstanding</div>
-        <div class="val">£1,940</div>
-        <div class="sub warn">4 invoices unpaid</div>
+        <div class="val" id="statOutstanding">£0</div>
+        <div class="sub warn" id="statOutstandingSub">No invoices unpaid</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Paid this month</div>
-        <div class="val">£6,215</div>
-        <div class="sub">↑ 9% vs. August</div>
+        <div class="val" id="statPaid">£0</div>
+        <div class="sub" id="statPaidSub">This month</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Avg. time to paid</div>
-        <div class="val">4.6 days</div>
-        <div class="sub neutral">Across last 30 days</div>
+        <div class="val" id="statAvgDays">—</div>
+        <div class="sub neutral" id="statAvgDaysSub">Across last 30 days</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Jobs this month</div>
-        <div class="val">27</div>
-        <div class="sub neutral">18 complete · 9 open</div>
+        <div class="val" id="statJobs">0</div>
+        <div class="sub neutral" id="statJobsSub">0 complete · 0 open</div>
       </div>
     </div>
 
@@ -186,74 +186,19 @@
         <thead>
           <tr><th>Client &amp; job</th><th>Sent</th><th>Status</th><th style="text-align:right;">Amount</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="job-cell"><div class="client">M. Okafor</div><div class="desc">Combi boiler install</div></td>
-            <td>1 Sep</td>
-            <td><span class="status due">Due 8 Sep</span></td>
-            <td class="amt">£1,840.00</td>
-          </tr>
-          <tr>
-            <td class="job-cell"><div class="client">S. Whitfield</div><div class="desc">Annual boiler service</div></td>
-            <td>29 Aug</td>
-            <td><span class="status paid">Paid</span></td>
-            <td class="amt">£78.00</td>
-          </tr>
-          <tr>
-            <td class="job-cell"><div class="client">R. Patel</div><div class="desc">Radiator replacement ×2</div></td>
-            <td>21 Aug</td>
-            <td><span class="status overdue">Overdue 5 days</span></td>
-            <td class="amt">£530.00</td>
-          </tr>
-          <tr>
-            <td class="job-cell"><div class="client">J. Carrick</div><div class="desc">Bathroom re-pipe</div></td>
-            <td>18 Aug</td>
-            <td><span class="status paid">Paid</span></td>
-            <td class="amt">£1,120.00</td>
-          </tr>
+        <tbody id="recentInvoicesBody">
+          <tr><td colspan="4" style="color:var(--text-faint); padding:18px 8px;">Loading…</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="section-label"><span class="t">Insights</span><a href="insights.html">Open Insights tab →</a></div>
     <div class="insight-grid">
-
-      <a class="insight-card" href="insights.html">
-        <div class="top"><div class="title">Pricing</div><div class="icon" style="background:var(--warn-bg);color:var(--warn);">£</div></div>
-        <div class="stat warn">£14 under</div>
-        <div class="caption">Boiler services are priced below your local average — see where.</div>
+      <a class="insight-card locked" href="insights.html" style="grid-column:1 / -1;">
+        <div class="top"><div class="title">Pricing &amp; market insights</div><div class="icon" style="background:var(--surface-2);color:var(--text-faint);">◎</div></div>
+        <div class="stat">Open the Insights tab</div>
+        <div class="locked-caption" id="insightsTeaser">Pooled comparisons unlock once at least 20 businesses are sharing data for your area — the Insights tab shows exactly where things stand for you right now, honestly, not guessed.</div>
       </a>
-
-      <a class="insight-card" href="insights.html">
-        <div class="top"><div class="title">Seasonal demand</div><div class="icon" style="background:var(--info-bg);color:var(--info);">◐</div></div>
-        <div class="stat info">Peak in 6 wks</div>
-        <div class="caption">Boiler-install demand for your trade typically rises from mid-October.</div>
-      </a>
-
-      <a class="insight-card" href="insights.html">
-        <div class="top"><div class="title">Where to advertise</div><div class="icon" style="background:var(--good-bg);color:var(--good);">◎</div></div>
-        <div class="stat good">Redbridge ↑</div>
-        <div class="caption">Highest-value nearby jobs are coming from an area you're not targeting yet.</div>
-      </a>
-
-      <a class="insight-card" href="insights.html">
-        <div class="top"><div class="title">Growth vs. peers</div><div class="icon" style="background:var(--good-bg);color:var(--good);">▲</div></div>
-        <div class="stat good">+9% vs +7%</div>
-        <div class="caption">You're growing faster this quarter than similar trades businesses.</div>
-      </a>
-
-      <a class="insight-card locked" href="insights.html">
-        <div class="top"><div class="title">Cross-sell opportunities</div><div class="icon" style="background:var(--surface-2);color:var(--text-faint);">＋</div></div>
-        <div class="stat">Unlocks soon</div>
-        <div class="locked-caption">A few more jobs logged and we'll show job pairings you might be missing.</div>
-      </a>
-
-      <a class="insight-card" href="insights.html">
-        <div class="top"><div class="title">Your best clients</div><div class="icon" style="background:var(--surface-2);color:var(--brand-gold);">★</div></div>
-        <div class="stat">14% repeat</div>
-        <div class="caption">Repeat clients are worth 2.6× a one-off job — see your top 10.</div>
-      </a>
-
     </div>
   </main>
 </div>
@@ -261,6 +206,94 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
 <script>
+  function fmtMoney(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Same rule as invoices.html's effectiveStatus — "overdue" is computed,
+  // never stored, so both pages agree on what counts as overdue.
+  function daysOverdue(dueDate) {
+    if (!dueDate) return 0;
+    const due = new Date(dueDate + 'T00:00:00');
+    const diffMs = new Date().setHours(0,0,0,0) - due.getTime();
+    return Math.floor(diffMs / 86400000);
+  }
+  function effectiveStatus(inv) {
+    if (inv.status === 'sent' && daysOverdue(inv.due_date) > 0) return 'overdue';
+    return inv.status;
+  }
+
+  async function loadDashboard(accountId) {
+    const { data: invoices, error } = await supabaseClient
+      .from('invoices')
+      .select('id, invoice_number, job_description, amount, job_date, due_date, status, sent_at, paid_at, created_at, clients(name)')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false });
+
+    if (error || !invoices) {
+      document.getElementById('recentInvoicesBody').innerHTML =
+        '<tr><td colspan="4" style="color:var(--warn); padding:18px 8px;">Could not load your invoices right now.</td></tr>';
+      return;
+    }
+
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    const lastMonthDate = new Date(thisYear, thisMonth - 1, 1);
+
+    const unpaid = invoices.filter(i => i.status === 'sent');
+    const outstanding = unpaid.reduce((sum, i) => sum + Number(i.amount), 0);
+    document.getElementById('statOutstanding').textContent = fmtMoney(outstanding);
+    document.getElementById('statOutstandingSub').textContent =
+      unpaid.length ? `${unpaid.length} invoice${unpaid.length === 1 ? '' : 's'} unpaid` : 'No invoices unpaid';
+
+    const paidThisMonth = invoices.filter(i => i.paid_at && new Date(i.paid_at).getMonth() === thisMonth && new Date(i.paid_at).getFullYear() === thisYear);
+    const paidThisMonthSum = paidThisMonth.reduce((sum, i) => sum + Number(i.amount), 0);
+    const paidLastMonth = invoices.filter(i => i.paid_at && new Date(i.paid_at).getMonth() === lastMonthDate.getMonth() && new Date(i.paid_at).getFullYear() === lastMonthDate.getFullYear());
+    const paidLastMonthSum = paidLastMonth.reduce((sum, i) => sum + Number(i.amount), 0);
+    document.getElementById('statPaid').textContent = fmtMoney(paidThisMonthSum);
+    document.getElementById('statPaidSub').textContent = paidLastMonthSum > 0
+      ? `${paidThisMonthSum >= paidLastMonthSum ? '↑' : '↓'} ${Math.abs(Math.round((paidThisMonthSum - paidLastMonthSum) / paidLastMonthSum * 100))}% vs last month`
+      : 'This month';
+
+    const paidLast30d = invoices.filter(i => i.paid_at && i.sent_at && (now - new Date(i.paid_at)) <= 30 * 86400000);
+    if (paidLast30d.length) {
+      const avgMs = paidLast30d.reduce((sum, i) => sum + (new Date(i.paid_at) - new Date(i.sent_at)), 0) / paidLast30d.length;
+      document.getElementById('statAvgDays').textContent = (avgMs / 86400000).toFixed(1) + ' days';
+    } else {
+      document.getElementById('statAvgDays').textContent = '—';
+      document.getElementById('statAvgDaysSub').textContent = 'No invoices paid yet';
+    }
+
+    const jobsThisMonth = invoices.filter(i => i.job_date && new Date(i.job_date + 'T00:00:00').getMonth() === thisMonth && new Date(i.job_date + 'T00:00:00').getFullYear() === thisYear);
+    const complete = jobsThisMonth.filter(i => i.status === 'paid').length;
+    document.getElementById('statJobs').textContent = jobsThisMonth.length;
+    document.getElementById('statJobsSub').textContent = `${complete} complete · ${jobsThisMonth.length - complete} open`;
+
+    const recent = invoices.slice(0, 5);
+    const body = document.getElementById('recentInvoicesBody');
+    if (!recent.length) {
+      body.innerHTML = '<tr><td colspan="4" style="color:var(--text-faint); padding:18px 8px;">No invoices yet — <a href="invoice-new.html">create your first one</a>.</td></tr>';
+      return;
+    }
+    body.innerHTML = recent.map(inv => {
+      const eff = effectiveStatus(inv);
+      const badge = {
+        draft: '<span class="status due">Draft</span>',
+        sent: '<span class="status due">Sent</span>',
+        paid: '<span class="status paid">Paid</span>',
+        overdue: `<span class="status overdue">Overdue ${daysOverdue(inv.due_date)} day${daysOverdue(inv.due_date) === 1 ? '' : 's'}</span>`,
+      }[eff] || eff;
+      const sentDate = inv.sent_at ? new Date(inv.sent_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—';
+      return `<tr>
+        <td class="job-cell"><div class="client">${inv.clients?.name || 'Unknown client'}</div><div class="desc">${inv.job_description}</div></td>
+        <td>${sentDate}</td>
+        <td>${badge}</td>
+        <td class="amt">${fmtMoney(inv.amount)}</td>
+      </tr>`;
+    }).join('');
+  }
+
   (async () => {
     const result = await requireSession();
     if (!result) return; // requireSession already redirected
@@ -269,6 +302,12 @@
     document.getElementById('sidebarBusinessName').textContent = businessName;
     wireSignOut();
     showTrialBannerIfNeeded(result.membership.account_id);
+
+    const hour = new Date().getHours();
+    document.getElementById('greeting').textContent = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('dateLine').textContent = 'Here\'s how things stand today — ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+
+    loadDashboard(result.membership.account_id);
   })();
 </script>
 </body>
