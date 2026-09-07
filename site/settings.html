@@ -138,10 +138,15 @@
           <div>
             <div class="plan-name">Starter plan</div>
             <div class="plan-price">£99/month · unlimited users · unlimited invoices</div>
+            <div class="plan-price" id="billingStatusLine" style="margin-top:4px;">Checking your billing status…</div>
           </div>
         </div>
-        <button class="upgrade-btn">See Growth &amp; Insider →</button>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+          <button class="upgrade-btn" id="subscribeBtn" hidden>Subscribe — £99/month →</button>
+          <button class="upgrade-btn">See Growth &amp; Insider →</button>
+        </div>
       </div>
+      <div id="billingMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
       <div class="ceiling-note">
         <span class="mark">✓</span>
         <p><b>Your bill never goes up with volume.</b> Add more jobs, more invoices, more staff — £99/month, always. No per-user fees, no usage tiers.</p>
@@ -256,6 +261,73 @@
     exportMsg.style.color = 'var(--good)';
   }
 
+  // Real subscription status, shown honestly (not just "Starter plan" as if
+  // it were always active) — and the one real path to actually pay: redirects
+  // to a genuine Stripe Checkout session, created server-side via
+  // create-checkout-session (Owner-only, matching every other billing action).
+  async function loadBillingStatus(accountId, isOwner) {
+    const statusLine = document.getElementById('billingStatusLine');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    const billingMsg = document.getElementById('billingMsg');
+
+    const { data: account, error } = await supabaseClient
+      .from('accounts')
+      .select('subscription_status')
+      .eq('id', accountId)
+      .maybeSingle();
+
+    if (error || !account) {
+      statusLine.textContent = 'Could not load billing status right now.';
+      return;
+    }
+
+    const statusText = {
+      trialing: 'Status: free trial',
+      active: 'Status: ✓ Active — thank you for subscribing',
+      past_due: 'Status: ⚠ Last payment failed — Stripe will retry automatically',
+      read_only_lapsed: 'Status: Read-only — subscribe below to unlock invoicing again',
+      cancelled: 'Status: Cancelled — subscribe below to reactivate',
+    };
+    statusLine.textContent = statusText[account.subscription_status] || `Status: ${account.subscription_status}`;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === 'success') {
+      billingMsg.style.display = 'block';
+      billingMsg.style.color = 'var(--good)';
+      billingMsg.textContent = 'Payment received — your subscription is now active. (If the status above still says otherwise, refresh in a few seconds — Stripe\'s confirmation can take a moment to arrive.)';
+    } else if (params.get('checkout') === 'cancelled') {
+      billingMsg.style.display = 'block';
+      billingMsg.style.color = 'var(--text-faint)';
+      billingMsg.textContent = 'Checkout was cancelled — no charge was made.';
+    }
+
+    if (isOwner && account.subscription_status !== 'active') {
+      subscribeBtn.hidden = false;
+      subscribeBtn.addEventListener('click', async () => {
+        subscribeBtn.disabled = true;
+        subscribeBtn.textContent = 'Redirecting to Stripe…';
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        try {
+          const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/create-checkout-session', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ origin: window.location.origin + window.location.pathname.replace(/settings\.html$/, '') }),
+          });
+          const data = await res.json();
+          if (!res.ok || !data.url) throw new Error(data.error || 'Unknown error');
+          window.location.href = data.url;
+        } catch (e) {
+          subscribeBtn.disabled = false;
+          subscribeBtn.textContent = 'Subscribe — £99/month →';
+          billingMsg.style.display = 'block';
+          billingMsg.style.color = 'var(--warn)';
+          billingMsg.textContent = 'Could not start checkout — please try again.';
+        }
+      });
+    }
+  }
+
   async function loadTeam(accountId, isOwner, myUserId) {
     const { data: members, error } = await supabaseClient
       .from('account_members')
@@ -334,6 +406,7 @@
     document.getElementById('sidebarBusinessName').textContent = membership.accounts?.business_name || 'Your business';
     wireSignOut();
     showTrialBannerIfNeeded(accountId);
+    loadBillingStatus(accountId, isOwner);
 
     loadTeam(accountId, isOwner, myUserId);
     if (isOwner) {
