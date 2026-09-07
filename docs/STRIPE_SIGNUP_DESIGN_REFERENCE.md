@@ -69,6 +69,20 @@ characters"), while a similar-length password with more varied characters passed
 copying this actual logic (penalize repetition/predictability, not just count characters)
 if we ever build our own strength meter, rather than a naive length-only check.
 
+## A real rough edge worth improving on, not copying
+
+Clearing the password field back to empty does **not** reset the strength indicator —
+it stays showing the last real assessment (e.g. a red "Too weak" bar and the "needs at
+least 10 characters" hint) even though the field is now blank and the person hasn't
+typed anything yet. An empty, untouched field showing an error is a genuine UX rough
+edge, even in an otherwise well-built flow.
+
+**For our own signup/reset-password pages: show no strength state at all until the
+field has real content, and ideally wait until the person pauses typing or moves to
+the next field, rather than validating on every keystroke from character one.** This is
+a deliberate, specific place to do better than the reference we're copying from, not
+just faster.
+
 ## Copy/UX patterns worth reusing (structure, not literal wording)
 
 - A single checkbox, checked by default, for "receive marketing communications," with
