@@ -48,15 +48,37 @@ Vertical gap between stacked fields: ~43–44px consistently.
 | Size | fills the form width (444px) × 36px tall |
 | Radius | 4px |
 
-## Password-strength bar (weak state only — see caveat)
+## Password-strength bar — full system, confirmed live
 
 | Property | Value |
 |---|---|
 | Segments | 3, each 142.7px wide × 4px tall |
 | Radius | 10px (fully pill-rounded) |
 | Gap between segments | 8px |
-| Critical/red (weak) | `#E61947` — measured directly off the real bar |
-| Unfilled/grey | `#D8DEE4` — measured directly off the real bar |
+| Unfilled/grey | `#D8DEE4` |
+| Weak state | 1 of 3 segments filled, bar color `#E61947`, label "Too weak" in `#C0123C` |
+| Acceptable/Strong state | 2 or 3 of 3 segments filled, bar color `#2B8700`, label ("Acceptable"/"Strong") in `#217005` — a darker green than the fill, presumably for text contrast on white |
+
+**Real finding from live user testing (2026-09-07):** amber/orange never appeared once,
+across many different password attempts of varying length and composition — only ever
+red or green. In practice this reads as a two-state (weak/good) system, not a genuine
+three-tone gradient, despite the meter visually implying more granularity. Also notable:
+length alone does not guarantee "Strong" — a 28-character password with repeating
+characters (`111111111222222222222222gggg`) was still rated "Too weak" ("Avoid... repeating
+characters"), while a similar-length password with more varied characters passed. Worth
+copying this actual logic (penalize repetition/predictability, not just count characters)
+if we ever build our own strength meter, rather than a naive length-only check.
+
+## Copy/UX patterns worth reusing (structure, not literal wording)
+
+- A single checkbox, checked by default, for "receive marketing communications," with
+  inline `Unsubscribe` and `Privacy Policy` links folded into the same sentence rather
+  than as separate rows.
+- "Already have an account? Sign in" as a single small centered line below the primary
+  and secondary (Google) buttons, not a separate header link.
+- A secondary "Or sign up with [Google]" option presented as a full-width outlined
+  button directly below the primary submit button, separated by a plain "Or sign up
+  with" divider line.
 
 ## Colors — full palette
 
