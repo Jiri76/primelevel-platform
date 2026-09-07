@@ -315,11 +315,25 @@
       billingMsg.textContent = 'Checkout was cancelled — no charge was made.';
     }
 
+    // Reset all three billing buttons to a clean default state on every
+    // render — a real bug found live: without this, whichever button you'd
+    // just clicked stayed stuck disabled showing "Cancelling…"/"Resuming…"
+    // forever, since only the OTHER button was ever touched on re-render.
+    [subscribeBtn, cancelBtn, resumeBtn].forEach(btn => {
+      btn.hidden = true;
+      btn.disabled = false;
+    });
+    subscribeBtn.textContent = 'Subscribe — £99/month →';
+    cancelBtn.textContent = 'Cancel subscription';
+    resumeBtn.textContent = 'Resume subscription';
+
     if (!isOwner) return;
 
     if (account.subscription_status !== 'active') {
       subscribeBtn.hidden = false;
-      subscribeBtn.addEventListener('click', async () => {
+      // .onclick (not addEventListener) so re-renders replace the handler
+      // instead of silently stacking a second, third, fourth one.
+      subscribeBtn.onclick = async () => {
         subscribeBtn.disabled = true;
         subscribeBtn.textContent = 'Redirecting to Stripe…';
 
@@ -340,7 +354,7 @@
           billingMsg.style.color = 'var(--warn)';
           billingMsg.textContent = 'Could not start checkout — please try again.';
         }
-      });
+      };
       return;
     }
 
@@ -359,7 +373,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Unknown error');
-        loadBillingStatus(accountId, isOwner);
+        loadBillingStatus(accountId, isOwner); // re-render resets both buttons cleanly
       } catch (e) {
         btn.disabled = false;
         btn.textContent = originalText;
