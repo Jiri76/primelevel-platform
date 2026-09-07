@@ -48,28 +48,6 @@
   *{box-sizing:border-box;}
   body{ margin:0; background:#343B47; color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
 
-  /* Dark cards on the lighter #343B47 filler — real depth from just the two
-     locked colors (Navy for cards, a Navy/White derived tint for the page),
-     so every card's own text/border needs to flip to light values too. */
-  .stat-card, .invoice-panel, .insight-card{ background:#1E2633; border-color:#333E4F; }
-  .stat-card .lbl{ color:#7B8393; }
-  .stat-card .val{ color:#F1EEE6; }
-  .stat-card .sub{ color:#57B78E; }
-  .stat-card .sub.warn{ color:#DD8E5D; }
-  .stat-card .sub.neutral{ color:#7B8393; }
-  .section-label a{ color:#87A6CE; }
-  thead th{ color:#7B8393; border-bottom-color:#333E4F; }
-  tbody td{ border-bottom-color:#333E4F; color:#F1EEE6; }
-  td.job-cell .client{ color:#F1EEE6; }
-  td.job-cell .desc{ color:#7B8393; }
-  .status.paid{ color:#57B78E; background:#1D3A30; }
-  .status.due{ color:#87A6CE; background:#22314A; }
-  .status.overdue{ color:#DD8E5D; background:#402C1F; }
-  .insight-card .title{ color:#F1EEE6; }
-  .insight-card .caption{ color:#A7AEBA; }
-  .insight-card .locked-caption{ color:#7B8393; }
-  .insight-card .icon{ background:#242E3B !important; color:#7B8393 !important; }
-
   /* ============ New shell: a collapsed icon rail (hover to expand,
      mirroring Supabase's own dashboard nav) + a top bar with an
      account menu (also mirroring Supabase) — real measured values:
@@ -82,7 +60,7 @@
   .rail{ position:relative; width:48px; flex:none; }
   .rail-inner{
     position:absolute; top:0; left:0; bottom:0; width:48px; overflow:hidden;
-    background:#242E3B; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
+    background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
     transition:width 0.15s ease; z-index:20;
   }
   .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
@@ -109,7 +87,7 @@
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .topbar{
     height:48px; flex:none; display:flex; align-items:center; justify-content:space-between;
-    padding:0 20px 0 16px; background:#242E3B;
+    padding:0 20px 0 16px; background:#1E2633;
   }
   .topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; }
   .topbar-right{ position:relative; }
@@ -147,48 +125,48 @@
 
   /* stat row */
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
-  .stat-card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
-  .stat-card .lbl{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); margin-bottom:8px; }
-  .stat-card .val{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; color:var(--text); }
-  .stat-card .sub{ font-size:11.5px; color:var(--good); margin-top:4px; font-weight:600; }
-  .stat-card .sub.warn{ color:var(--warn); }
-  .stat-card .sub.neutral{ color:var(--text-faint); font-weight:500; }
+  .stat-card{ background:#1E2633; border:1px solid #333E4F; border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
+  .stat-card .lbl{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#7B8393; margin-bottom:8px; }
+  .stat-card .val{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; color:#F1EEE6; }
+  .stat-card .sub{ font-size:11.5px; color:#57B78E; margin-top:4px; font-weight:600; }
+  .stat-card .sub.warn{ color:#DD8E5D; }
+  .stat-card .sub.neutral{ color:#7B8393; font-weight:500; }
 
   .section-label{ display:flex; align-items:baseline; justify-content:space-between; margin:0 0 14px; }
   .section-label span.t{ font-size:11.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#8791A1; }
-  .section-label a{ font-size:12.5px; color:var(--info); text-decoration:none; font-weight:600; }
+  .section-label a{ font-size:12.5px; color:#87A6CE; text-decoration:none; font-weight:600; }
 
   /* invoice table */
-  .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:40px; }
+  .invoice-panel{ background:#1E2633; border:1px solid #333E4F; border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:40px; }
   table{ width:100%; border-collapse:collapse; }
-  thead th{ text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); padding:13px 18px; border-bottom:1px solid var(--border); }
-  tbody td{ padding:13px 18px; font-size:13.5px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  thead th{ text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#7B8393; padding:13px 18px; border-bottom:1px solid #333E4F; }
+  tbody td{ padding:13px 18px; font-size:13.5px; border-bottom:1px solid #333E4F; vertical-align:middle; color:#F1EEE6; }
   tbody tr:last-child td{ border-bottom:none; }
   td.amt{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; text-align:right; }
-  td.job-cell .client{ font-weight:600; color:var(--text); }
-  td.job-cell .desc{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  td.job-cell .client{ font-weight:600; color:#F1EEE6; }
+  td.job-cell .desc{ font-size:12px; color:#7B8393; margin-top:2px; }
   .status{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; padding:4px 9px; border-radius:100px; }
-  .status.paid{ color:var(--good); background:var(--good-bg); }
-  .status.due{ color:var(--info); background:var(--info-bg); }
-  .status.overdue{ color:var(--warn); background:var(--warn-bg); }
+  .status.paid{ color:#57B78E; background:#1D3A30; }
+  .status.due{ color:#87A6CE; background:#22314A; }
+  .status.overdue{ color:#DD8E5D; background:#402C1F; }
 
   /* insights grid */
   .insight-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .insight-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:16px 17px;
+    background:#1E2633; border:1px solid #333E4F; border-radius:13px; padding:16px 17px;
     box-shadow:var(--shadow); text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:10px;
   }
   .insight-card .top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-  .insight-card .icon{ width:26px;height:26px;border-radius:7px; display:flex;align-items:center;justify-content:center; font-size:13px; flex:none; }
-  .insight-card .title{ font-size:13px; font-weight:600; color:var(--text); }
+  .insight-card .icon{ width:26px;height:26px;border-radius:7px; display:flex;align-items:center;justify-content:center; font-size:13px; flex:none; background:#333E4F !important; color:#7B8393 !important; }
+  .insight-card .title{ font-size:13px; font-weight:600; color:#F1EEE6; }
   .insight-card .stat{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:19px; font-weight:600; }
-  .insight-card .stat.good{ color:var(--good); }
-  .insight-card .stat.warn{ color:var(--warn); }
-  .insight-card .stat.info{ color:var(--info); }
-  .insight-card .caption{ font-size:12px; color:var(--text-soft); line-height:1.5; }
-  .insight-card .locked-caption{ font-size:12px; color:var(--text-faint); line-height:1.5; }
+  .insight-card .stat.good{ color:#57B78E; }
+  .insight-card .stat.warn{ color:#DD8E5D; }
+  .insight-card .stat.info{ color:#87A6CE; }
+  .insight-card .caption{ font-size:12px; color:#A7AEBA; line-height:1.5; }
+  .insight-card .locked-caption{ font-size:12px; color:#7B8393; line-height:1.5; }
   .insight-card.locked{ opacity:0.72; }
-  .insight-card.locked .stat{ color:var(--text-faint); font-size:13px; font-family:'Archivo',sans-serif; font-weight:600; }
+  .insight-card.locked .stat{ color:#7B8393; font-size:13px; font-family:'Archivo',sans-serif; font-weight:600; }
 
   @media (max-width:920px){
     .rail{ display:none; }
