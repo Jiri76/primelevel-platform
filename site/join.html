@@ -111,7 +111,16 @@
       // handle_new_user() database trigger to link this signup to an
       // existing pending invite (matched by email) instead of creating a
       // brand-new business account. See DATA_MODEL.md.
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      //
+      // Explicit redirect, same reason as index.html's signup — don't rely
+      // solely on the dashboard's Site URL default.
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}${window.location.pathname.replace(/join\.html$/, '')}dashboard.html`,
+        },
+      });
 
       if (error) {
         showMsg(error.message, 'err');

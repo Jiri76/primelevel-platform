@@ -203,10 +203,17 @@
       const email = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value;
 
+      // Explicit redirect, rather than relying solely on the project's
+      // dashboard-configured Site URL default — that default pointed at a
+      // local dev URL for a while after this site went live on GitHub Pages,
+      // silently breaking every confirmation email until caught live.
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: { data: { business_name: businessName } },
+        options: {
+          data: { business_name: businessName },
+          emailRedirectTo: `${window.location.origin}${window.location.pathname.replace(/index\.html$/, '')}dashboard.html`,
+        },
       });
 
       if (error) {
