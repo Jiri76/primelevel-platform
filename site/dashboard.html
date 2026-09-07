@@ -46,22 +46,70 @@
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
   }
   *{box-sizing:border-box;}
-  body{ background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
 
-  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
-  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface-2); } }
-  :root[data-theme="dark"] .sidebar{ background:var(--surface-2); }
-  .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
+  /* ============ New shell: a collapsed icon rail (hover to expand,
+     mirroring Supabase's own dashboard nav) + a top bar with an
+     account menu (also mirroring Supabase) — real measured values:
+     rail collapsed 47px, expanded ~208px, row height 32px, topbar
+     height 47px, account menu 256px wide with 6px radius. Rounded up
+     slightly to whole pixels; colors mapped onto PrimeLevel's own
+     navy/gold tokens instead of Supabase's literal palette. ============ */
+  .shell{ display:flex; min-height:100vh; }
+
+  .rail{ position:relative; width:48px; flex:none; }
+  .rail-inner{
+    position:absolute; top:0; left:0; bottom:0; width:48px; overflow:hidden;
+    background:var(--brand-navy); display:flex; flex-direction:column; gap:4px; padding:10px 8px;
+    transition:width 0.15s ease; z-index:20;
+  }
+  @media (prefers-color-scheme: dark){ .rail-inner{ background:var(--surface-2); } }
+  :root[data-theme="dark"] .rail-inner{ background:var(--surface-2); }
+  .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
+
+  .rail-brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 14px; white-space:nowrap; }
   .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
-  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
-  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
-  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
-  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
-  .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
-  .tab.active .dot{background:var(--brand-gold);}
-  .tab:hover:not(.active){ background:rgba(178,155,104,0.08); color:#E9E4D8; box-shadow: inset 2px 0 0 rgba(178,155,104,0.4); }
-  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
+  .brand-mark.small{ width:22px; height:22px; font-size:12px; border-radius:5px; }
+  .rail-brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:16px; color:#F7F4EC; opacity:0; transition:opacity 0.1s; }
+  .rail:hover .rail-brand-word{ opacity:1; transition-delay:0.05s; }
+
+  .rail-nav{ display:flex; flex-direction:column; gap:2px; }
+  .rail-item{
+    display:flex; align-items:center; gap:10px; height:32px; padding:0 7px; border-radius:6px;
+    color:#989A99; text-decoration:none; white-space:nowrap; overflow:hidden;
+    transition:background 0.1s, color 0.1s;
+  }
+  .rail-item:hover{ background:rgba(255,255,255,0.06); color:#E9E4D8; }
+  .rail-item.active{ background:rgba(178,155,104,0.18); color:#F7F4EC; }
+  .rail-icon{ flex:none; width:18px; text-align:center; font-size:13px; font-weight:600; }
+  .rail-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity 0.1s; }
+  .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
+
+  .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{
+    height:48px; flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:0 20px 0 16px; border-bottom:1px solid var(--border);
+  }
+  .topbar-crumb{ display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; color:var(--text); }
+  .topbar-right{ position:relative; }
+  .avatar-btn{
+    width:32px; height:32px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--brand-navy); color:#F7F4EC; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
+  }
+  :root[data-theme="dark"] .avatar-btn{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .avatar-btn{ background:var(--brand-gold); color:#1A1406; } }
+
+  .account-menu{
+    position:absolute; top:40px; right:0; width:256px; background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10);
+    padding:6px; z-index:30;
+  }
+  .account-menu-head{ padding:8px 10px 10px; }
+  .account-menu-name{ font-size:13px; font-weight:600; color:var(--text); }
+  .account-menu-email{ font-size:12px; color:var(--text-faint); margin-top:1px; }
+  .account-menu-sep{ height:1px; background:var(--border); margin:4px 0; }
+  .account-menu-item{ display:block; padding:7px 10px; border-radius:6px; font-size:12.5px; color:var(--text-soft); text-decoration:none; cursor:pointer; }
+  .account-menu-item:hover{ background:var(--surface-2); color:var(--text); }
 
   main{ padding:32px 40px 64px; max-width:1120px; }
   .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:26px; }
@@ -120,10 +168,7 @@
   .insight-card.locked .stat{ color:var(--text-faint); font-size:13px; font-family:'Archivo',sans-serif; font-weight:600; }
 
   @media (max-width:920px){
-    .shell{ grid-template-columns:1fr; }
-    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
-    nav.tabs{ flex-direction:row; }
-    .sidebar-foot{ display:none; }
+    .rail{ display:none; }
     .stats{ grid-template-columns:repeat(2,1fr); }
     .insight-grid{ grid-template-columns:1fr; }
     table{ font-size:12.5px; }
@@ -133,25 +178,40 @@
 <body>
 <div class="shell">
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">P</div>
-      <div class="brand-word">PrimeLevel</div>
+  <aside class="rail">
+    <div class="rail-inner">
+      <div class="rail-brand"><div class="brand-mark">P</div><span class="rail-brand-word">PrimeLevel</span></div>
+      <nav class="rail-nav">
+        <a class="rail-item active" href="dashboard.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
+        <a class="rail-item" href="invoices.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
+        <a class="rail-item" href="payments.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
+        <a class="rail-item" href="insights.html"><span class="rail-icon">◎</span><span class="rail-label">Insights</span></a>
+        <a class="rail-item" href="renewals.html"><span class="rail-icon">↻</span><span class="rail-label">Renewals</span></a>
+        <a class="rail-item" href="plans.html"><span class="rail-icon">$</span><span class="rail-label">Plans &amp; Billing</span></a>
+        <a class="rail-item" href="team.html"><span class="rail-icon">T</span><span class="rail-label">Team</span></a>
+        <a class="rail-item" href="settings.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
+      </nav>
     </div>
-    <nav class="tabs">
-      <a class="tab active" href="dashboard.html"><span class="dot"></span>Dashboard</a>
-      <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
-      <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
-      <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
-      <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
-      <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
-      <a class="tab" href="team.html"><span class="dot"></span>Team</a>
-      <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
-    </nav>
-    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
-  <main>
+  <div class="main-col">
+    <header class="topbar">
+      <div class="topbar-crumb"><div class="brand-mark small">P</div><span id="topbarBusinessName">…</span></div>
+      <div class="topbar-right">
+        <button class="avatar-btn" id="accountBtn">…</button>
+        <div class="account-menu" id="accountMenu" hidden>
+          <div class="account-menu-head">
+            <div class="account-menu-name" id="accountMenuName">…</div>
+            <div class="account-menu-email" id="accountMenuEmail">…</div>
+          </div>
+          <a class="account-menu-item" href="settings.html">Settings</a>
+          <div class="account-menu-sep"></div>
+          <a class="account-menu-item" href="#" data-sign-out>Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
     <div class="page-head">
       <div>
         <h1 id="greeting">Welcome back</h1>
@@ -203,7 +263,8 @@
         <div class="locked-caption" id="insightsTeaser">Pooled comparisons unlock once at least 20 businesses are sharing data for your area — the Insights tab shows exactly where things stand for you right now, honestly, not guessed.</div>
       </a>
     </div>
-  </main>
+    </main>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -297,12 +358,36 @@
     }).join('');
   }
 
+  // Real account menu: toggles on click, closes on outside click or Escape
+  // — same discipline as the inline-confirm pattern used elsewhere (no
+  // native browser dialogs), just a dropdown instead of a confirmation.
+  function wireAccountMenu(businessName, email) {
+    const btn = document.getElementById('accountBtn');
+    const menu = document.getElementById('accountMenu');
+    const initial = (businessName || '?').charAt(0).toUpperCase();
+    btn.textContent = initial;
+    document.getElementById('accountMenuName').textContent = businessName;
+    document.getElementById('accountMenuEmail').textContent = email || '';
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) menu.hidden = true;
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') menu.hidden = true;
+    });
+  }
+
   (async () => {
     const result = await requireSession();
     if (!result) return; // requireSession already redirected
 
     const businessName = result.membership.accounts?.business_name || 'Your business';
-    document.getElementById('sidebarBusinessName').textContent = businessName;
+    document.getElementById('topbarBusinessName').textContent = businessName;
+    wireAccountMenu(businessName, result.session.user.email);
     wireSignOut();
     showTrialBannerIfNeeded(result.membership.account_id);
 
