@@ -44,10 +44,11 @@
   .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
   .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
   nav.tabs{ display:flex; flex-direction:column; gap:2px; }
-  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
   .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
   .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
   .tab.active .dot{background:var(--brand-gold);}
+  .tab:hover:not(.active){ background:rgba(178,155,104,0.08); color:#E9E4D8; box-shadow: inset 2px 0 0 rgba(178,155,104,0.4); }
   .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
 
   main{ padding:32px 40px 64px; max-width:1040px; }
@@ -121,6 +122,7 @@
       <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
+      <a class="tab" href="team.html"><span class="dot"></span>Team</a>
       <a class="tab active" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
@@ -153,19 +155,6 @@
           </div>
           <div id="businessNameMsg" style="font-size:11.5px; margin-top:6px; display:none;"></div>
         </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>Team</h2>
-      <p class="desc">Everyone who can access this account, and what they can do. Only the owner can mark invoices paid, manage the team, or change billing. Any active member can mark an invoice paid — always attributed to whoever did it.</p>
-      <div id="teamList"><div class="desc">Loading…</div></div>
-      <div id="inviteFormWrap" hidden>
-        <form id="inviteForm" style="display:flex; gap:8px; margin-top:14px;">
-          <input type="email" id="inviteEmail" placeholder="employee@email.co.uk" required style="flex:1; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:13px;">
-          <button type="submit" class="export-btn">+ Invite a team member</button>
-        </form>
-        <div id="inviteMsg" style="font-size:12px; margin-top:8px;"></div>
       </div>
     </div>
 
@@ -344,72 +333,6 @@
     };
   }
 
-  async function loadTeam(accountId, isOwner, myUserId) {
-    const { data: members, error } = await supabaseClient
-      .from('account_members')
-      .select('id, user_id, role, invited_email, status, web_dashboard_access')
-      .eq('account_id', accountId)
-      .neq('status', 'revoked')
-      .order('invited_at', { ascending: true });
-
-    const list = document.getElementById('teamList');
-    if (error || !members) {
-      list.innerHTML = '<div class="desc">Could not load your team right now.</div>';
-      return;
-    }
-
-    list.innerHTML = '';
-    members.forEach((m) => {
-      const isMe = m.user_id === myUserId;
-      const row = document.createElement('div');
-      row.className = 'renewal-row';
-
-      const roleLabel = m.role === 'owner'
-        ? 'Owner · full access'
-        : (m.status === 'invited' ? 'Member · invited' : 'Member · can create &amp; send invoices');
-      const statusBadge = m.status === 'invited'
-        ? '<span class="countdown soon">Pending</span>'
-        : '<span class="countdown ok">Active</span>';
-
-      let controls = statusBadge;
-      if (isOwner && m.role !== 'owner') {
-        controls += `
-          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-faint); cursor:pointer;">
-            Dashboard access
-            <div class="toggle ${m.web_dashboard_access ? '' : 'off'}" data-toggle-id="${m.id}" data-current="${m.web_dashboard_access}"><div class="knob"></div></div>
-          </label>
-          <span class="remove-wrap"><button class="export-btn" data-remove-open="${m.id}" style="color:var(--warn);">Remove</button></span>`;
-      }
-
-      row.innerHTML = `
-        <div><div class="name">${m.invited_email}${isMe ? ' (you)' : ''}</div><div class="type">${roleLabel}</div></div>
-        <div style="display:flex; align-items:center; gap:14px;">${controls}</div>`;
-      list.appendChild(row);
-    });
-
-    list.querySelectorAll('[data-toggle-id]').forEach((t) => {
-      t.addEventListener('click', async () => {
-        const id = t.getAttribute('data-toggle-id');
-        const current = t.getAttribute('data-current') === 'true';
-        const { error } = await supabaseClient.from('account_members').update({ web_dashboard_access: !current }).eq('id', id);
-        if (!error) loadTeam(accountId, isOwner, myUserId);
-      });
-    });
-
-    list.querySelectorAll('[data-remove-open]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-remove-open');
-        const wrap = btn.closest('.remove-wrap');
-        wrap.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">Remove — they'll lose access immediately.</span> <button class="export-btn" data-remove-confirm="${id}" style="color:var(--warn);">Yes, remove</button> <button class="export-btn" data-remove-cancel="1">Cancel</button>`;
-        wrap.querySelector('[data-remove-confirm]').addEventListener('click', async () => {
-          const { error } = await supabaseClient.from('account_members').update({ status: 'revoked', revoked_at: new Date().toISOString() }).eq('id', id);
-          if (!error) loadTeam(accountId, isOwner, myUserId);
-        });
-        wrap.querySelector('[data-remove-cancel]').addEventListener('click', () => loadTeam(accountId, isOwner, myUserId));
-      });
-    });
-  }
-
   (async () => {
     const result = await requireSession();
     if (!result) return;
@@ -423,47 +346,6 @@
     wireSignOut();
     showTrialBannerIfNeeded(accountId);
     loadProfile(accountId, isOwner);
-
-    loadTeam(accountId, isOwner, myUserId);
-    if (isOwner) {
-      document.getElementById('inviteFormWrap').hidden = false;
-      document.getElementById('inviteForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('inviteEmail').value.trim();
-        const msg = document.getElementById('inviteMsg');
-        const { data: newInvite, error } = await supabaseClient
-          .from('account_members')
-          .insert({ account_id: accountId, invited_email: email, role: 'member', status: 'invited' })
-          .select('id')
-          .single();
-
-        if (error) {
-          msg.textContent = error.message.includes('duplicate')
-            ? 'That email has already been invited.'
-            : 'Something went wrong — please try again.';
-          msg.style.color = 'var(--warn)';
-          return;
-        }
-
-        document.getElementById('inviteForm').reset();
-        loadTeam(accountId, isOwner, myUserId);
-        msg.textContent = 'Added — sending them an invite email…';
-        msg.style.color = 'var(--good)';
-
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/send-invite-email', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ account_member_id: newInvite.id }),
-        });
-
-        if (res.ok) {
-          msg.textContent = 'Invite email sent — they just need to click the link to join.';
-        } else {
-          msg.textContent = 'Added, but the invite email could not be sent — ask them to sign up using that exact email address instead.';
-        }
-      });
-    }
 
     document.getElementById('exportInvoicesBtn').addEventListener('click', () => downloadInvoicesCsv(accountId));
   })();

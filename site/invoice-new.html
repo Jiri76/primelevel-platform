@@ -45,10 +45,11 @@
   .brand-mark{ width:30px;height:30px;border-radius:7px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
   .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
   nav.tabs{ display:flex; flex-direction:column; gap:2px; }
-  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; }
+  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
   .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
   .tab.active{ background:rgba(178,155,104,0.16); color:#F7F4EC; box-shadow: inset 2px 0 0 var(--brand-gold); }
   .tab.active .dot{background:var(--brand-gold);}
+  .tab:hover:not(.active){ background:rgba(178,155,104,0.08); color:#E9E4D8; box-shadow: inset 2px 0 0 rgba(178,155,104,0.4); }
   .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid rgba(255,255,255,0.08); }
 
   main{ padding:32px 40px 64px; }
@@ -161,6 +162,7 @@
       <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
+      <a class="tab" href="team.html"><span class="dot"></span>Team</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>

@@ -125,6 +125,7 @@
     color:#C7CDD9;
     text-decoration:none;
     letter-spacing:0.01em;
+    transition:background 0.15s, box-shadow 0.15s, color 0.15s;
   }
   .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
   .tab.active{
@@ -133,6 +134,7 @@
     box-shadow: inset 2px 0 0 var(--brand-gold);
   }
   .tab.active .dot{background:var(--brand-gold);}
+  .tab:hover:not(.active){ background:rgba(178,155,104,0.08); color:#E9E4D8; box-shadow: inset 2px 0 0 rgba(178,155,104,0.4); }
   .sidebar-foot{
     margin-top:auto;
     padding:12px 8px 4px;
@@ -385,6 +387,7 @@
       <a class="tab active" href="insights.html"><span class="dot"></span>Insights</a>
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
       <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
+      <a class="tab" href="team.html"><span class="dot"></span>Team</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
