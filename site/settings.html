@@ -120,6 +120,7 @@
       <a class="tab" href="payments.html"><span class="dot"></span>Payments</a>
       <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
       <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
+      <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
       <a class="tab active" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
     <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
@@ -128,41 +129,31 @@
   <main>
     <div class="page-head">
       <h1>Settings</h1>
-      <p>Your plan, your data, and how PrimeLevel uses it.</p>
+      <p>Your profile, your team, your data, and how PrimeLevel uses it.</p>
     </div>
 
     <div class="panel">
-      <div class="plan-row">
-        <div class="plan-badge">
-          <div class="icon">S</div>
-          <div>
-            <div class="plan-name">Starter plan</div>
-            <div class="plan-price">£99/month · unlimited users · unlimited invoices</div>
-            <div class="plan-price" id="billingStatusLine" style="margin-top:4px;">Checking your billing status…</div>
+      <h2>Profile</h2>
+      <p class="desc">How your business appears across PrimeLevel — on invoices, in emails, and to your team.</p>
+      <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+        <div>
+          <div class="field-lbl" style="font-size:11.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Logo</div>
+          <div id="logoPreview" style="width:76px; height:76px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; font-family:'Fraunces',serif; font-weight:600; font-size:26px; color:var(--text-faint);">…</div>
+          <label class="export-btn" style="display:inline-block; margin-top:10px; cursor:pointer;">
+            Change logo
+            <input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+          </label>
+          <div id="logoMsg" style="font-size:11.5px; margin-top:6px; display:none;"></div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <div class="field-lbl" style="font-size:11.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Business name</div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="businessNameInput" style="flex:1; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:13.5px;">
+            <button class="export-btn" id="saveBusinessNameBtn">Save</button>
           </div>
-        </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-          <button class="upgrade-btn" id="subscribeBtn" hidden>Subscribe — £99/month →</button>
-          <button class="export-btn" id="cancelBtn" style="color:var(--warn);" hidden>Cancel subscription</button>
-          <button class="export-btn" id="resumeBtn" hidden>Resume subscription</button>
-          <button class="upgrade-btn">See Growth &amp; Insider →</button>
+          <div id="businessNameMsg" style="font-size:11.5px; margin-top:6px; display:none;"></div>
         </div>
       </div>
-      <div id="billingMsg" style="font-size:12px; margin-top:8px; display:none;"></div>
-      <div class="ceiling-note">
-        <span class="mark">✓</span>
-        <p><b>Your bill never goes up with volume.</b> Add more jobs, more invoices, more staff — £99/month, always. No per-user fees, no usage tiers.</p>
-      </div>
-      <ul class="feature-list">
-        <li><span class="yes">✓</span> Unlimited invoices &amp; users</li>
-        <li><span class="yes">✓</span> Client dashboard &amp; reminders</li>
-        <li><span class="yes">✓</span> Compliance &amp; renewal tracker</li>
-        <li><span class="yes">✓</span> Repeat-client &amp; lifetime-value insight</li>
-        <li><span class="yes">✓</span> Full data export, any time</li>
-        <li class="locked"><span class="lock">🔒</span> Automated multi-step payment chasing</li>
-        <li class="locked"><span class="lock">🔒</span> Local pricing &amp; market insights</li>
-        <li class="locked"><span class="lock">🔒</span> Priority same-day support</li>
-      </ul>
     </div>
 
     <div class="panel">
@@ -263,133 +254,94 @@
     exportMsg.style.color = 'var(--good)';
   }
 
-  // Real subscription status, shown honestly (not just "Starter plan" as if
-  // it were always active) — and the one real path to actually pay: redirects
-  // to a genuine Stripe Checkout session, created server-side via
-  // create-checkout-session (Owner-only, matching every other billing action).
-  async function loadBillingStatus(accountId, isOwner) {
-    const statusLine = document.getElementById('billingStatusLine');
-    const subscribeBtn = document.getElementById('subscribeBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const resumeBtn = document.getElementById('resumeBtn');
-    const billingMsg = document.getElementById('billingMsg');
+  // Real Profile section: business name (editable by anyone active — it's
+  // not a billing action) and a real logo upload to Supabase Storage
+  // (Owner-only to change, matching every other account-identity action).
+  async function loadProfile(accountId, isOwner) {
+    const logoPreview = document.getElementById('logoPreview');
+    const logoInput = document.getElementById('logoInput');
+    const logoMsg = document.getElementById('logoMsg');
+    const nameInput = document.getElementById('businessNameInput');
+    const nameMsg = document.getElementById('businessNameMsg');
+    const saveNameBtn = document.getElementById('saveBusinessNameBtn');
 
     const { data: account, error } = await supabaseClient
       .from('accounts')
-      .select('subscription_status, cancel_at_period_end, current_period_end')
+      .select('business_name, logo_url')
       .eq('id', accountId)
       .maybeSingle();
 
-    if (error || !account) {
-      statusLine.textContent = 'Could not load billing status right now.';
-      return;
-    }
+    if (error || !account) return;
 
-    const periodEndDate = account.current_period_end
-      ? new Date(account.current_period_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-      : null;
-
-    let statusText;
-    if (account.subscription_status === 'active' && account.cancel_at_period_end && periodEndDate) {
-      statusText = `Status: Cancelled — you can keep using PrimeLevel until ${periodEndDate}, then it'll stop. You won't be charged again.`;
+    nameInput.value = account.business_name || '';
+    if (account.logo_url) {
+      logoPreview.innerHTML = `<img src="${account.logo_url}" alt="Logo" style="width:100%; height:100%; object-fit:cover;">`;
     } else {
-      const plainStatusText = {
-        trialing: 'Status: free trial',
-        active: 'Status: ✓ Active — thank you for subscribing',
-        past_due: 'Status: ⚠ Last payment failed — Stripe will retry automatically',
-        read_only_lapsed: 'Status: Read-only — subscribe below to unlock invoicing again',
-        cancelled: 'Status: Cancelled — subscribe below to reactivate',
-      };
-      statusText = plainStatusText[account.subscription_status] || `Status: ${account.subscription_status}`;
-    }
-    statusLine.textContent = statusText;
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('checkout') === 'success') {
-      billingMsg.style.display = 'block';
-      billingMsg.style.color = 'var(--good)';
-      billingMsg.textContent = 'Payment received — your subscription is now active. (If the status above still says otherwise, refresh in a few seconds — Stripe\'s confirmation can take a moment to arrive.)';
-    } else if (params.get('checkout') === 'cancelled') {
-      billingMsg.style.display = 'block';
-      billingMsg.style.color = 'var(--text-faint)';
-      billingMsg.textContent = 'Checkout was cancelled — no charge was made.';
+      logoPreview.textContent = (account.business_name || '?').charAt(0).toUpperCase();
     }
 
-    // Reset all three billing buttons to a clean default state on every
-    // render — a real bug found live: without this, whichever button you'd
-    // just clicked stayed stuck disabled showing "Cancelling…"/"Resuming…"
-    // forever, since only the OTHER button was ever touched on re-render.
-    [subscribeBtn, cancelBtn, resumeBtn].forEach(btn => {
-      btn.hidden = true;
-      btn.disabled = false;
-    });
-    subscribeBtn.textContent = 'Subscribe — £99/month →';
-    cancelBtn.textContent = 'Cancel subscription';
-    resumeBtn.textContent = 'Resume subscription';
-
-    if (!isOwner) return;
-
-    if (account.subscription_status !== 'active') {
-      subscribeBtn.hidden = false;
-      // .onclick (not addEventListener) so re-renders replace the handler
-      // instead of silently stacking a second, third, fourth one.
-      subscribeBtn.onclick = async () => {
-        subscribeBtn.disabled = true;
-        subscribeBtn.textContent = 'Redirecting to Stripe…';
-
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        try {
-          const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/create-checkout-session', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ origin: window.location.origin + window.location.pathname.replace(/settings\.html$/, '') }),
-          });
-          const data = await res.json();
-          if (!res.ok || !data.url) throw new Error(data.error || 'Unknown error');
-          window.location.href = data.url;
-        } catch (e) {
-          subscribeBtn.disabled = false;
-          subscribeBtn.textContent = 'Subscribe — £99/month →';
-          billingMsg.style.display = 'block';
-          billingMsg.style.color = 'var(--warn)';
-          billingMsg.textContent = 'Could not start checkout — please try again.';
-        }
-      };
-      return;
+    if (!isOwner) {
+      logoInput.disabled = true;
+      logoInput.closest('label').style.opacity = '0.5';
+      logoInput.closest('label').style.cursor = 'default';
     }
 
-    // Active subscription: offer cancel (if not already cancelled) or resume
-    // (if it is) — one real Stripe call either way, see manage-subscription.
-    async function callManageSubscription(action, btn, busyText) {
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = busyText;
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      try {
-        const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/manage-subscription', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Unknown error');
-        loadBillingStatus(accountId, isOwner); // re-render resets both buttons cleanly
-      } catch (e) {
-        btn.disabled = false;
-        btn.textContent = originalText;
-        billingMsg.style.display = 'block';
-        billingMsg.style.color = 'var(--warn)';
-        billingMsg.textContent = 'Could not update your subscription — please try again.';
+    saveNameBtn.onclick = async () => {
+      const newName = nameInput.value.trim();
+      if (!newName) return;
+      saveNameBtn.disabled = true;
+      saveNameBtn.textContent = 'Saving…';
+      const { error: saveError } = await supabaseClient.from('accounts').update({ business_name: newName }).eq('id', accountId);
+      saveNameBtn.disabled = false;
+      saveNameBtn.textContent = 'Save';
+      nameMsg.style.display = 'block';
+      if (saveError) {
+        nameMsg.style.color = 'var(--warn)';
+        nameMsg.textContent = 'Could not save — please try again.';
+      } else {
+        nameMsg.style.color = 'var(--good)';
+        nameMsg.textContent = 'Saved.';
+        document.getElementById('sidebarBusinessName').textContent = newName;
       }
-    }
+    };
 
-    if (account.cancel_at_period_end) {
-      resumeBtn.hidden = false;
-      resumeBtn.onclick = () => callManageSubscription('resume', resumeBtn, 'Resuming…');
-    } else {
-      cancelBtn.hidden = false;
-      cancelBtn.onclick = () => callManageSubscription('cancel', cancelBtn, 'Cancelling…');
-    }
+    logoInput.onchange = async () => {
+      const file = logoInput.files[0];
+      if (!file) return;
+      logoMsg.style.display = 'block';
+      logoMsg.style.color = 'var(--text-faint)';
+      logoMsg.textContent = 'Uploading…';
+
+      const ext = file.name.split('.').pop();
+      const path = `${accountId}/logo.${ext}`;
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from('logos')
+        .upload(path, file, { upsert: true, cacheControl: '3600' });
+
+      if (uploadError) {
+        logoMsg.style.color = 'var(--warn)';
+        logoMsg.textContent = 'Could not upload — please try a different image.';
+        return;
+      }
+
+      const { data: publicUrlData } = supabaseClient.storage.from('logos').getPublicUrl(path);
+      // Cache-bust so the browser doesn't keep showing the old logo at the
+      // exact same URL (see the version-key lesson — bump the key on the
+      // one thing that actually changed, here just the query string).
+      const versionedUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+
+      const { error: saveError } = await supabaseClient.from('accounts').update({ logo_url: versionedUrl }).eq('id', accountId);
+      if (saveError) {
+        logoMsg.style.color = 'var(--warn)';
+        logoMsg.textContent = 'Uploaded, but could not save — please try again.';
+        return;
+      }
+
+      logoPreview.innerHTML = `<img src="${versionedUrl}" alt="Logo" style="width:100%; height:100%; object-fit:cover;">`;
+      logoMsg.style.color = 'var(--good)';
+      logoMsg.textContent = 'Logo updated.';
+    };
   }
 
   async function loadTeam(accountId, isOwner, myUserId) {
@@ -470,7 +422,7 @@
     document.getElementById('sidebarBusinessName').textContent = membership.accounts?.business_name || 'Your business';
     wireSignOut();
     showTrialBannerIfNeeded(accountId);
-    loadBillingStatus(accountId, isOwner);
+    loadProfile(accountId, isOwner);
 
     loadTeam(accountId, isOwner, myUserId);
     if (isOwner) {
