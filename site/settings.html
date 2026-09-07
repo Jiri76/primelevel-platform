@@ -143,6 +143,8 @@
         </div>
         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
           <button class="upgrade-btn" id="subscribeBtn" hidden>Subscribe — £99/month →</button>
+          <button class="export-btn" id="cancelBtn" style="color:var(--warn);" hidden>Cancel subscription</button>
+          <button class="export-btn" id="resumeBtn" hidden>Resume subscription</button>
           <button class="upgrade-btn">See Growth &amp; Insider →</button>
         </div>
       </div>
@@ -268,11 +270,13 @@
   async function loadBillingStatus(accountId, isOwner) {
     const statusLine = document.getElementById('billingStatusLine');
     const subscribeBtn = document.getElementById('subscribeBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
     const billingMsg = document.getElementById('billingMsg');
 
     const { data: account, error } = await supabaseClient
       .from('accounts')
-      .select('subscription_status')
+      .select('subscription_status, cancel_at_period_end, current_period_end')
       .eq('id', accountId)
       .maybeSingle();
 
@@ -281,14 +285,24 @@
       return;
     }
 
-    const statusText = {
-      trialing: 'Status: free trial',
-      active: 'Status: ✓ Active — thank you for subscribing',
-      past_due: 'Status: ⚠ Last payment failed — Stripe will retry automatically',
-      read_only_lapsed: 'Status: Read-only — subscribe below to unlock invoicing again',
-      cancelled: 'Status: Cancelled — subscribe below to reactivate',
-    };
-    statusLine.textContent = statusText[account.subscription_status] || `Status: ${account.subscription_status}`;
+    const periodEndDate = account.current_period_end
+      ? new Date(account.current_period_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null;
+
+    let statusText;
+    if (account.subscription_status === 'active' && account.cancel_at_period_end && periodEndDate) {
+      statusText = `Status: Cancelled — you can keep using PrimeLevel until ${periodEndDate}, then it'll stop. You won't be charged again.`;
+    } else {
+      const plainStatusText = {
+        trialing: 'Status: free trial',
+        active: 'Status: ✓ Active — thank you for subscribing',
+        past_due: 'Status: ⚠ Last payment failed — Stripe will retry automatically',
+        read_only_lapsed: 'Status: Read-only — subscribe below to unlock invoicing again',
+        cancelled: 'Status: Cancelled — subscribe below to reactivate',
+      };
+      statusText = plainStatusText[account.subscription_status] || `Status: ${account.subscription_status}`;
+    }
+    statusLine.textContent = statusText;
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('checkout') === 'success') {
@@ -301,7 +315,9 @@
       billingMsg.textContent = 'Checkout was cancelled — no charge was made.';
     }
 
-    if (isOwner && account.subscription_status !== 'active') {
+    if (!isOwner) return;
+
+    if (account.subscription_status !== 'active') {
       subscribeBtn.hidden = false;
       subscribeBtn.addEventListener('click', async () => {
         subscribeBtn.disabled = true;
@@ -325,6 +341,40 @@
           billingMsg.textContent = 'Could not start checkout — please try again.';
         }
       });
+      return;
+    }
+
+    // Active subscription: offer cancel (if not already cancelled) or resume
+    // (if it is) — one real Stripe call either way, see manage-subscription.
+    async function callManageSubscription(action, btn, busyText) {
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = busyText;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      try {
+        const res = await fetch('https://aujxoyyuyjlsjhnzlrpc.supabase.co/functions/v1/manage-subscription', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Unknown error');
+        loadBillingStatus(accountId, isOwner);
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        billingMsg.style.display = 'block';
+        billingMsg.style.color = 'var(--warn)';
+        billingMsg.textContent = 'Could not update your subscription — please try again.';
+      }
+    }
+
+    if (account.cancel_at_period_end) {
+      resumeBtn.hidden = false;
+      resumeBtn.onclick = () => callManageSubscription('resume', resumeBtn, 'Resuming…');
+    } else {
+      cancelBtn.hidden = false;
+      cancelBtn.onclick = () => callManageSubscription('cancel', cancelBtn, 'Cancelling…');
     }
   }
 
