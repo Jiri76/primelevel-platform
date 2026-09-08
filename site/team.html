@@ -47,11 +47,27 @@
   nav.tabs{ display:flex; flex-direction:column; gap:2px; }
   .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
   .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
-  .tab.active{ background:var(--brand-gold); color:#1A1406; box-shadow: inset 2px 0 0 var(--brand-gold); }
+  .tab.active{ background:#12171F; color:var(--brand-gold); font-weight:700; box-shadow: inset 2px 0 0 var(--brand-gold); }
   .tab.active .dot{background:var(--brand-gold);}
   .tab:hover:not(.active){ background:#12171F; color:#E9E4D8; box-shadow: inset 2px 0 0 #333E4F; }
   .tab:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
-  .sidebar-foot{ margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8791A1; line-height:1.5; border-top:1px solid #F9F9FA; }
+
+  .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:var(--brand-navy); }
+  @media (prefers-color-scheme: dark){ .topbar{ background:var(--surface); } }
+  :root[data-theme="dark"] .topbar{ background:var(--surface); }
+  .topbar-right{ position:relative; }
+  .avatar-btn{ width:32px; height:32px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0; background:var(--brand-navy); color:#F7F4EC; font-family:'Fraunces',serif; font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  :root[data-theme="dark"] .avatar-btn{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .avatar-btn{ background:var(--brand-gold); color:#1A1406; } }
+  .avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .account-menu{ position:absolute; top:40px; right:0; width:256px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10); padding:6px; z-index:30; }
+  .account-menu-head{ padding:8px 10px 10px; }
+  .account-menu-name{ font-size:13px; font-weight:600; color:var(--text); }
+  .account-menu-email{ font-size:12px; color:var(--text-faint); margin-top:1px; }
+  .account-menu-sep{ height:1px; background:var(--border); margin:4px 0; }
+  .account-menu-item{ display:block; padding:7px 10px; border-radius:6px; font-size:12.5px; color:var(--text-soft); text-decoration:none; cursor:pointer; }
+  .account-menu-item:hover{ background:var(--surface-2); color:var(--text); }
 
   main{ padding:32px 40px 64px; max-width:1040px; }
   .page-head{ margin-bottom:26px; }
@@ -80,7 +96,6 @@
     .shell{ grid-template-columns:1fr; }
     .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
     nav.tabs{ flex-direction:row; }
-    .sidebar-foot{ display:none; }
   }
 </style>
 </head>
@@ -99,27 +114,43 @@
       <a class="tab active" href="team.html"><span class="dot"></span>Team</a>
       <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
     </nav>
-    <div class="sidebar-foot">Signed in as<br><strong id="sidebarBusinessName" style="color:#DCD5C4">…</strong><br><a href="#" data-sign-out style="color:#8791A1; text-decoration:underline;">Sign out</a></div>
   </aside>
 
-  <main>
-    <div class="page-head">
-      <h1>Team</h1>
-      <p>Everyone who can access this account, and what they can do.</p>
-    </div>
-
-    <div class="panel">
-      <p class="desc">Only the owner can mark invoices paid, manage the team, or change billing. Any active member can mark an invoice paid — always attributed to whoever did it.</p>
-      <div id="teamList"><div class="desc">Loading…</div></div>
-      <div id="inviteFormWrap" hidden>
-        <form id="inviteForm" style="display:flex; gap:8px; margin-top:14px;">
-          <input type="email" id="inviteEmail" placeholder="employee@email.co.uk" required style="flex:1; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:13px;">
-          <button type="submit" class="export-btn">+ Invite a team member</button>
-        </form>
-        <div id="inviteMsg" style="font-size:12px; margin-top:8px;"></div>
+  <div class="main-col">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="avatar-btn" id="accountBtn" title="Account settings"></button>
+        <div class="account-menu" id="accountMenu" hidden>
+          <div class="account-menu-head">
+            <div class="account-menu-name" id="accountMenuName">…</div>
+            <div class="account-menu-email" id="accountMenuEmail">…</div>
+          </div>
+          <a class="account-menu-item" href="settings.html">Account settings</a>
+          <div class="account-menu-sep"></div>
+          <a class="account-menu-item" href="#" data-sign-out>Sign out</a>
+        </div>
       </div>
-    </div>
-  </main>
+    </header>
+
+    <main>
+      <div class="page-head">
+        <h1>Team</h1>
+        <p>Everyone who can access this account, and what they can do.</p>
+      </div>
+
+      <div class="panel">
+        <p class="desc">Only the owner can mark invoices paid, manage the team, or change billing. Any active member can mark an invoice paid — always attributed to whoever did it.</p>
+        <div id="teamList"><div class="desc">Loading…</div></div>
+        <div id="inviteFormWrap" hidden>
+          <form id="inviteForm" style="display:flex; gap:8px; margin-top:14px;">
+            <input type="email" id="inviteEmail" placeholder="employee@email.co.uk" required style="flex:1; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:13px;">
+            <button type="submit" class="export-btn">+ Invite a team member</button>
+          </form>
+          <div id="inviteMsg" style="font-size:12px; margin-top:8px;"></div>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
@@ -190,6 +221,37 @@
     });
   }
 
+  const GENERIC_PROFILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>';
+
+  async function wireAccountMenu(accountId, businessName, email) {
+    const btn = document.getElementById('accountBtn');
+    const menu = document.getElementById('accountMenu');
+
+    const { data: account } = await supabaseClient
+      .from('accounts')
+      .select('logo_url')
+      .eq('id', accountId)
+      .maybeSingle();
+
+    btn.innerHTML = account?.logo_url
+      ? `<img src="${account.logo_url}" alt="${businessName}">`
+      : GENERIC_PROFILE_ICON;
+
+    document.getElementById('accountMenuName').textContent = businessName;
+    document.getElementById('accountMenuEmail').textContent = email || '';
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) menu.hidden = true;
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') menu.hidden = true;
+    });
+  }
+
   (async () => {
     const result = await requireSession();
     if (!result) return;
@@ -199,7 +261,8 @@
     const isOwner = membership.role === 'owner';
     const myUserId = result.session.user.id;
 
-    document.getElementById('sidebarBusinessName').textContent = membership.accounts?.business_name || 'Your business';
+    const businessName = membership.accounts?.business_name || 'Your business';
+    wireAccountMenu(accountId, businessName, result.session.user.email);
     wireSignOut();
     showTrialBannerIfNeeded(accountId);
 
