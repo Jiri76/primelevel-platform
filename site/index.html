@@ -39,7 +39,8 @@
 
   header{ display:flex; align-items:center; justify-content:space-between; padding:22px 48px; max-width:1180px; margin:0 auto; }
   .brand{ display:flex; align-items:center; gap:10px; }
-  .brand-mark{ width:32px;height:32px;border-radius:8px; background:var(--brand-gold); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:17px; flex:none; }
+  .brand-mark{ width:32px;height:32px;border-radius:8px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
+  .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
   .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--text); }
   .header-actions{ display:flex; align-items:center; gap:18px; }
   .link-btn{ font-size:13.5px; font-weight:600; color:var(--text-soft); text-decoration:none; }
@@ -107,7 +108,7 @@
 <body>
 
   <header>
-    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <div class="brand"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div><div class="brand-word">PrimeLevel</div></div>
     <div class="header-actions">
       <a class="link-btn" href="signin.html">Log in</a>
       <a class="cta-small" href="#signup">Start free trial</a>

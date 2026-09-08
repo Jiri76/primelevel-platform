@@ -41,7 +41,8 @@
   :root[data-theme="dark"] .sidebar{ background:var(--surface); }
   @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface); } }
   .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
-  .brand-mark{ width:30px;height:30px;border-radius:7px; background:var(--brand-gold); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px; flex:none; }
+  .brand-mark{ width:30px;height:30px;border-radius:7px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
+  .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
   .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
   nav.tabs{ display:flex; flex-direction:column; gap:2px; }
   .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
@@ -100,7 +101,7 @@
 <div class="shell">
 
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">P</div><div class="brand-word">PrimeLevel</div></div>
+    <div class="brand"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div><div class="brand-word">PrimeLevel</div></div>
     <nav class="tabs">
       <a class="tab" href="dashboard.html"><span class="dot"></span>Dashboard</a>
       <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
