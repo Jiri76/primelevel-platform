@@ -9,9 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F9F9FA; --surface:#FFFFFF; --surface-2:#F1EFE9; --border:#E3DFD3;
+    --bg:#F9F9FA; --surface:#F9F9FA; --surface-2:#F1EFE9; --border:#E3DFD3;
     --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
-    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#DCCFAF;
+    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
     --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
     --info:#3D5A80; --info-bg:#E7ECF2;
     --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
@@ -20,7 +20,7 @@
     :root:not([data-theme="light"]){
       --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
       --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
-      --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+      --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
       --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
       --info:#87A6CE; --info-bg:#22314A;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
@@ -29,7 +29,7 @@
   :root[data-theme="dark"]{
     --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:#333E4F;
     --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
-    --brand-navy:#AFC3E6; --brand-gold:#C7AD79; --brand-gold-soft:#8A7650;
+    --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
     --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
     --info:#87A6CE; --info-bg:#22314A;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
@@ -39,7 +39,7 @@
 
   header{ display:flex; align-items:center; justify-content:space-between; padding:22px 48px; max-width:1180px; margin:0 auto; }
   .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-  .brand-mark{ width:32px;height:32px;border-radius:8px; background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:17px; flex:none; }
+  .brand-mark{ width:32px;height:32px;border-radius:8px; background:var(--brand-gold); display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:17px; flex:none; }
   .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--text); }
 
   .wrap{ max-width:400px; margin:64px auto; padding:0 24px; }
@@ -47,7 +47,7 @@
   .sub{ font-size:14px; color:var(--text-soft); text-align:center; margin:0 0 28px; }
 
   .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:24px 26px 26px; }
-  .field-lbl{ font-size:11.5px; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 6px; }
+  .field-lbl{ font-size:11.5px; font-weight:600; color:#F9F9FA; text-transform:uppercase; letter-spacing:0.04em; margin:0 0 6px; }
   input{ width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:'Archivo',sans-serif; font-size:13.5px; margin-bottom:14px; }
   .cta-main{ width:100%; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:10px; padding:13px; font-weight:700; font-size:14.5px; cursor:pointer; }
   .cta-main:disabled{ opacity:0.6; cursor:default; }
@@ -55,9 +55,9 @@
   @media (prefers-color-scheme:dark){ .cta-main{ background:var(--brand-gold); color:#1A1406; } }
 
   .row-between{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
-  .link-btn{ font-size:12.5px; font-weight:600; color:var(--info); text-decoration:none; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; }
-  .foot-note{ text-align:center; font-size:12.5px; color:var(--text-soft); margin-top:20px; }
-  .foot-note a{ color:var(--info); font-weight:600; text-decoration:none; }
+  .link-btn{ font-size:12.5px; font-weight:600; color:#F9F9FA; text-decoration:none; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; }
+  .foot-note{ text-align:center; font-size:12.5px; color:#F9F9FA; margin-top:20px; }
+  .foot-note a{ color:var(--brand-gold); font-weight:600; text-decoration:none; }
 
   .msg{ font-size:12.5px; border-radius:8px; padding:10px 12px; margin-bottom:14px; display:none; }
   .msg.show{ display:block; }

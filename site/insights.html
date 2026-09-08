@@ -10,7 +10,7 @@
 <style>
   :root{
     --bg:#F9F9FA;
-    --surface:#FFFFFF;
+    --surface:#F9F9FA;
     --surface-2:#F1EFE9;
     --border:#E3DFD3;
     --text:#1E2633;
@@ -19,7 +19,7 @@
     --brand-navy:#1E2633;
     --brand-navy-soft:#334156;
     --brand-gold:#B29B68;
-    --brand-gold-soft:#DCCFAF;
+    --brand-gold-soft:#B29B68;
     --good:#2F7D5B;
     --good-bg:#E6F1EB;
     --warn:#B4552B;
@@ -39,8 +39,8 @@
       --text-faint:#7B8393;
       --brand-navy:#AFC3E6;
       --brand-navy-soft:#8FA6CC;
-      --brand-gold:#C7AD79;
-      --brand-gold-soft:#8A7650;
+      --brand-gold:#B29B68;
+      --brand-gold-soft:#B29B68;
       --good:#57B78E;
       --good-bg:#1D3A30;
       --warn:#DD8E5D;
@@ -60,8 +60,8 @@
     --text-faint:#7B8393;
     --brand-navy:#AFC3E6;
     --brand-navy-soft:#8FA6CC;
-    --brand-gold:#C7AD79;
-    --brand-gold-soft:#8A7650;
+    --brand-gold:#B29B68;
+    --brand-gold-soft:#B29B68;
     --good:#57B78E;
     --good-bg:#1D3A30;
     --warn:#DD8E5D;
@@ -103,7 +103,7 @@
   }
   .brand-mark{
     width:30px;height:30px;border-radius:7px;
-    background:linear-gradient(155deg,var(--brand-gold) 0%, #8C7548 100%);
+    background:var(--brand-gold);
     display:flex;align-items:center;justify-content:center;
     font-family:'Fraunces',serif;font-weight:600;color:#1E2633;font-size:16px;
     flex:none;
@@ -129,19 +129,19 @@
   }
   .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
   .tab.active{
-    background:rgba(178,155,104,0.16);
-    color:#F7F4EC;
+    background:var(--brand-gold);
+    color:#1A1406;
     box-shadow: inset 2px 0 0 var(--brand-gold);
   }
   .tab.active .dot{background:var(--brand-gold);}
-  .tab:hover:not(.active){ background:rgba(178,155,104,0.08); color:#E9E4D8; box-shadow: inset 2px 0 0 rgba(178,155,104,0.4); }
+  .tab:hover:not(.active){ background:#12171F; color:#E9E4D8; box-shadow: inset 2px 0 0 #333E4F; }
   .sidebar-foot{
     margin-top:auto;
     padding:12px 8px 4px;
     font-size:11px;
     color:#8791A1;
     line-height:1.5;
-    border-top:1px solid rgba(255,255,255,0.08);
+    border-top:1px solid #F9F9FA;
     padding-top:16px;
   }
 
