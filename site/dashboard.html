@@ -80,8 +80,9 @@
     transition:background 0.1s, color 0.1s;
   }
   .rail-item:hover{ background:#12171F; color:#E9E4D8; }
+  .rail-item:focus{ outline:none; }
   .rail-item:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
-  .rail-item.active{ background:var(--brand-gold); color:#1A1406; }
+  .rail-item.active{ background:#12171F; color:#E9E4D8; }
   .rail-icon{ flex:none; width:18px; text-align:center; font-size:13px; font-weight:600; }
   .rail-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity 0.1s; }
   .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
