@@ -47,7 +47,7 @@
   html,body{ margin:0; padding:0; }
   body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
   .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
-  .sidebar{ background:#1E2633; color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
+  .sidebar{ background:var(--brand-navy); color:#EFE9DC; padding:24px 16px; display:flex; flex-direction:column; gap:28px; }
   @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface); } }
   :root[data-theme="dark"] .sidebar{ background:var(--surface); }
   .brand{ display:flex; align-items:center; gap:10px; padding:0 8px; }
@@ -64,7 +64,7 @@
   .tab:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
 
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
-  .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; }
+  .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:var(--brand-navy); }
   @media (prefers-color-scheme: dark){ .topbar{ background:var(--surface); } }
   :root[data-theme="dark"] .topbar{ background:var(--surface); }
   .topbar-right{ position:relative; }
