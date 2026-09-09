@@ -46,22 +46,35 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{ margin:0; padding:0; }
   body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-  .shell{ display:grid; grid-template-columns:216px 1fr; min-height:100vh; }
-  .sidebar{ background:#1E2633; color:#EFE9DC; padding:0; display:flex; flex-direction:column; border-right:1px solid rgba(249,249,250,0.14); }
-  @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface); } }
-  :root[data-theme="dark"] .sidebar{ background:var(--surface); }
-  .brand{ display:flex; align-items:center; gap:10px; height:48px; flex:none; padding:0 24px; border-bottom:1px solid rgba(249,249,250,0.14); }
+  .shell{ display:flex; min-height:100vh; }
+  .rail{ position:relative; width:48px; flex:none; }
+  .rail-brand-fixed{
+    position:absolute; top:0; left:0; width:48px; height:48px; z-index:22;
+    background:#1E2633; display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid rgba(249,249,250,0.14);
+  }
+  .rail-inner{
+    position:absolute; top:48px; left:0; bottom:0; width:48px; overflow:hidden;
+    background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
+    border-right:1px solid rgba(249,249,250,0.14);
+    transition:width 0.15s ease; z-index:20;
+  }
+  .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
   .brand-mark{ width:30px;height:30px;border-radius:7px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
   .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .brand-word{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:#F7F4EC; }
-  nav.tabs{ display:flex; flex-direction:column; gap:2px; padding:28px 16px 24px; }
-  .tab{ display:flex;align-items:center;gap:10px; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500; color:#C7CDD9; text-decoration:none; transition:background 0.15s, box-shadow 0.15s, color 0.15s; }
-  .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none;}
-  .tab.active{ background:var(--bg); color:var(--text); }
-  
-  .tab:hover:not(.active){ background:var(--bg); color:var(--text); }
-  .tab:focus{ outline:none; }
-  .tab:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
+  .rail-nav{ display:flex; flex-direction:column; gap:2px; }
+  .rail-item{
+    display:flex; align-items:center; gap:10px; height:32px; padding:0 7px; border-radius:8px;
+    color:#989A99; text-decoration:none; white-space:nowrap; overflow:hidden;
+    transition:background 0.1s, color 0.1s;
+  }
+  .rail-item:hover{ background:var(--bg); color:var(--text); }
+  .rail-item:focus{ outline:none; }
+  .rail-item:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
+  .rail-item.active{ background:var(--bg); color:var(--text); }
+  .rail-icon{ flex:none; width:18px; text-align:center; font-size:13px; font-weight:600; }
+  .rail-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity 0.1s; }
+  .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
 
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; border-bottom:1px solid rgba(249,249,250,0.14); }
@@ -136,9 +149,7 @@
   .status.paid{ color:var(--good); background:var(--good-bg); }
 
   @media (max-width:920px){
-    .shell{ grid-template-columns:1fr; }
-    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; gap:16px; }
-    nav.tabs{ flex-direction:row; }
+    .rail{ display:none; }
     .stats{ grid-template-columns:repeat(2,1fr); }
     .methods-grid{ grid-template-columns:1fr; }
     .chase-next{ display:none; }
@@ -148,18 +159,20 @@
 <body>
 <div class="shell">
 
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div></div>
-    <nav class="tabs">
-      <a class="tab" href="dashboard.html"><span class="dot"></span>Dashboard</a>
-      <a class="tab" href="invoices.html"><span class="dot"></span>Invoices</a>
-      <a class="tab active" href="payments.html"><span class="dot"></span>Payments</a>
-      <a class="tab" href="insights.html"><span class="dot"></span>Insights</a>
-      <a class="tab" href="renewals.html"><span class="dot"></span>Renewals</a>
-      <a class="tab" href="plans.html"><span class="dot"></span>Plans &amp; Billing</a>
-      <a class="tab" href="team.html"><span class="dot"></span>Team</a>
-      <a class="tab" href="settings.html"><span class="dot"></span>Settings</a>
-    </nav>
+<aside class="rail">
+    <div class="rail-brand-fixed"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div></div>
+    <div class="rail-inner">
+      <nav class="rail-nav">
+        <a class="rail-item" href="dashboard.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
+        <a class="rail-item" href="invoices.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
+        <a class="rail-item active" href="payments.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
+        <a class="rail-item" href="insights.html"><span class="rail-icon">◎</span><span class="rail-label">Insights</span></a>
+        <a class="rail-item" href="renewals.html"><span class="rail-icon">↻</span><span class="rail-label">Renewals</span></a>
+        <a class="rail-item" href="plans.html"><span class="rail-icon">$</span><span class="rail-label">Plans &amp; Billing</span></a>
+        <a class="rail-item" href="team.html"><span class="rail-icon">T</span><span class="rail-label">Team</span></a>
+        <a class="rail-item" href="settings.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
+      </nav>
+    </div>
   </aside>
 
   <div class="main-col">
