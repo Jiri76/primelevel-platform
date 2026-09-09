@@ -566,6 +566,16 @@
       window.addEventListener('mousemove', checkFirstMove);
     }
 
+    // Belt-and-braces: clicking a nav link only happens while the cursor
+    // is over it, so stamp the flag right at click time too, unconditionally
+    // -- some browsers fire a mouseleave as part of tearing down the old
+    // page during navigation, which could otherwise race with (and wipe
+    // out) the mouseenter-set flag a split second before the new page
+    // reads it.
+    rail.addEventListener('click', (e) => {
+      if (e.target.closest('.rail-item')) setRailStored('1');
+    });
+
     rail.addEventListener('mouseenter', () => {
       setRailStored('1');
       document.documentElement.setAttribute('data-rail', 'expanded');
