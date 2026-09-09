@@ -99,10 +99,9 @@
   .sidebar{
     background:#1E2633;
     color:#EFE9DC;
-    padding:24px 16px;
+    padding:0;
     display:flex;
     flex-direction:column;
-    gap:28px;
     border-right:1px solid rgba(249,249,250,0.14);
   }
   :root[data-theme="dark"] .sidebar{ background:var(--surface); }
@@ -111,7 +110,10 @@
     display:flex;
     align-items:center;
     gap:10px;
-    padding:0 8px;
+    height:48px;
+    flex:none;
+    padding:0 24px;
+    border-bottom:1px solid rgba(249,249,250,0.14);
   }
   .brand-mark{
     width:30px;height:30px;border-radius:7px;
@@ -127,7 +129,7 @@
     letter-spacing:0.01em;
     color:#F7F4EC;
   }
-  nav.tabs{ display:flex; flex-direction:column; gap:2px; }
+  nav.tabs{ display:flex; flex-direction:column; gap:2px; padding:28px 16px 24px; }
   .tab{
     display:flex;align-items:center;gap:10px;
     padding:10px 12px;
