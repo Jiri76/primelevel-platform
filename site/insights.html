@@ -103,6 +103,7 @@
     display:flex;
     flex-direction:column;
     gap:28px;
+    border-right:1px solid rgba(249,249,250,0.14);
   }
   :root[data-theme="dark"] .sidebar{ background:var(--surface); }
   @media (prefers-color-scheme: dark){ .sidebar{ background:var(--surface); } }
@@ -145,7 +146,7 @@
   .tab:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
 
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
-  .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; }
+  .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; border-bottom:1px solid rgba(249,249,250,0.14); }
   @media (prefers-color-scheme: dark){ .topbar{ background:var(--surface); } }
   :root[data-theme="dark"] .topbar{ background:var(--surface); }
   .topbar-right{ position:relative; }
@@ -401,7 +402,6 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div>
-      <div class="brand-word">PrimeLevel</div>
     </div>
     <nav class="tabs">
       <a class="tab" href="dashboard.html"><span class="dot"></span>Dashboard</a>
