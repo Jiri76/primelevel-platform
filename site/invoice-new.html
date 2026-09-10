@@ -620,6 +620,7 @@
     const result = window.__APP_SESSION || await requireSession();
     if (!result) return;
     window.__APP_SESSION = result;
+    window.__APP_SESSION = result;
 
     currentAccountId = result.membership.account_id;
     currentUserId = result.session.user.id;

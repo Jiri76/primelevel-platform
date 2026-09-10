@@ -392,6 +392,7 @@
     const result = window.__APP_SESSION || await requireSession();
     if (!result) return;
     window.__APP_SESSION = result;
+    window.__APP_SESSION = result;
 
     const businessName = result.membership.accounts?.business_name || 'Your business';
     if (!window.__SHELL_WIRED) {

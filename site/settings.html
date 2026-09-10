@@ -457,6 +457,7 @@
     const result = window.__APP_SESSION || await requireSession();
     if (!result) return;
     window.__APP_SESSION = result;
+    window.__APP_SESSION = result;
 
     const { membership } = result;
     const accountId = membership.account_id;

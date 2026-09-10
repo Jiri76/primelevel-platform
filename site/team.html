@@ -11,18 +11,6 @@
   (function(){
     var t = localStorage.getItem('primelevel-theme');
     if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-    // Same idea for the rail: if it was hover-expanded on the page we just
-    // navigated away from (a real click while hovering the nav), start this
-    // page already expanded too, before first paint -- so clicking between
-    // nav items feels continuous instead of the rail flashing shut and
-    // reopening on every page load (each page here is a full reload, not
-    // a single-page app, so plain CSS :hover can't survive navigation
-    // on its own).
-    try {
-      if (sessionStorage.getItem('primelevel-rail-expanded') === '1') {
-        document.documentElement.setAttribute('data-rail', 'expanded');
-      }
-    } catch (e) { /* storage disabled -- falls back to plain :hover, no crash */ }
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,7 +59,7 @@
     border-right:1px solid rgba(249,249,250,0.14);
     transition:width 0.15s ease; z-index:20;
   }
-  .rail:hover .rail-inner, :root[data-rail="expanded"] .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
+  .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
   .brand-mark{ width:30px;height:30px;border-radius:7px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
   .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
   .rail-nav{ display:flex; flex-direction:column; gap:2px; }
@@ -86,7 +74,7 @@
   .rail-item.active{ background:var(--bg); color:var(--text); }
   .rail-icon{ flex:none; width:18px; text-align:center; font-size:13px; font-weight:600; }
   .rail-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity 0.1s; }
-  .rail:hover .rail-label, :root[data-rail="expanded"] .rail-label{ opacity:1; transition-delay:0.05s; }
+  .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
 
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .topbar{ height:48px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; border-bottom:1px solid rgba(249,249,250,0.14); }
@@ -202,6 +190,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/app-shell.js?v=2"></script>
 <script>
   async function loadTeam(accountId, isOwner, myUserId) {
     const { data: members, error } = await supabaseClient
@@ -289,51 +278,6 @@
     });
   }
 
-  // Keeps the rail's hover-expanded state alive across a real page
-  // navigation (each nav link is a full page load, not client-side
-  // routing, so plain CSS :hover can't survive a click on its own).
-  // The early inline script in <head> already applied data-rail=
-  // "expanded" before paint if sessionStorage said so; here we (a) keep
-  // sessionStorage in sync going forward via real mouseenter/mouseleave,
-  // and (b) correct a stale "expanded" start if the very first mousemove
-  // on this page shows the cursor isn't actually over the rail (e.g. the
-  // user clicked then moved away before this page finished loading).
-  (function wireRailPersistence() {
-    const rail = document.querySelector('.rail');
-    if (!rail) return;
-    const setRailStored = (v) => { try { sessionStorage.setItem('primelevel-rail-expanded', v); } catch (e) {} };
-
-    if (document.documentElement.getAttribute('data-rail') === 'expanded') {
-      const checkFirstMove = (e) => {
-        if (!e.target.closest || !e.target.closest('.rail')) {
-          document.documentElement.removeAttribute('data-rail');
-          setRailStored('0');
-        }
-        window.removeEventListener('mousemove', checkFirstMove);
-      };
-      window.addEventListener('mousemove', checkFirstMove);
-    }
-
-    // Belt-and-braces: clicking a nav link only happens while the cursor
-    // is over it, so stamp the flag right at click time too, unconditionally
-    // -- some browsers fire a mouseleave as part of tearing down the old
-    // page during navigation, which could otherwise race with (and wipe
-    // out) the mouseenter-set flag a split second before the new page
-    // reads it.
-    rail.addEventListener('click', (e) => {
-      if (e.target.closest('.rail-item')) setRailStored('1');
-    });
-
-    rail.addEventListener('mouseenter', () => {
-      setRailStored('1');
-      document.documentElement.setAttribute('data-rail', 'expanded');
-    });
-    rail.addEventListener('mouseleave', () => {
-      setRailStored('0');
-      document.documentElement.removeAttribute('data-rail');
-    });
-  })();
-
   async function wireAccountMenu(accountId, businessName, email) {
     const btn = document.getElementById('accountBtn');
     const menu = document.getElementById('accountMenu');
@@ -365,8 +309,9 @@
   }
 
   (async () => {
-    const result = await requireSession();
+    const result = window.__APP_SESSION || await requireSession();
     if (!result) return;
+    window.__APP_SESSION = result;
 
     const { membership } = result;
     const accountId = membership.account_id;
@@ -374,8 +319,11 @@
     const myUserId = result.session.user.id;
 
     const businessName = membership.accounts?.business_name || 'Your business';
-    wireAccountMenu(accountId, businessName, result.session.user.email);
-    wireSignOut();
+    if (!window.__SHELL_WIRED) {
+      window.__SHELL_WIRED = true;
+      wireAccountMenu(accountId, businessName, result.session.user.email);
+      wireSignOut();
+    }
     showTrialBannerIfNeeded(accountId);
 
     loadTeam(accountId, isOwner, myUserId);
