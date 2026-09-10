@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rail Test A</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  (function(){
+    try {
+      var v = sessionStorage.getItem('primelevel-rail-expanded');
+      window.__railReadOnLoad = v;
+      if (v === '1') document.documentElement.setAttribute('data-rail', 'expanded');
+    } catch (e) { window.__railReadOnLoad = 'THREW:' + e.message; }
+  })();
+</script>
+<style>
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:system-ui,sans-serif; background:#12171F; color:#eee; }
+  .shell{ display:flex; min-height:100vh; }
+  .rail{ position:relative; width:48px; flex:none; }
+  .rail-inner{
+    position:absolute; top:0; left:0; bottom:0; width:48px; overflow:hidden;
+    background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
+    border-right:1px solid rgba(249,249,250,0.14);
+    transition:width 0.15s ease; z-index:20;
+  }
+  .rail:hover .rail-inner, :root[data-rail="expanded"] .rail-inner{ width:208px; }
+  .rail-item{ display:flex; align-items:center; gap:10px; height:32px; padding:0 7px; border-radius:8px; color:#989A99; text-decoration:none; white-space:nowrap; }
+  .rail-item:hover{ background:#12171F; color:#fff; }
+  .rail-icon{ flex:none; width:18px; text-align:center; font-weight:600; }
+  .rail-label{ opacity:0; transition:opacity 0.1s; }
+  .rail:hover .rail-label, :root[data-rail="expanded"] .rail-label{ opacity:1; }
+  main{ flex:1; padding:40px; }
+  h1{ font-size:40px; }
+  #log{ font-family:monospace; font-size:12px; white-space:pre-wrap; background:#000; padding:12px; border-radius:8px; margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-inner">
+      <nav>
+        <a class="rail-item active" href="_railtest_a.html"><span class="rail-icon">A</span><span class="rail-label">Page A</span></a>
+        <a class="rail-item" href="_railtest_b.html"><span class="rail-icon">B</span><span class="rail-label">Page B</span></a>
+      </nav>
+    </div>
+  </aside>
+  <main>
+    <h1>PAGE A</h1>
+    <div id="log"></div>
+  </main>
+</div>
+<script>
+  var log = document.getElementById('log');
+  function L(s){ log.textContent += s + "\n"; }
+  L('PAGE A loaded at ' + new Date().toISOString());
+  L('sessionStorage read on load (head script): ' + JSON.stringify(window.__railReadOnLoad));
+  try { L('sessionStorage NOW: ' + JSON.stringify(sessionStorage.getItem('primelevel-rail-expanded'))); } catch(e){ L('sessionStorage THREW: ' + e.message); }
+  L('data-rail attr on <html> NOW: ' + JSON.stringify(document.documentElement.getAttribute('data-rail')));
+
+  (function wireRailPersistence() {
+    const rail = document.querySelector('.rail');
+    if (!rail) return;
+    const setRailStored = (v) => { try { sessionStorage.setItem('primelevel-rail-expanded', v); L('  -> setRailStored(' + v + ')'); } catch (e) {} };
+
+    if (document.documentElement.getAttribute('data-rail') === 'expanded') {
+      const checkFirstMove = (e) => {
+        L('  checkFirstMove fired. target=' + (e.target.tagName||'?') + ' closest(.rail)=' + !!(e.target.closest && e.target.closest('.rail')));
+        if (!e.target.closest || !e.target.closest('.rail')) {
+          document.documentElement.removeAttribute('data-rail');
+          setRailStored('0');
+          L('  checkFirstMove COLLAPSED the rail');
+        }
+        window.removeEventListener('mousemove', checkFirstMove);
+      };
+      window.addEventListener('mousemove', checkFirstMove);
+    }
+
+    rail.addEventListener('click', (e) => {
+      if (e.target.closest('.rail-item')) { L('rail CLICK on a rail-item'); setRailStored('1'); }
+    });
+    rail.addEventListener('mouseenter', () => {
+      L('rail MOUSEENTER');
+      setRailStored('1');
+      document.documentElement.setAttribute('data-rail', 'expanded');
+    });
+    rail.addEventListener('mouseleave', () => {
+      L('rail MOUSELEAVE');
+      setRailStored('0');
+      document.documentElement.removeAttribute('data-rail');
+    });
+  })();
+
+  window.addEventListener('pagehide', () => {
+    try { sessionStorage.setItem('primelevel-railtest-pagehide', 'A@' + Date.now() + ' storage=' + sessionStorage.getItem('primelevel-rail-expanded')); } catch(e){}
+  });
+</script>
+</body>
+</html>
