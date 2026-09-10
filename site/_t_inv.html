@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PrimeLevel Payments</title>
+<title>PrimeLevel Invoices</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
   // Apply any stored theme choice immediately, before first paint, so there's
@@ -102,57 +102,46 @@
   .theme-option.active{ color:#F7F4EC; font-weight:600; }
 
   main{ padding:32px 40px 64px; max-width:1120px; }
-  .page-head{ margin-bottom:26px; }
+  .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:22px; }
   .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; }
-  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; max-width:60ch; line-height:1.5; }
+  .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
+  .new-invoice{ flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px; padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+  :root[data-theme="dark"] .new-invoice{ background:var(--brand-gold); color:#1A1406; }
+  @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
 
-  .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:34px; }
-  .stat-card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
-  .stat-card .lbl{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); margin-bottom:8px; }
-  .stat-card .val{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:600; color:var(--text); }
-  .stat-card .sub{ font-size:11.5px; color:var(--good); margin-top:4px; font-weight:600; }
-  .stat-card .sub.warn{ color:var(--warn); }
-  .stat-card .sub.neutral{ color:var(--text-faint); font-weight:500; }
+  /* toolbar */
+  .toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .filter-pills{ display:flex; gap:6px; }
+  .fpill{ font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:100px; border:1px solid var(--border); background:var(--surface); color:var(--text-soft); cursor:pointer; }
+  .fpill.active{ background:var(--brand-navy); color:#F7F4EC; border-color:var(--brand-navy); }
+  :root[data-theme="dark"] .fpill.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); }
+  .search{ margin-left:auto; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:8px 12px; font-size:13px; color:var(--text-faint); min-width:220px; }
 
-  .section-label{ display:flex; align-items:baseline; justify-content:space-between; margin:0 0 14px; }
-  .section-label span.t{ font-size:11.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-faint); }
-
-  /* chase queue */
-  .chase-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:6px 0; margin-bottom:36px; }
-  .chase-row{ display:flex; align-items:center; gap:16px; padding:14px 20px; border-bottom:1px solid var(--border); }
-  .chase-row:last-child{ border-bottom:none; }
-  .chase-row .who{ flex:1; min-width:0; }
-  .chase-row .who .client{ font-weight:600; font-size:13.5px; color:var(--text); }
-  .chase-row .who .inv{ font-size:12px; color:var(--text-faint); margin-top:2px; }
-  .chase-steps{ display:flex; gap:5px; flex:none; }
-  .step{ width:26px;height:26px;border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:10.5px; font-weight:700; border:1.5px solid var(--border); color:var(--text-faint); background:var(--surface-2); }
-  .step.done{ background:var(--good); border-color:var(--good); color:#fff; }
-  .step.current{ background:var(--brand-gold); border-color:var(--brand-gold); color:#1A1406; }
-  .chase-amt{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:13.5px; flex:none; width:80px; text-align:right; }
-  .chase-next{ flex:none; font-size:12px; color:var(--text-faint); width:120px; text-align:right; }
-
-  /* methods */
-  .methods-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px; }
-  .method-card{ background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:16px 17px; box-shadow:var(--shadow); }
-  .method-card .name{ font-size:13.5px; font-weight:600; margin-bottom:4px; }
-  .method-card .pct{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:19px; font-weight:600; color:var(--text); }
-  .method-card .note{ font-size:12px; color:var(--text-soft); margin-top:6px; line-height:1.5; }
-
-  /* history table */
-  .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; }
+  .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px; }
   table{ width:100%; border-collapse:collapse; }
   thead th{ text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); padding:13px 18px; border-bottom:1px solid var(--border); }
   tbody td{ padding:13px 18px; font-size:13.5px; border-bottom:1px solid var(--border); vertical-align:middle; }
   tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover td{ background:var(--surface-2); }
   td.amt{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; text-align:right; }
+  td.job-cell .client{ font-weight:600; color:var(--text); }
+  td.job-cell .desc{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  td.inv-no{ font-family:'IBM Plex Mono',ui-monospace,monospace; color:var(--text-faint); font-size:12px; }
   .status{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; padding:4px 9px; border-radius:100px; }
   .status.paid{ color:var(--good); background:var(--good-bg); }
+  .status.due{ color:var(--info); background:var(--info-bg); }
+  .status.overdue{ color:var(--warn); background:var(--warn-bg); }
+  .status.draft{ color:var(--text-faint); background:var(--surface-2); }
+  .row-action{ font-size:12px; color:var(--info); font-weight:600; text-decoration:none; }
+
+  .pager{ display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--text-faint); }
+  .pager .btns{ display:flex; gap:6px; }
+  .pgbtn{ border:1px solid var(--border); background:var(--surface); border-radius:7px; padding:6px 11px; color:var(--text-soft); font-size:12.5px; cursor:pointer; }
 
   @media (max-width:920px){
     .rail{ display:none; }
-    .stats{ grid-template-columns:repeat(2,1fr); }
-    .methods-grid{ grid-template-columns:1fr; }
-    .chase-next{ display:none; }
+    table{ font-size:12.5px; }
+    .search{ min-width:140px; }
   }
 </style>
 </head>
@@ -163,14 +152,14 @@
     <div class="rail-brand-fixed"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div></div>
     <div class="rail-inner">
       <nav class="rail-nav">
-        <a class="rail-item" href="dashboard.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
-        <a class="rail-item" href="invoices.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
-        <a class="rail-item active" href="payments.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
+        <a class="rail-item" href="_t_dash.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
+        <a class="rail-item active" href="_t_inv.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
+        <a class="rail-item" href="_t_pay.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
         <a class="rail-item" href="insights.html"><span class="rail-icon">◎</span><span class="rail-label">Insights</span></a>
         <a class="rail-item" href="renewals.html"><span class="rail-icon">↻</span><span class="rail-label">Renewals</span></a>
         <a class="rail-item" href="plans.html"><span class="rail-icon">$</span><span class="rail-label">Plans &amp; Billing</span></a>
         <a class="rail-item" href="team.html"><span class="rail-icon">T</span><span class="rail-label">Team</span></a>
-        <a class="rail-item" href="settings.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
+        <a class="rail-item" href="_t_set.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
       </nav>
     </div>
   </aside>
@@ -184,7 +173,7 @@
             <div class="account-menu-name" id="accountMenuName">…</div>
             <div class="account-menu-email" id="accountMenuEmail">…</div>
           </div>
-          <a class="account-menu-item" href="settings.html">Account settings</a>
+          <a class="account-menu-item" href="_t_set.html">Account settings</a>
           <div class="account-menu-sep"></div>
           <div class="account-menu-theme-label">Theme</div>
           <button class="account-menu-item theme-option" data-theme-choice="dark"><span class="theme-dot"></span>Dark</button>
@@ -197,146 +186,209 @@
 
     <main>
       <div class="page-head">
-        <h1>Payments</h1>
-        <p>What's outstanding, what's being chased automatically, and how clients are paying you.</p>
-      </div>
-
-      <div class="stats">
-        <div class="stat-card">
-          <div class="lbl">Outstanding</div>
-          <div class="val" id="statOutstanding">£0</div>
-          <div class="sub warn" id="statOutstandingSub">0 invoices unpaid</div>
+        <div>
+          <h1>Invoices</h1>
+          <p>Every invoice you've sent, all in one place.</p>
         </div>
-        <div class="stat-card">
-          <div class="lbl">Collected this month</div>
-          <div class="val" id="statCollected">£0</div>
-          <div class="sub neutral" id="statCollectedSub">This calendar month</div>
+        <a class="new-invoice" href="invoice-new.html" style="text-decoration:none; display:inline-block;">+ New invoice</a>
+      </div>
+
+      <div class="toolbar">
+        <div class="filter-pills" id="filterPills">
+          <button class="fpill active" data-filter="all">All (0)</button>
+          <button class="fpill" data-filter="sent">Due (0)</button>
+          <button class="fpill" data-filter="overdue">Overdue (0)</button>
+          <button class="fpill" data-filter="paid">Paid (0)</button>
+          <button class="fpill" data-filter="draft">Draft (0)</button>
         </div>
-        <div class="stat-card">
-          <div class="lbl">Avg. time to paid</div>
-          <div class="val" id="statAvgDays">—</div>
-          <div class="sub neutral">From sent to paid, all time</div>
-        </div>
+        <div class="search" style="padding:0;"><input id="searchInput" type="text" placeholder="🔍 Search client or job…" style="border:none; background:none; color:var(--text); font-family:inherit; font-size:13px; width:100%; padding:8px 12px; outline:none;"></div>
       </div>
 
-      <div class="section-label"><span class="t">Needs chasing</span></div>
-      <div class="chase-panel" id="chasePanel">
-        <div class="chase-row"><div class="who"><div class="client">Loading…</div></div></div>
-      </div>
-      <p style="font-size:12px; color:var(--text-faint); margin:-24px 0 36px;">Automated multi-step reminders aren't built yet (see Settings → your plan) — this is a real, live list of what's actually overdue right now.</p>
-
-      <div class="section-label"><span class="t">How clients pay you</span></div>
-      <div class="methods-grid" id="methodsGrid">
-        <div class="method-card"><div class="name">Not enough paid invoices yet</div></div>
-      </div>
-
-      <div class="section-label"><span class="t">Recently paid</span></div>
       <div class="invoice-panel">
         <table>
-          <thead><tr><th>Client &amp; job</th><th>Paid on</th><th>Method</th><th style="text-align:right;">Amount</th></tr></thead>
-          <tbody id="recentlyPaidRows">
-            <tr><td colspan="4" style="text-align:center; color:var(--text-faint);">Loading…</td></tr>
+          <thead>
+            <tr><th>Invoice</th><th>Client &amp; job</th><th>Sent</th><th>Status</th><th style="text-align:right;">Amount</th><th></th></tr>
+          </thead>
+          <tbody id="invoiceRows">
+            <tr><td colspan="6" style="text-align:center; color:var(--text-faint);">Loading…</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="pager">
+        <span id="pagerText">Showing 0 invoices</span>
       </div>
     </main>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/app-shell.js"></script>
+
 <script>
-  function fmtMoney(n) {
-    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-  function fmtMoney2(n) {
-    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+window.__isTest = true;
+window.requireSession = async () => ({
+  membership:{ account_id:'test-acct', role:'owner', web_dashboard_access:true, accounts:{ business_name:'Test Plumbing Ltd' } },
+  session:{ user:{ id:'test-user', email:'owner@testplumbing.co.uk' } }
+});
+window.wireSignOut = () => {};
+window.showTrialBannerIfNeeded = async () => {};
+const _tbl = () => ({ select:_tbl, eq:_tbl, order: async()=>({data:[],error:null}), maybeSingle: async()=>({data:null,error:null}), single: async()=>({data:null,error:null}), in:_tbl, gte:_tbl, lte:_tbl, limit:_tbl });
+window.supabaseClient = { from:_tbl, auth:{ getSession: async()=>({data:{session:{user:{id:'test-user'}}}}), signOut: async()=>{} }, storage:{ from:()=>({ upload: async()=>({}), getPublicUrl:()=>({data:{publicUrl:''}}) }) };
+window.showTrialBannerIfNeeded = async () => {};
+</script>
+<script src="js/_app-shell-test.js"></script>
+<script>
+  let allInvoices = [];
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let currentAccountId = null;
+
   function fmtDate(iso) {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    if (!iso) return '—';
+    return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+  function fmtMoney(n) {
+    return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function daysOverdue(dueDate) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const due = new Date(dueDate + 'T00:00:00');
     return Math.round((today - due) / 86400000);
   }
-  const METHOD_LABEL = { cash: 'Cash', bank_transfer: 'Bank transfer', card: 'Card payment' };
+  function effectiveStatus(inv) {
+    if (inv.status === 'sent' && daysOverdue(inv.due_date) > 0) return 'overdue';
+    return inv.status;
+  }
 
-  async function loadPayments(accountId) {
-    const { data: invoices, error } = await supabaseClient
+  async function loadInvoices() {
+    const { data, error } = await supabaseClient
       .from('invoices')
-      .select('id, job_description, amount, due_date, status, payment_method, paid_at, created_at, clients(name)')
-      .eq('account_id', accountId)
+      .select('id, invoice_number, job_description, amount, job_date, due_date, status, sent_at, created_at, clients(name)')
+      .eq('account_id', currentAccountId)
       .order('created_at', { ascending: false });
 
-    if (error || !invoices) return;
-
-    // ---- Outstanding ----
-    const unpaid = invoices.filter((i) => i.status === 'sent');
-    const outstandingTotal = unpaid.reduce((sum, i) => sum + Number(i.amount), 0);
-    document.getElementById('statOutstanding').textContent = fmtMoney(outstandingTotal);
-    document.getElementById('statOutstandingSub').textContent = `${unpaid.length} invoice${unpaid.length === 1 ? '' : 's'} unpaid`;
-
-    // ---- Collected this month ----
-    const now = new Date();
-    const paid = invoices.filter((i) => i.status === 'paid' && i.paid_at);
-    const collectedThisMonth = paid
-      .filter((i) => { const d = new Date(i.paid_at); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); })
-      .reduce((sum, i) => sum + Number(i.amount), 0);
-    document.getElementById('statCollected').textContent = fmtMoney(collectedThisMonth);
-
-    // ---- Avg time to paid ----
-    if (paid.length) {
-      const avgMs = paid.reduce((sum, i) => sum + (new Date(i.paid_at) - new Date(i.created_at)), 0) / paid.length;
-      document.getElementById('statAvgDays').textContent = (avgMs / 86400000).toFixed(1) + ' days';
+    if (error) {
+      document.getElementById('invoiceRows').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--warn);">Could not load invoices right now.</td></tr>';
+      return;
     }
-
-    // ---- Needs chasing (real overdue, no fake automation) ----
-    const overdue = unpaid.filter((i) => daysOverdue(i.due_date) > 0).sort((a, b) => daysOverdue(b.due_date) - daysOverdue(a.due_date));
-    const chasePanel = document.getElementById('chasePanel');
-    if (!overdue.length) {
-      chasePanel.innerHTML = '<div class="chase-row"><div class="who"><div class="client" style="color:var(--text-faint); font-weight:500;">Nothing overdue right now.</div></div></div>';
-    } else {
-      chasePanel.innerHTML = overdue.map((i) => `
-        <div class="chase-row">
-          <div class="who"><div class="client">${i.clients?.name || 'Unknown client'} — ${i.job_description}</div><div class="inv">Overdue ${daysOverdue(i.due_date)} days</div></div>
-          <div class="chase-amt">${fmtMoney2(i.amount)}</div>
-        </div>`).join('');
-    }
-
-    // ---- How clients pay you ----
-    const methodsGrid = document.getElementById('methodsGrid');
-    if (paid.length < 3) {
-      methodsGrid.innerHTML = '<div class="method-card"><div class="name" style="color:var(--text-faint);">Not enough paid invoices yet to show a real breakdown.</div></div>';
-    } else {
-      const counts = {};
-      paid.forEach((i) => { const m = i.payment_method || 'unknown'; counts[m] = (counts[m] || 0) + 1; });
-      methodsGrid.innerHTML = Object.entries(counts)
-        .sort((a, b) => b[1] - a[1])
-        .map(([method, count]) => `
-          <div class="method-card">
-            <div class="name">${METHOD_LABEL[method] || method}</div>
-            <div class="pct">${Math.round((count / paid.length) * 100)}%</div>
-            <div class="note">${count} of ${paid.length} paid invoices</div>
-          </div>`).join('');
-    }
-
-    // ---- Recently paid ----
-    const recentlyPaid = paid.sort((a, b) => new Date(b.paid_at) - new Date(a.paid_at)).slice(0, 10);
-    const rowsEl = document.getElementById('recentlyPaidRows');
-    if (!recentlyPaid.length) {
-      rowsEl.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-faint); padding:20px;">Nothing paid yet.</td></tr>';
-    } else {
-      rowsEl.innerHTML = recentlyPaid.map((i) => `
-        <tr>
-          <td>${i.clients?.name || 'Unknown client'} — ${i.job_description}</td>
-          <td>${fmtDate(i.paid_at)}</td>
-          <td>${METHOD_LABEL[i.payment_method] || '—'}</td>
-          <td class="amt">${fmtMoney2(i.amount)}</td>
-        </tr>`).join('');
-    }
+    allInvoices = data || [];
+    updateFilterCounts();
+    render();
   }
+
+  function updateFilterCounts() {
+    const counts = { all: allInvoices.length, sent: 0, overdue: 0, paid: 0, draft: 0 };
+    allInvoices.forEach((inv) => {
+      const st = effectiveStatus(inv);
+      if (st === 'sent') counts.sent++;
+      else if (st === 'overdue') counts.overdue++;
+      else if (st === 'paid') counts.paid++;
+      else if (st === 'draft') counts.draft++;
+    });
+    document.querySelectorAll('#filterPills .fpill').forEach((btn) => {
+      const key = btn.dataset.filter;
+      const label = { all: 'All', sent: 'Due', overdue: 'Overdue', paid: 'Paid', draft: 'Draft' }[key];
+      btn.textContent = `${label} (${counts[key]})`;
+    });
+  }
+
+  function render() {
+    let rows = allInvoices;
+    if (currentFilter !== 'all') rows = rows.filter((inv) => effectiveStatus(inv) === currentFilter);
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      rows = rows.filter((inv) =>
+        (inv.clients?.name || '').toLowerCase().includes(q) ||
+        (inv.job_description || '').toLowerCase().includes(q)
+      );
+    }
+
+    const tbody = document.getElementById('invoiceRows');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-faint); padding:24px;">No invoices to show yet.</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map((inv) => {
+        const st = effectiveStatus(inv);
+        const statusHtml = st === 'paid' ? '<span class="status paid">Paid</span>'
+          : st === 'overdue' ? `<span class="status overdue">Overdue ${daysOverdue(inv.due_date)} days</span>`
+          : st === 'draft' ? '<span class="status draft">Draft</span>'
+          : `<span class="status due">Due ${fmtDate(inv.due_date)}</span>`;
+
+        const actionHtml = st === 'draft'
+          ? `<a class="row-action" href="#" data-send-id="${inv.id}">Send →</a>`
+          : (st === 'sent' || st === 'overdue')
+            ? `<span class="pay-choice" data-row-for="${inv.id}">
+                 <a class="row-action" href="#" data-mark-paid-open="${inv.id}">Mark Paid</a> &nbsp; <a class="row-action" href="invoice-new.html?id=${inv.id}">View →</a>
+               </span>`
+            : `<a class="row-action" href="invoice-new.html?id=${inv.id}">View →</a>`;
+
+        return `<tr>
+          <td class="inv-no">${inv.invoice_number}</td>
+          <td class="job-cell"><div class="client">${inv.clients?.name || 'Unknown client'}</div><div class="desc">${inv.job_description}</div></td>
+          <td>${inv.sent_at ? fmtDate(inv.sent_at.slice(0, 10)) : '—'}</td>
+          <td>${statusHtml}</td>
+          <td class="amt">${fmtMoney(inv.amount)}</td>
+          <td>${actionHtml}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('pagerText').textContent = `Showing ${rows.length} of ${allInvoices.length} invoice${allInvoices.length === 1 ? '' : 's'}`;
+
+    async function markPaid(id, method) {
+      const { error } = await supabaseClient
+        .from('invoices')
+        .update({ status: 'paid', payment_method: method })
+        .eq('id', id);
+      if (error) alert('Could not mark this as paid right now — please try again.');
+      else loadInvoices();
+    }
+
+    tbody.querySelectorAll('[data-mark-paid-open]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = el.getAttribute('data-mark-paid-open');
+        const wrap = el.closest('.pay-choice');
+        wrap.innerHTML = `
+          <span style="font-size:12px; color:var(--text-faint);">Paid by:</span>
+          <a class="row-action" href="#" data-pay-method="cash" data-pay-id="${id}">Cash</a> &nbsp;
+          <a class="row-action" href="#" data-pay-method="bank_transfer" data-pay-id="${id}">Bank transfer</a> &nbsp;
+          <a class="row-action" href="#" data-pay-cancel="1" style="color:var(--text-faint);">Cancel</a>`;
+        wrap.querySelectorAll('[data-pay-method]').forEach((btn) => {
+          btn.addEventListener('click', (e2) => {
+            e2.preventDefault();
+            markPaid(btn.getAttribute('data-pay-id'), btn.getAttribute('data-pay-method'));
+          });
+        });
+        wrap.querySelector('[data-pay-cancel]').addEventListener('click', (e2) => {
+          e2.preventDefault();
+          render();
+        });
+      });
+    });
+
+    tbody.querySelectorAll('[data-send-id]').forEach((el) => {
+      el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const id = el.getAttribute('data-send-id');
+        const { error } = await supabaseClient.from('invoices').update({ status: 'sent' }).eq('id', id);
+        if (!error) loadInvoices();
+      });
+    });
+  }
+
+  document.getElementById('filterPills').addEventListener('click', (e) => {
+    const btn = e.target.closest('.fpill');
+    if (!btn) return;
+    document.querySelectorAll('#filterPills .fpill').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    currentSearch = e.target.value.trim();
+    render();
+  });
 
   const GENERIC_PROFILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>';
 
@@ -393,15 +445,16 @@
     if (!result) return;
     window.__APP_SESSION = result;
 
+    currentAccountId = result.membership.account_id;
     const businessName = result.membership.accounts?.business_name || 'Your business';
     if (!window.__SHELL_WIRED) {
       window.__SHELL_WIRED = true;
-      wireAccountMenu(result.membership.account_id, businessName, result.session.user.email);
+      wireAccountMenu(currentAccountId, businessName, result.session.user.email);
       wireSignOut();
     }
-    showTrialBannerIfNeeded(result.membership.account_id);
+    showTrialBannerIfNeeded(currentAccountId);
 
-    loadPayments(result.membership.account_id);
+    loadInvoices();
   })();
 </script>
 </body>

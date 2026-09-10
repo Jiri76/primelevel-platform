@@ -163,14 +163,14 @@
     <div class="rail-brand-fixed"><div class="brand-mark"><img src="assets/primelevel-icon.png" alt="PrimeLevel"></div></div>
     <div class="rail-inner">
       <nav class="rail-nav">
-        <a class="rail-item" href="dashboard.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
-        <a class="rail-item" href="invoices.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
-        <a class="rail-item active" href="payments.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
+        <a class="rail-item" href="_t_dash.html"><span class="rail-icon">D</span><span class="rail-label">Dashboard</span></a>
+        <a class="rail-item" href="_t_inv.html"><span class="rail-icon">I</span><span class="rail-label">Invoices</span></a>
+        <a class="rail-item active" href="_t_pay.html"><span class="rail-icon">£</span><span class="rail-label">Payments</span></a>
         <a class="rail-item" href="insights.html"><span class="rail-icon">◎</span><span class="rail-label">Insights</span></a>
         <a class="rail-item" href="renewals.html"><span class="rail-icon">↻</span><span class="rail-label">Renewals</span></a>
         <a class="rail-item" href="plans.html"><span class="rail-icon">$</span><span class="rail-label">Plans &amp; Billing</span></a>
         <a class="rail-item" href="team.html"><span class="rail-icon">T</span><span class="rail-label">Team</span></a>
-        <a class="rail-item" href="settings.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
+        <a class="rail-item" href="_t_set.html"><span class="rail-icon">⚙</span><span class="rail-label">Settings</span></a>
       </nav>
     </div>
   </aside>
@@ -184,7 +184,7 @@
             <div class="account-menu-name" id="accountMenuName">…</div>
             <div class="account-menu-email" id="accountMenuEmail">…</div>
           </div>
-          <a class="account-menu-item" href="settings.html">Account settings</a>
+          <a class="account-menu-item" href="_t_set.html">Account settings</a>
           <div class="account-menu-sep"></div>
           <div class="account-menu-theme-label">Theme</div>
           <button class="account-menu-item theme-option" data-theme-choice="dark"><span class="theme-dot"></span>Dark</button>
@@ -243,9 +243,20 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/app-shell.js"></script>
+
+<script>
+window.__isTest = true;
+window.requireSession = async () => ({
+  membership:{ account_id:'test-acct', role:'owner', web_dashboard_access:true, accounts:{ business_name:'Test Plumbing Ltd' } },
+  session:{ user:{ id:'test-user', email:'owner@testplumbing.co.uk' } }
+});
+window.wireSignOut = () => {};
+window.showTrialBannerIfNeeded = async () => {};
+const _tbl = () => ({ select:_tbl, eq:_tbl, order: async()=>({data:[],error:null}), maybeSingle: async()=>({data:null,error:null}), single: async()=>({data:null,error:null}), in:_tbl, gte:_tbl, lte:_tbl, limit:_tbl });
+window.supabaseClient = { from:_tbl, auth:{ getSession: async()=>({data:{session:{user:{id:'test-user'}}}}), signOut: async()=>{} }, storage:{ from:()=>({ upload: async()=>({}), getPublicUrl:()=>({data:{publicUrl:''}}) }) };
+window.showTrialBannerIfNeeded = async () => {};
+</script>
+<script src="js/_app-shell-test.js"></script>
 <script>
   function fmtMoney(n) {
     return '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
