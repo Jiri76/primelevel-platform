@@ -25,7 +25,7 @@
   // ---- what counts as an in-app link ------------------------------------------
   const APP_PAGES = new Set([
     'dashboard.html', 'invoices.html', 'payments.html', 'insights.html',
-    'renewals.html', 'settings.html', 'invoice-new.html', 'plans.html',
+    'renewals.html', 'plans.html', 'team.html', 'settings.html', 'invoice-new.html',
   ]);
 
   function samePageName(url) {
