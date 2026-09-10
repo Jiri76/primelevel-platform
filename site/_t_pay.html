@@ -246,15 +246,25 @@
 
 <script>
 window.__isTest = true;
-window.requireSession = async () => ({
-  membership:{ account_id:'test-acct', role:'owner', web_dashboard_access:true, accounts:{ business_name:'Test Plumbing Ltd' } },
-  session:{ user:{ id:'test-user', email:'owner@testplumbing.co.uk' } }
-});
-window.wireSignOut = () => {};
-window.showTrialBannerIfNeeded = async () => {};
-const _tbl = () => ({ select:_tbl, eq:_tbl, order: async()=>({data:[],error:null}), maybeSingle: async()=>({data:null,error:null}), single: async()=>({data:null,error:null}), in:_tbl, gte:_tbl, lte:_tbl, limit:_tbl });
-window.supabaseClient = { from:_tbl, auth:{ getSession: async()=>({data:{session:{user:{id:'test-user'}}}}), signOut: async()=>{} }, storage:{ from:()=>({ upload: async()=>({}), getPublicUrl:()=>({data:{publicUrl:''}}) }) };
-window.showTrialBannerIfNeeded = async () => {};
+window.requireSession = async function(){ return {
+  membership:{ account_id:"test-acct", role:"owner", web_dashboard_access:true, accounts:{ business_name:"Test Plumbing Ltd" } },
+  session:{ user:{ id:"test-user", email:"owner@testplumbing.co.uk" } }
+}; };
+window.wireSignOut = function(){};
+window.showTrialBannerIfNeeded = async function(){};
+function _q(){
+  var api = {};
+  ["select","eq","neq","in","gte","lte","gt","lt","order","limit","match","is","filter","or","range"].forEach(function(m){ api[m] = function(){ return api; }; });
+  api.maybeSingle = async function(){ return { data:null, error:null }; };
+  api.single = async function(){ return { data:null, error:null }; };
+  api.then = function(res){ return Promise.resolve({ data:[], error:null }).then(res); };
+  return api;
+}
+window.supabaseClient = {
+  from: function(){ return _q(); },
+  auth: { getSession: async function(){ return { data:{ session:{ user:{ id:"test-user" } } } }; }, signOut: async function(){} },
+  storage: { from: function(){ return { upload: async function(){ return {}; }, getPublicUrl: function(){ return { data:{ publicUrl:"" } }; } }; } }
+};
 </script>
 <script src="js/_app-shell-test.js"></script>
 <script>
