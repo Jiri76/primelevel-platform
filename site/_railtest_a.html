@@ -301,37 +301,28 @@
   (function wireRailPersistence() {
     const rail = document.querySelector('.rail');
     if (!rail) return;
-    const setRailStored = (v) => { try { sessionStorage.setItem('primelevel-rail-expanded', v); } catch (e) {} };
+    const set = (v) => { try { sessionStorage.setItem('primelevel-rail-expanded', v); } catch (e) {} };
+    const expand = () => { document.documentElement.setAttribute('data-rail', 'expanded'); set('1'); };
+    const collapse = () => { document.documentElement.removeAttribute('data-rail'); set('0'); };
 
-    if (document.documentElement.getAttribute('data-rail') === 'expanded') {
-      const checkFirstMove = (e) => {
-        if (!e.target.closest || !e.target.closest('.rail')) {
-          document.documentElement.removeAttribute('data-rail');
-          setRailStored('0');
-        }
-        window.removeEventListener('mousemove', checkFirstMove);
-      };
-      window.addEventListener('mousemove', checkFirstMove);
-    }
-
-    // Belt-and-braces: clicking a nav link only happens while the cursor
-    // is over it, so stamp the flag right at click time too, unconditionally
-    // -- some browsers fire a mouseleave as part of tearing down the old
-    // page during navigation, which could otherwise race with (and wipe
-    // out) the mouseenter-set flag a split second before the new page
-    // reads it.
+    // Once a nav link is clicked we are navigating -- lock the flag ON so no
+    // late pointer event (a mouseleave/pointermove fired while the old page
+    // tears down) can flip it OFF before the next page reads it.
+    let navigating = false;
     rail.addEventListener('click', (e) => {
-      if (e.target.closest('.rail-item')) setRailStored('1');
+      if (e.target.closest('.rail-item')) { navigating = true; set('1'); }
     });
 
-    rail.addEventListener('mouseenter', () => {
-      setRailStored('1');
-      document.documentElement.setAttribute('data-rail', 'expanded');
-    });
-    rail.addEventListener('mouseleave', () => {
-      setRailStored('0');
-      document.documentElement.removeAttribute('data-rail');
-    });
+    // Single source of truth for the rest of the page's life: the rail is
+    // expanded iff the pointer is actually over it. This re-asserts the
+    // correct state on the very first pointer move after load, which fixes
+    // the "cursor was already resting here / already moved away" cases that
+    // plain CSS :hover gets wrong across a full page load.
+    document.addEventListener('pointermove', (e) => {
+      if (navigating) return;
+      if (e.target && e.target.closest && e.target.closest('.rail')) expand();
+      else collapse();
+    }, { passive: true });
   })();
 
   async function wireAccountMenu(accountId, businessName, email) {
