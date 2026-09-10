@@ -65,6 +65,23 @@
       return;
     }
 
+    // Swap the page's <head> <style> block(s). Every page carries the full
+    // stylesheet inline — the shell/rail/token rules are byte-identical
+    // across pages, but each page also has its own page-specific rules
+    // (.page-head layout, .stat-card grids, form styles, …). Swapping the
+    // whole <style> in one synchronous step re-establishes the right rules
+    // with no flash. Old ones are removed only after the new ones are in.
+    const freshStyles = [...doc.querySelectorAll('head style')];
+    const oldStyles = [...document.querySelectorAll('head style')];
+    if (freshStyles.length) {
+      freshStyles.forEach((st) => {
+        const clone = document.createElement('style');
+        clone.textContent = st.textContent;
+        document.head.appendChild(clone);
+      });
+      oldStyles.forEach((st) => st.remove());
+    }
+
     // Swap <main>.
     currentMain.replaceWith(freshMain);
 
