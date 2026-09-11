@@ -121,24 +121,71 @@
   .btn:disabled{ opacity:0.6; cursor:default; }
   #billingMsg{ font-size:12px; margin-top:10px; display:none; }
 
-  .tier-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; }
-  .tier-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:22px 22px 24px; display:flex; flex-direction:column; transition:transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
-  .tier-card:hover{ transform:translateY(-3px); border-color:var(--brand-gold); box-shadow:0 4px 10px rgba(30,38,51,0.10), 0 12px 28px rgba(30,38,51,0.10); }
-  .tier-card.current{ border-color:var(--brand-gold); box-shadow:0 0 0 1.5px var(--brand-gold), var(--shadow); }
-  .tier-card.current:hover{ transform:translateY(-3px); box-shadow:0 0 0 1.5px var(--brand-gold), 0 4px 10px rgba(30,38,51,0.10), 0 12px 28px rgba(30,38,51,0.10); }
-  .tier-badge{ display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--brand-gold); background:var(--brand-gold-soft); border-radius:100px; padding:3px 10px; margin-bottom:12px; width:fit-content; }
-  :root[data-theme="dark"] .tier-badge{ color:#1A1406; }
-  .tier-name{ font-family:'Fraunces',serif; font-weight:500; font-size:19px; margin:0 0 2px; }
-  .tier-price{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:22px; font-weight:600; margin:6px 0 16px; }
-  .tier-price span{ font-size:12px; font-weight:400; color:var(--text-faint); }
-  .tier-features{ list-style:none; margin:0 0 20px; padding:0; flex:1; }
-  .tier-features li{ font-size:12.5px; color:var(--text-soft); padding:6px 0; border-bottom:1px solid var(--border); }
-  .tier-features li:last-child{ border-bottom:none; }
-  .tier-btn{ width:100%; }
+  /* ---- Pricing tier cards ----------------------------------------------
+     Fixed brand tier colours (Navy / 80%-gold blend / Gold), all opacity 1.
+     These do NOT flip between light/dark themes -- the tier colour IS the
+     identity, and the same colour carries into the upgrade/downgrade emails.
+     Deliberate exception to the site-wide 14% hairline-border rule: these
+     are solid-fill feature blocks, not canvas panels, so the fill + shadow
+     define the edge. Only Insider gets a border, as its flagship frame.
+     See the primelevel-platform-tier-colors memory for the full spec. */
+  .plans-block{ margin-bottom:22px; }
+  .plans-block h2{ font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin:0 0 4px; }
+  .plans-block .desc{ font-size:12.5px; color:var(--text-faint); margin:0 0 4px; line-height:1.5; }
 
+  .tier-grid{
+    display:grid; grid-template-columns:repeat(3, 290px); gap:22px;
+    justify-content:center; align-items:end; padding-top:34px;
+  }
+  .tier-card{
+    border-radius:16px; padding:26px; display:flex; flex-direction:column;
+    min-height:472px; position:relative;
+    box-shadow:0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.08);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .tier-card[data-tier="starter"]{ background:#1E2633; color:#F9F9FA; }
+  .tier-card[data-tier="growth"] { background:#94845D; color:#1E2633; }
+  .tier-card[data-tier="insider"]{
+    background:#B29B68; color:#1E2633; border:2px solid #1E2633;
+    transform:translateY(-14px) scale(1.04);
+    box-shadow:0 4px 8px rgba(30,38,51,0.12), 0 18px 44px rgba(30,38,51,0.18);
+  }
+  .tier-card[data-tier="starter"]:hover, .tier-card[data-tier="growth"]:hover{ transform:translateY(-4px); }
+  .tier-card[data-tier="insider"]:hover{ transform:translateY(-18px) scale(1.04); }
+
+  .tier-flag{
+    position:absolute; top:-15px; left:50%; transform:translateX(-50%);
+    background:#1E2633; color:#F9F9FA; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.08em; padding:6px 16px;
+    border-radius:8px; white-space:nowrap;
+  }
+
+  /* dynamic "Current plan" pill (shown by JS on the active tier) */
+  .tier-badge{ display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; border-radius:100px; padding:3px 10px; margin-bottom:12px; width:fit-content; background:rgba(249,249,250,0.18); color:inherit; }
+  .tier-badge[hidden]{ display:none; }
+  .tier-card[data-tier="growth"] .tier-badge, .tier-card[data-tier="insider"] .tier-badge{ background:rgba(30,38,51,0.16); }
+
+  .tier-name{ font-family:'Fraunces',serif; font-weight:600; font-size:21px; margin:0 0 6px; }
+  .tier-price{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:28px; font-weight:600; margin:0 0 20px; }
+  .tier-price span{ font-size:12px; font-weight:400; opacity:0.62; margin-left:4px; }
+  .tier-features{ list-style:none; margin:0 0 22px; padding:0; flex:1; }
+  .tier-features li{ font-size:13px; opacity:0.82; padding:7px 0; }
+  .tier-features li::before{ content:"+"; opacity:0.55; margin-right:10px; font-weight:600; }
+
+  .tier-btn{ width:100%; height:46px; padding:0; border-radius:10px; border:none; cursor:pointer; font-family:'Archivo',ui-sans-serif,sans-serif; font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .tier-card[data-tier="starter"] .tier-btn{ background:#F9F9FA; color:#1E2633; }
+  .tier-card[data-tier="starter"] .tier-btn.btn-secondary{ background:transparent; border:1.5px solid #F9F9FA; color:#F9F9FA; }
+  .tier-card[data-tier="growth"] .tier-btn, .tier-card[data-tier="insider"] .tier-btn{ background:#1E2633; color:#F9F9FA; }
+  .tier-card[data-tier="growth"] .tier-btn.btn-secondary, .tier-card[data-tier="insider"] .tier-btn.btn-secondary{ background:transparent; border:1.5px solid #1E2633; color:#1E2633; }
+  .tier-btn:disabled{ opacity:0.55; cursor:default; }
+
+  @media (max-width:980px){
+    .tier-grid{ grid-template-columns:minmax(0,340px); padding-top:34px; }
+    .tier-card[data-tier="insider"]{ transform:none; }
+    .tier-card[data-tier="insider"]:hover{ transform:translateY(-4px); }
+  }
   @media (max-width:920px){
     .rail{ display:none; }
-    .tier-grid{ grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -198,7 +245,7 @@
         <div id="billingMsg"></div>
       </div>
 
-      <div class="panel">
+      <div class="plans-block">
         <h2>Choose your plan</h2>
         <p class="desc">Prices and features below are placeholders while we finish building this out — the switching mechanism itself is real.</p>
         <div class="tier-grid" id="tierGrid">
@@ -225,6 +272,7 @@
             <button class="btn tier-btn" data-tier-btn="growth">—</button>
           </div>
           <div class="tier-card" data-tier="insider">
+            <span class="tier-flag">Flagship</span>
             <span class="tier-badge" hidden>Current plan</span>
             <div class="tier-name">Insider</div>
             <div class="tier-price">£199<span>/month</span></div>
