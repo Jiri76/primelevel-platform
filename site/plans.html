@@ -147,11 +147,11 @@
   .tier-card[data-tier="growth"] { background:#94845D; color:#1E2633; }
   .tier-card[data-tier="insider"]{
     background:#B29B68; color:#1E2633; border:2px solid #1E2633;
-    transform:translateY(-14px) scale(1.04);
+    transform:translateY(-16px);
     box-shadow:0 4px 8px rgba(30,38,51,0.12), 0 18px 44px rgba(30,38,51,0.18);
   }
   .tier-card[data-tier="starter"]:hover, .tier-card[data-tier="growth"]:hover{ transform:translateY(-4px); }
-  .tier-card[data-tier="insider"]:hover{ transform:translateY(-18px) scale(1.04); }
+  .tier-card[data-tier="insider"]:hover{ transform:translateY(-20px); }
 
   .tier-flag{
     position:absolute; top:-15px; left:50%; transform:translateX(-50%);
@@ -180,7 +180,7 @@
   .tier-btn:disabled{ opacity:0.55; cursor:default; }
 
   @media (max-width:980px){
-    .tier-grid{ grid-template-columns:minmax(0,340px); padding-top:34px; }
+    .tier-grid{ grid-template-columns:minmax(0,340px); padding-top:28px; }
     .tier-card[data-tier="insider"]{ transform:none; }
     .tier-card[data-tier="insider"]:hover{ transform:translateY(-4px); }
   }
