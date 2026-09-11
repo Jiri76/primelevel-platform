@@ -145,8 +145,10 @@
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
   .tier-card[data-tier="starter"]{ background:#1E2633; color:#F9F9FA; }
-  .tier-card[data-tier="growth"] { background:#94845D; color:#1E2633; }
-  .tier-card[data-tier="insider"]{ background:#B29B68; color:#1E2633; }
+  /* Hairline = 14% of the card's own ink colour, so it's actually visible on
+     every surface (white-14% vanishes on the light gold cards). One rule. */
+  .tier-card[data-tier="growth"] { background:#94845D; color:#1E2633; border-color:rgba(30,38,51,0.14); }
+  .tier-card[data-tier="insider"]{ background:#B29B68; color:#1E2633; border-color:rgba(30,38,51,0.14); }
   .tier-card:hover{ transform:translateY(-8px); box-shadow:0 6px 14px rgba(30,38,51,0.14), 0 22px 48px rgba(30,38,51,0.16); }
 
   .tier-flag{
