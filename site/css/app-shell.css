@@ -60,7 +60,12 @@
 
 .rail-nav{ display:flex; flex-direction:column; gap:2px; }
 .rail-item{
-  display:flex; align-items:center; gap:10px; height:32px; padding:0 7px; border-radius:8px;
+  display:flex; align-items:center; gap:10px; height:32px; padding:0 8px; border-radius:8px;
+  /* padding-left 8px (matching .rail-inner's own 8px) puts every icon's
+     center exactly on the same vertical line as the logo above -- 7px
+     left a real, measured 1px misalignment: icon center at 24px from the
+     rail's edge vs the logo's 25px. Symmetric 8px both sides also keeps
+     equal left/right padding around the icon itself. */
   color:rgba(249,249,250,0.6); text-decoration:none; white-space:nowrap; overflow:hidden;
   font-family:'Montserrat',sans-serif;
   transition:background 0.1s, color 0.1s;
@@ -69,7 +74,8 @@
 .rail-item:focus{ outline:none; }
 .rail-item:focus-visible{ outline:none; }
 .rail-item.active{ background:rgba(0,0,0,0.4); color:#F9F9FA; }
-.rail-icon{ flex:none; width:18px; text-align:center; font-size:15px; font-weight:600; }
+.rail-icon{ flex:none; width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+.rail-icon svg{ width:18px; height:18px; stroke:currentColor; display:block; }
 .rail-label{ font-size:15px; font-weight:500; opacity:0; transition:opacity 0.1s; }
 .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
 
