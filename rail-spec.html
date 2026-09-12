@@ -40,7 +40,7 @@
   }
   .rail-mock .logo::after{ content:"PL"; font-family:'Fraunces',serif; font-weight:600; font-size:26px; color:var(--gold); }
   .rail-mock .items{ position:absolute; top:153px; left:0; right:0; bottom:0; display:flex; flex-direction:column; gap:12px; padding:30px 24px; }
-  .rail-mock .row{ height:96px; border-radius:12px; display:flex; align-items:center; gap:30px; padding:0 24px; }
+  .rail-mock .row{ height:96px; border-radius:12px; display:flex; align-items:center; gap:48px; padding:0 24px; }
   .rail-mock .row.active{ background:rgba(0,0,0,.4); }
   .rail-mock .ico{ width:54px; height:54px; flex:none; border:2px solid var(--text-soft); border-radius:8px; opacity:.7; }
   .rail-mock .label{ font-size:15px; font-weight:600; color:var(--text-soft); white-space:nowrap; }
@@ -102,13 +102,13 @@
     <div class="dim-line h" style="top:349px; left:0; width:48px;"></div>
     <div class="dim-val" style="top:358px; left:2px;">16px</div>
 
-    <!-- icon-to-label gap, 10px real (30px scaled) -->
-    <div class="dim-line h" style="top:349px; left:126px; width:30px;"></div>
-    <div class="dim-val" style="top:358px; left:118px;">10px</div>
+    <!-- icon-to-label gap, 16px real (48px scaled) -->
+    <div class="dim-line h" style="top:349px; left:126px; width:48px;"></div>
+    <div class="dim-val" style="top:358px; left:130px;">16px</div>
 
     <!-- right padding: icon right edge to rail edge/divider, 16px real (48px scaled) -->
-    <div class="dim-line h" style="top:349px; left:246px; width:48px;"></div>
-    <div class="dim-val" style="top:358px; left:250px;">16px</div>
+    <div class="dim-line h" style="top:349px; left:264px; width:48px;"></div>
+    <div class="dim-val" style="top:358px; left:268px;">16px</div>
 
   </div>
 
@@ -132,9 +132,9 @@
     <div class="dim-line h" style="top:470px; left:0; width:102px;"></div>
     <div class="dim-val" style="top:479px; left:36px;">34px</div>
 
-    <!-- icon right to label left: 10px real (30px scaled) -->
-    <div class="dim-line h" style="top:451px; left:126px; width:30px;"></div>
-    <div class="dim-val" style="top:410px; left:118px;">10px</div>
+    <!-- icon right to label left: 16px real (48px scaled) -->
+    <div class="dim-line h" style="top:451px; left:126px; width:48px;"></div>
+    <div class="dim-val" style="top:410px; left:130px;">16px</div>
   </div>
 
   <div class="panel">
@@ -152,7 +152,7 @@
         <tr><td>Padding — icon to rail edge/divider (right)</td><td class="val">16px</td><td class="note">Confirmed equal to the left side</td></tr>
         <tr><td>Expanded: screen edge to icon's left edge</td><td class="val">16px</td><td class="note">Same as collapsed — unaffected by rail width</td></tr>
         <tr><td>Expanded: screen edge to icon's right edge</td><td class="val">34px</td><td class="note">16px padding + 18px icon width</td></tr>
-        <tr><td>Gap — icon's right edge to label text</td><td class="val">10px</td><td class="note">Visible once the rail is expanded</td></tr>
+        <tr><td>Gap — icon's right edge to label text</td><td class="val">16px</td><td class="note">Matches the left/right padding — visible once the rail is expanded</td></tr>
         <tr><td>Avatar</td><td class="val">30 × 30px</td><td class="note">Circular, sits in the topbar</td></tr>
         <tr><td>Avatar padding — top / right / bottom</td><td class="val">10 / 10 / 10px</td><td class="note">Matches the logo's own 10px rhythm</td></tr>
         <tr><td>Divider line opacity</td><td class="val">14%</td><td class="note">White on navy — locked site-wide standard</td></tr>
