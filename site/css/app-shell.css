@@ -45,15 +45,21 @@
 }
 .rail-inner{
   /* top is 51px, not 50 -- one px below .shell-topline's own row, so
-     this element's own border-right (a second, vertical hairline)
-     doesn't start on the exact same row as the horizontal topline and
-     visibly cross it at the corner. */
+     this element's own vertical divider doesn't start on the exact
+     same row as the horizontal topline and visibly cross it at the
+     corner. The divider itself is a box-shadow, not a border-right --
+     with box-sizing:border-box, a real border-right would eat 1px out
+     of this element's own content width (50 -> 49 usable, an odd
+     number split across 8px padding + 8px padding that can never come
+     out even around an 18px icon). box-shadow paints outside the box
+     instead, so the full width stays available and every icon's
+     left/right padding can actually be equal. */
   position:absolute; top:51px; left:0; bottom:0; width:50px; overflow:hidden;
   background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
-  border-right:1px solid rgba(249,249,250,0.14);
+  box-shadow:1px 0 0 rgba(249,249,250,0.14);
   transition:width 0.15s ease; z-index:20;
 }
-.rail:hover .rail-inner{ width:210px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
+.rail:hover .rail-inner{ width:210px; box-shadow:1px 0 0 rgba(249,249,250,0.14), 2px 0 16px rgba(0,0,0,0.18); }
 
 .brand-mark{ width:30px;height:30px;border-radius:7px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
 .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
