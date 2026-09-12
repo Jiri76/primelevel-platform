@@ -81,7 +81,7 @@
 }
 .rail-item:hover{ background:rgba(0,0,0,0.4); color:#F9F9FA; }
 .rail-item:focus{ outline:none; }
-.rail-item:focus-visible{ outline:2px solid var(--brand-gold); outline-offset:-2px; }
+.rail-item:focus-visible{ outline:none; }
 .rail-item.active{ background:rgba(0,0,0,0.4); color:#F9F9FA; }
 .rail-icon{ flex:none; width:18px; text-align:center; font-size:15px; font-weight:600; }
 .rail-label{ font-size:15px; font-weight:500; opacity:0; transition:opacity 0.1s; }
