@@ -66,7 +66,7 @@
 
 .rail-nav{ display:flex; flex-direction:column; gap:2px; }
 .rail-item{
-  display:flex; align-items:center; gap:10px; height:32px; padding:0 8px; border-radius:8px;
+  display:flex; align-items:center; gap:16px; height:32px; padding:0 8px; border-radius:8px;
   /* padding-left 8px (matching .rail-inner's own 8px) puts every icon's
      center exactly on the same vertical line as the logo above -- 7px
      left a real, measured 1px misalignment: icon center at 24px from the

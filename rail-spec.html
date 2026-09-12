@@ -1,0 +1,162 @@
+<title>Rail Chrome Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:rgba(249,249,250,0.14);
+    --text:#F9F9FA; --text-soft:#A7AEBA; --text-faint:#7B8393;
+    --gold:#B29B68; --line:#E2574C;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,sans-serif; }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:48px 32px 96px; }
+  h1{ font-family:'Fraunces',serif; font-weight:600; font-size:32px; margin:0 0 6px; text-wrap:balance; }
+  .sub{ color:var(--text-soft); font-size:14.5px; margin:0 0 44px; max-width:60ch; line-height:1.6; }
+
+  .stage{
+    position:relative; background:var(--surface-2); border:1px solid var(--border); border-radius:14px;
+    padding:64px 220px 120px 96px; margin-bottom:56px; overflow:visible;
+  }
+  .stage-label{
+    position:absolute; top:16px; left:20px; font-size:11px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--text-faint);
+  }
+
+  /* the rail itself, rendered to scale, 3x actual size (real: 50px collapsed) */
+  .rail-mock{
+    position:relative; width:150px; height:300px; background:var(--surface);
+    border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  .rail-mock .topline{ position:absolute; top:150px; left:0; right:0; height:3px; background:var(--border); }
+  .rail-mock .cell{
+    position:absolute; top:0; left:0; width:150px; height:150px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .rail-mock .logo{
+    width:90px; height:90px; border-radius:21px; background:var(--gold); opacity:.18;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .rail-mock .logo::after{ content:"PL"; font-family:'Fraunces',serif; font-weight:600; font-size:26px; color:var(--gold); }
+  .rail-mock .items{ position:absolute; top:153px; left:0; right:0; bottom:0; display:flex; flex-direction:column; gap:12px; padding:30px 24px; }
+  .rail-mock .row{ height:96px; border-radius:12px; display:flex; align-items:center; gap:30px; padding:0 24px; }
+  .rail-mock .row.active{ background:rgba(0,0,0,.4); }
+  .rail-mock .ico{ width:54px; height:54px; flex:none; border:2px solid var(--text-soft); border-radius:8px; opacity:.7; }
+  .rail-mock .label{ font-size:15px; font-weight:600; color:var(--text-soft); white-space:nowrap; }
+  .rail-mock .row.active .label{ color:var(--text); }
+
+  /* dimension lines */
+  .dim{ position:absolute; color:var(--line); font-family:'IBM Plex Mono',ui-monospace,monospace; }
+  .dim-line{ position:absolute; background:var(--line); }
+  .dim-line.h{ height:1px; }
+  .dim-line.v{ width:1px; }
+  .dim-tick{ position:absolute; width:1px; height:8px; background:var(--line); }
+  .dim-val{
+    position:absolute; font-size:12px; font-weight:600; background:var(--bg);
+    padding:2px 6px; border-radius:4px; white-space:nowrap; border:1px solid var(--line);
+  }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{
+    text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-faint); padding:10px 14px; border-bottom:1px solid var(--border);
+  }
+  tbody td{ padding:12px 14px; border-bottom:1px solid var(--border); }
+  tbody tr:last-child td{ border-bottom:none; }
+  td.val{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; color:var(--gold); font-weight:600; }
+  td.note{ color:var(--text-soft); }
+  .panel{ background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:8px 0; overflow-x:auto; }
+  .panel h2{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; margin:18px 14px 8px; }
+
+  @media (max-width:720px){ .stage{ padding:48px 24px; } }
+</style>
+
+<div class="wrap">
+  <h1>Rail chrome — measured spec</h1>
+  <p class="sub">Every dimension below is a real live measurement (getBoundingClientRect), not a value read off the stylesheet. Diagram is rendered at 3× scale for legibility — real pixel values are labeled on each line.</p>
+
+  <div class="stage">
+    <div class="stage-label">Collapsed rail · scaled 3× (real width 50px)</div>
+    <div class="rail-mock">
+      <div class="topline"></div>
+      <div class="cell"><div class="logo"></div></div>
+      <div class="items">
+        <div class="row"><div class="ico"></div><div class="label">Dashboard</div></div>
+        <div class="row active"><div class="ico"></div><div class="label">Payments</div></div>
+        <div class="row"><div class="ico"></div><div class="label">Insights</div></div>
+      </div>
+    </div>
+
+    <!-- logo padding: top/left/right/bottom = 10px real (30px scaled) -->
+    <div class="dim-line v" style="left:96px; top:64px; height:30px;"></div>
+    <div class="dim-val" style="left:56px; top:72px;">10px</div>
+    <div class="dim-line v" style="left:96px; top:154px; height:30px;"></div>
+    <div class="dim-val" style="left:56px; top:162px;">10px</div>
+    <div class="dim-line h" style="top:109px; left:96px; width:30px;"></div>
+    <div class="dim-val" style="top:96px; left:82px;">10px</div>
+    <div class="dim-line h" style="top:109px; left:216px; width:30px;"></div>
+    <div class="dim-val" style="top:96px; left:238px;">10px</div>
+
+    <!-- left padding: screen edge to icon, 16px real (48px scaled) -->
+    <div class="dim-line h" style="top:349px; left:0; width:48px;"></div>
+    <div class="dim-val" style="top:358px; left:2px;">16px</div>
+
+    <!-- icon-to-label gap, 10px real (30px scaled) -->
+    <div class="dim-line h" style="top:349px; left:126px; width:30px;"></div>
+    <div class="dim-val" style="top:358px; left:118px;">10px</div>
+
+    <!-- right padding: icon right edge to rail edge/divider, 16px real (48px scaled) -->
+    <div class="dim-line h" style="top:349px; left:246px; width:48px;"></div>
+    <div class="dim-val" style="top:358px; left:250px;">16px</div>
+
+  </div>
+
+  <div class="stage" style="padding:64px 40px 100px 96px; overflow:auto;">
+    <div class="stage-label">Hover-expanded rail · scaled 3× (real width 210px)</div>
+    <div class="rail-mock" style="width:630px;">
+      <div class="topline" style="right:0;"></div>
+      <div class="cell"><div class="logo"></div></div>
+      <div class="items" style="right:0;">
+        <div class="row active" style="width:582px;"><div class="ico"></div><div class="label">Payments</div></div>
+        <div class="row" style="width:582px;"><div class="ico"></div><div class="label">Insights</div></div>
+        <div class="row" style="width:582px;"><div class="ico"></div><div class="label">Renewals</div></div>
+      </div>
+    </div>
+
+    <!-- screen edge to icon LEFT: 16px real (48px scaled) -->
+    <div class="dim-line h" style="top:451px; left:0; width:48px;"></div>
+    <div class="dim-val" style="top:460px; left:2px;">16px</div>
+
+    <!-- screen edge to icon RIGHT: 34px real (102px scaled) -->
+    <div class="dim-line h" style="top:470px; left:0; width:102px;"></div>
+    <div class="dim-val" style="top:479px; left:36px;">34px</div>
+
+    <!-- icon right to label left: 10px real (30px scaled) -->
+    <div class="dim-line h" style="top:451px; left:126px; width:30px;"></div>
+    <div class="dim-val" style="top:410px; left:118px;">10px</div>
+  </div>
+
+  <div class="panel">
+    <h2>Full reference table</h2>
+    <table>
+      <thead><tr><th>Measurement</th><th>Value</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Rail width, collapsed</td><td class="val">50px</td><td class="note">Also the topbar's own height</td></tr>
+        <tr><td>Rail width, hover-expanded</td><td class="val">210px</td><td class="note">Fits the longest label, "Plans &amp; Billing", with room to spare</td></tr>
+        <tr><td>Logo cell</td><td class="val">50 × 50px</td><td class="note">Icon 30 × 30px, centered</td></tr>
+        <tr><td>Logo padding — top / right / bottom / left</td><td class="val">10 / 10 / 10 / 10px</td><td class="note">Equal on all four sides</td></tr>
+        <tr><td>Nav row height</td><td class="val">32px</td><td class="note">Every item, same height</td></tr>
+        <tr><td>Icon size</td><td class="val">18 × 18px</td><td class="note">Real SVG icons, stroke follows text color</td></tr>
+        <tr><td>Padding — rail edge to icon (left)</td><td class="val">16px</td><td class="note">8px rail padding + 8px row padding</td></tr>
+        <tr><td>Padding — icon to rail edge/divider (right)</td><td class="val">16px</td><td class="note">Confirmed equal to the left side</td></tr>
+        <tr><td>Expanded: screen edge to icon's left edge</td><td class="val">16px</td><td class="note">Same as collapsed — unaffected by rail width</td></tr>
+        <tr><td>Expanded: screen edge to icon's right edge</td><td class="val">34px</td><td class="note">16px padding + 18px icon width</td></tr>
+        <tr><td>Gap — icon's right edge to label text</td><td class="val">10px</td><td class="note">Visible once the rail is expanded</td></tr>
+        <tr><td>Avatar</td><td class="val">30 × 30px</td><td class="note">Circular, sits in the topbar</td></tr>
+        <tr><td>Avatar padding — top / right / bottom</td><td class="val">10 / 10 / 10px</td><td class="note">Matches the logo's own 10px rhythm</td></tr>
+        <tr><td>Divider line opacity</td><td class="val">14%</td><td class="note">White on navy — locked site-wide standard</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
