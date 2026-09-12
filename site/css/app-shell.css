@@ -6,7 +6,18 @@
    row height 32px, logo cell 50x50 (30x30 icon, 10px padding all
    sides), topbar 50px, avatar 30x30 (10px top/bottom/right). */
 
-.shell{ display:flex; min-height:100vh; }
+.shell{ display:flex; min-height:100vh; position:relative; }
+
+/* One single divider line under the logo cell + topbar, drawn once as
+   its own full-width element. Deliberately NOT two separate box-shadows
+   on .rail-brand-fixed and .topbar that merely compute to the same y --
+   two independently-positioned elements can still land on different
+   physical pixel rows on a scaled/HiDPI display even when their CSS
+   values agree exactly. One element removes that class of bug outright. */
+.shell-topline{
+  position:absolute; top:50px; left:0; right:0; height:1px;
+  background:rgba(249,249,250,0.14); z-index:25; pointer-events:none;
+}
 
 .rail{ position:relative; width:50px; flex:none; }
 /* Fixed corner cell — same height as the topbar, never expands, so the
@@ -14,7 +25,6 @@
 .rail-brand-fixed{
   position:absolute; top:0; left:0; width:50px; height:50px; z-index:22;
   background:#1E2633; display:flex; align-items:center; justify-content:center;
-  box-shadow:0 1px 0 rgba(249,249,250,0.14);
 }
 .rail-inner{
   position:absolute; top:50px; left:0; bottom:0; width:50px; overflow:hidden;
@@ -47,7 +57,6 @@
 .topbar{
   height:50px; flex:none; display:flex; align-items:center; justify-content:space-between;
   padding:0 10px 0 16px; background:#1E2633;
-  box-shadow:0 1px 0 rgba(249,249,250,0.14);
 }
 .topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; }
 .topbar-right{ position:relative; }
