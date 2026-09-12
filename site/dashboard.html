@@ -4,50 +4,11 @@
 <meta charset="UTF-8">
 <title>PrimeLevel Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>
-  // Apply any stored theme choice immediately, before first paint, so there's
-  // no flash of the wrong theme. "system" (or no stored value) means no
-  // attribute at all, letting prefers-color-scheme decide, matching every
-  // other page on the site.
-  (function(){
-    var t = localStorage.getItem('primelevel-theme');
-    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-  })();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#DADBDE;
-    --surface:#F9F9FA;
-    --surface-2:#F1EFE9;
-    --border:#E3DFD3;
-    --text:#1E2633;
-    --text-soft:#5C6472;
-    --text-faint:#8B92A0;
-    --brand-navy:#1E2633;
-    --brand-gold:#B29B68;
-    --brand-gold-soft:#B29B68;
-    --good:#2F7D5B;
-    --good-bg:#E6F1EB;
-    --warn:#B4552B;
-    --warn-bg:#F6E7DE;
-    --info:#3D5A80;
-    --info-bg:#E7ECF2;
-    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:rgba(249,249,250,0.14);
-      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
-      --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
-      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
-      --info:#87A6CE; --info-bg:#22314A;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
-    }
-  }
-  :root[data-theme="dark"]{
     --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:rgba(249,249,250,0.14);
     --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
     --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
@@ -106,18 +67,16 @@
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
   .topbar{
     height:50px; flex:none; display:flex; align-items:center; justify-content:space-between;
-    padding:0 20px 0 16px; background:#1E2633;
+    padding:0 10px 0 16px; background:#1E2633;
     box-shadow:0 1px 0 rgba(249,249,250,0.14);
   }
   .topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; }
   .topbar-right{ position:relative; }
   .avatar-btn{
-    width:32px; height:32px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0;
-    background:var(--brand-navy); color:#F7F4EC; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
+    width:30px; height:30px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0;
+    background:var(--brand-gold); color:#1A1406; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
     display:flex; align-items:center; justify-content:center;
   }
-  :root[data-theme="dark"] .avatar-btn{ background:var(--brand-gold); color:#1A1406; }
-  @media (prefers-color-scheme:dark){ .avatar-btn{ background:var(--brand-gold); color:#1A1406; } }
   .avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
 
   .account-menu{
@@ -131,25 +90,15 @@
   .account-menu-sep{ height:1px; background:rgba(249,249,250,0.14); margin:4px 0; }
   .account-menu-item{ display:block; padding:10px 12px; border-radius:8px; font-size:12.5px; color:#E9E4D8; text-decoration:none; cursor:pointer; }
   .account-menu-item:hover{ background:var(--bg); color:var(--text); }
-  .account-menu-theme-label{ padding:8px 12px 4px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#7B8393; }
-  .theme-option{
-    width:100%; display:flex; align-items:center; gap:10px; border:none; background:none;
-    font-family:inherit; text-align:left;
-  }
-  .theme-dot{ width:6px; height:6px; border-radius:50%; background:transparent; flex:none; }
-  .theme-option.active .theme-dot{ background:var(--brand-gold); }
-  .theme-option.active{ color:#F7F4EC; font-weight:600; }
 
   main{ padding:32px 40px 64px; max-width:1120px; width:100%; margin:0 auto; box-sizing:border-box; }
   .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:26px; }
   .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; text-wrap:balance; color:var(--text); }
   .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
   .new-invoice{
-    flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px;
+    flex:none; background:var(--brand-gold); color:#1A1406; border:none; border-radius:9px;
     padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer;
   }
-  :root[data-theme="dark"] .new-invoice{ background:var(--brand-gold); color:#1A1406; }
-  @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
 
   /* stat row */
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:34px; }
@@ -233,10 +182,6 @@
             <div class="account-menu-email" id="accountMenuEmail">…</div>
           </div>
           <a class="account-menu-item" href="settings.html">Account settings</a>
-          <div class="account-menu-sep"></div>
-          <div class="account-menu-theme-label">Theme</div>
-          <button class="account-menu-item theme-option" data-theme-choice="dark"><span class="theme-dot"></span>Dark</button>
-          <button class="account-menu-item theme-option" data-theme-choice="light"><span class="theme-dot"></span>Light</button>
           <div class="account-menu-sep"></div>
           <a class="account-menu-item" href="#" data-sign-out>Sign out</a>
         </div>
@@ -396,36 +341,12 @@
   // initial letter.
   const GENERIC_PROFILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>';
 
-  // Theme switcher: System / Dark / Light, matching Supabase's own account
-  // menu exactly. Only ever touches data-theme -- every color that's meant
-  // to change between themes already keys off that attribute (or plain
-  // prefers-color-scheme for "system"); nothing else is touched here, so
-  // switching can never silently affect Navy/Gold/borders.
-  function applyTheme(choice) {
-    document.documentElement.setAttribute('data-theme', choice);
-    localStorage.setItem('primelevel-theme', choice);
-    document.querySelectorAll('.theme-option').forEach((el) => {
-      el.classList.toggle('active', el.dataset.themeChoice === choice);
-    });
-  }
-  function wireThemeSwitcher() {
-    const stored = localStorage.getItem('primelevel-theme');
-    const current = (stored === 'light' || stored === 'dark')
-      ? stored
-      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.querySelectorAll('.theme-option').forEach((el) => {
-      el.classList.toggle('active', el.dataset.themeChoice === current);
-      el.addEventListener('click', () => applyTheme(el.dataset.themeChoice));
-    });
-  }
-
   // Real account menu: toggles on click, closes on outside click or Escape
   // — same discipline as the inline-confirm pattern used elsewhere (no
   // native browser dialogs), just a dropdown instead of a confirmation.
   async function wireAccountMenu(accountId, businessName, email) {
     const btn = document.getElementById('accountBtn');
     const menu = document.getElementById('accountMenu');
-    wireThemeSwitcher();
 
     const { data: account } = await supabaseClient
       .from('accounts')

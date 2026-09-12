@@ -4,38 +4,11 @@
 <meta charset="UTF-8">
 <title>PrimeLevel Invoices</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>
-  // Apply any stored theme choice immediately, before first paint, so there's
-  // no flash of the wrong theme. No stored value means no attribute at all,
-  // letting prefers-color-scheme decide, matching every other page on the site.
-  (function(){
-    var t = localStorage.getItem('primelevel-theme');
-    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-  })();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#DADBDE; --surface:#F9F9FA; --surface-2:#F1EFE9; --border:#E3DFD3;
-    --text:#1E2633; --text-soft:#5C6472; --text-faint:#8B92A0;
-    --brand-navy:#1E2633; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
-    --good:#2F7D5B; --good-bg:#E6F1EB; --warn:#B4552B; --warn-bg:#F6E7DE;
-    --info:#3D5A80; --info-bg:#E7ECF2;
-    --shadow: 0 1px 2px rgba(30,38,51,0.06), 0 8px 24px rgba(30,38,51,0.06);
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:rgba(249,249,250,0.14);
-      --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
-      --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
-      --good:#57B78E; --good-bg:#1D3A30; --warn:#DD8E5D; --warn-bg:#402C1F;
-      --info:#87A6CE; --info-bg:#22314A;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px rgba(0,0,0,0.35);
-    }
-  }
-  :root[data-theme="dark"]{
     --bg:#12171F; --surface:#1E2633; --surface-2:#242E3B; --border:rgba(249,249,250,0.14);
     --text:#F1EEE6; --text-soft:#A7AEBA; --text-faint:#7B8393;
     --brand-navy:#AFC3E6; --brand-gold:#B29B68; --brand-gold-soft:#B29B68;
@@ -47,7 +20,10 @@
   html,body{ margin:0; padding:0; }
   body{ margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
   .shell{ display:flex; min-height:100vh; }
+
   .rail{ position:relative; width:50px; flex:none; }
+  /* Fixed corner cell — same height as the topbar, never expands, so the
+     rail's hover-expand can never draw over the topbar. */
   .rail-brand-fixed{
     position:absolute; top:0; left:0; width:50px; height:50px; z-index:22;
     background:#1E2633; display:flex; align-items:center; justify-content:center;
@@ -60,8 +36,11 @@
     transition:width 0.15s ease; z-index:20;
   }
   .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
+
   .brand-mark{ width:30px;height:30px;border-radius:7px; overflow:hidden; display:flex;align-items:center;justify-content:center; flex:none; }
   .brand-mark img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .brand-mark.small{ width:22px; height:22px; border-radius:5px; }
+
   .rail-nav{ display:flex; flex-direction:column; gap:2px; }
   .rail-item{
     display:flex; align-items:center; gap:10px; height:32px; padding:0 7px; border-radius:8px;
@@ -78,44 +57,43 @@
   .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
 
   .main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
-  .topbar{ height:50px; flex:none; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; background:#1E2633; box-shadow:0 1px 0 rgba(249,249,250,0.14); }
-  @media (prefers-color-scheme: dark){ .topbar{ background:var(--surface); } }
-  :root[data-theme="dark"] .topbar{ background:var(--surface); }
+  .topbar{
+    height:50px; flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:0 10px 0 16px; background:#1E2633;
+    box-shadow:0 1px 0 rgba(249,249,250,0.14);
+  }
+  .topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; }
   .topbar-right{ position:relative; }
-  .avatar-btn{ width:32px; height:32px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0; background:var(--brand-navy); color:#F7F4EC; font-family:'Fraunces',serif; font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; }
-  :root[data-theme="dark"] .avatar-btn{ background:var(--brand-gold); color:#1A1406; }
-  @media (prefers-color-scheme:dark){ .avatar-btn{ background:var(--brand-gold); color:#1A1406; } }
+  .avatar-btn{
+    width:30px; height:30px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0;
+    background:var(--brand-gold); color:#1A1406; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
   .avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .account-menu{ position:absolute; top:40px; right:0; width:256px; background:#1E2633; border:1px solid rgba(249,249,250,0.14); border-radius:8px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10); padding:6px; z-index:30; }
+
+  .account-menu{
+    position:absolute; top:40px; right:0; width:256px; background:#1E2633; border:1px solid rgba(249,249,250,0.14);
+    border-radius:8px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -2px rgba(0,0,0,0.10);
+    padding:6px; z-index:30;
+  }
   .account-menu-head{ padding:8px 12px 12px; }
   .account-menu-name{ font-size:13px; font-weight:600; color:#F7F4EC; }
   .account-menu-email{ font-size:12px; color:#A7AEBA; margin-top:1px; }
   .account-menu-sep{ height:1px; background:rgba(249,249,250,0.14); margin:4px 0; }
   .account-menu-item{ display:block; padding:10px 12px; border-radius:8px; font-size:12.5px; color:#E9E4D8; text-decoration:none; cursor:pointer; }
   .account-menu-item:hover{ background:var(--bg); color:var(--text); }
-  .account-menu-theme-label{ padding:8px 12px 4px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#7B8393; }
-  .theme-option{
-    width:100%; display:flex; align-items:center; gap:10px; border:none; background:none;
-    font-family:inherit; text-align:left;
-  }
-  .theme-dot{ width:6px; height:6px; border-radius:50%; background:transparent; flex:none; }
-  .theme-option.active .theme-dot{ background:var(--brand-gold); }
-  .theme-option.active{ color:#F7F4EC; font-weight:600; }
 
   main{ padding:32px 40px 64px; max-width:1120px; }
   .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:22px; }
   .page-head h1{ font-family:'Fraunces',serif; font-weight:500; font-size:27px; margin:0 0 4px; }
   .page-head p{ margin:0; color:var(--text-soft); font-size:13.5px; }
-  .new-invoice{ flex:none; background:var(--brand-navy); color:#F7F4EC; border:none; border-radius:9px; padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
-  :root[data-theme="dark"] .new-invoice{ background:var(--brand-gold); color:#1A1406; }
-  @media (prefers-color-scheme:dark){ .new-invoice{ background:var(--brand-gold); color:#1A1406; } }
+  .new-invoice{ flex:none; background:var(--brand-gold); color:#1A1406; border:none; border-radius:9px; padding:10px 16px; font-family:'Archivo',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
 
   /* toolbar */
   .toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
   .filter-pills{ display:flex; gap:6px; }
   .fpill{ font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:100px; border:1px solid var(--border); background:var(--surface); color:var(--text-soft); cursor:pointer; }
-  .fpill.active{ background:var(--brand-navy); color:#F7F4EC; border-color:var(--brand-navy); }
-  :root[data-theme="dark"] .fpill.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); }
+  .fpill.active{ background:var(--brand-gold); color:#1A1406; border-color:var(--brand-gold); }
   .search{ margin-left:auto; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:8px 12px; font-size:13px; color:var(--text-faint); min-width:220px; }
 
   .invoice-panel{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px; }
@@ -167,6 +145,7 @@
 
   <div class="main-col">
     <header class="topbar">
+      <div class="topbar-crumb"></div>
       <div class="topbar-right">
         <button class="avatar-btn" id="accountBtn" title="Account settings"></button>
         <div class="account-menu" id="accountMenu" hidden>
@@ -175,10 +154,6 @@
             <div class="account-menu-email" id="accountMenuEmail">…</div>
           </div>
           <a class="account-menu-item" href="settings.html">Account settings</a>
-          <div class="account-menu-sep"></div>
-          <div class="account-menu-theme-label">Theme</div>
-          <button class="account-menu-item theme-option" data-theme-choice="dark"><span class="theme-dot"></span>Dark</button>
-          <button class="account-menu-item theme-option" data-theme-choice="light"><span class="theme-dot"></span>Light</button>
           <div class="account-menu-sep"></div>
           <a class="account-menu-item" href="#" data-sign-out>Sign out</a>
         </div>
@@ -382,28 +357,9 @@
 
   const GENERIC_PROFILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>';
 
-  function applyTheme(choice) {
-    document.documentElement.setAttribute('data-theme', choice);
-    localStorage.setItem('primelevel-theme', choice);
-    document.querySelectorAll('.theme-option').forEach((el) => {
-      el.classList.toggle('active', el.dataset.themeChoice === choice);
-    });
-  }
-  function wireThemeSwitcher() {
-    const stored = localStorage.getItem('primelevel-theme');
-    const current = (stored === 'light' || stored === 'dark')
-      ? stored
-      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.querySelectorAll('.theme-option').forEach((el) => {
-      el.classList.toggle('active', el.dataset.themeChoice === current);
-      el.addEventListener('click', () => applyTheme(el.dataset.themeChoice));
-    });
-  }
-
   async function wireAccountMenu(accountId, businessName, email) {
     const btn = document.getElementById('accountBtn');
     const menu = document.getElementById('accountMenu');
-    wireThemeSwitcher();
 
     const { data: account } = await supabaseClient
       .from('accounts')
