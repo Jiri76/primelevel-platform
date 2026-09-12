@@ -49,7 +49,15 @@
 }
 .avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-.body-row{ display:flex; flex:1; min-height:0; }
+.body-row{
+  display:flex; flex:1; min-height:0;
+  /* Clips .rail-inner's hover box-shadow so its blur can't bleed UP past the
+     topbar boundary (it now sits flush under the topbar, unlike the old
+     structure). Does NOT clip the intended horizontal overflow when the rail
+     expands to 208px -- body-row itself is far wider than that, so nothing
+     visible is cut off sideways, only the shadow's illegal bleed upward. */
+  overflow:hidden;
+}
 .body-row > main{ flex:1; min-width:0; }
 
 .rail{ position:relative; width:50px; flex:none; }
