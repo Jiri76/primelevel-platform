@@ -29,13 +29,8 @@
 
 .topbar{
   height:50px; flex:none; display:flex; align-items:center;
-  background:#1E2633; box-shadow:0 1px 0 rgba(249,249,250,0.40);
+  background:#1E2633; box-shadow:0 1px 0 rgba(249,249,250,0.14);
   padding-right:10px;
-  /* 40%, not the site's usual 14% hairline: this is a real structural chrome
-     boundary (topbar/rail edge), not a decorative divider, and needs to
-     actually be visible. Real contrast math: 14% white on this navy composites
-     to a 1.55:1 contrast ratio -- below WCAG's 3:1 minimum for a UI boundary.
-     40% composites to ~3.54:1, comfortably above it. */
 }
 .topbar-brand{ width:50px; height:50px; flex:none; display:flex; align-items:center; justify-content:center; }
 .topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; padding-left:16px; }
@@ -69,7 +64,7 @@
 .rail-inner{
   position:absolute; top:0; left:0; bottom:0; width:50px; overflow:hidden;
   background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
-  border-right:1px solid rgba(249,249,250,0.40); /* 40%, matches .topbar's boundary line -- see its comment */
+  border-right:1px solid rgba(249,249,250,0.14);
   transition:width 0.15s ease; z-index:20;
 }
 .rail:hover .rail-inner{ width:208px; box-shadow:2px 0 16px rgba(0,0,0,0.18); }
