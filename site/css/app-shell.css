@@ -1,68 +1,54 @@
-/* PrimeLevel app shell — the ONE shared source for the topbar, logo,
-   rail nav, avatar, and account-menu chrome used by every signed-in
-   app page. Never copy this into a page's own <style> block again —
-   edit this file, and every page picks it up automatically.
+/* PrimeLevel app shell — the ONE shared source for the rail nav, logo
+   cell, topbar, avatar, and account-menu chrome used by every
+   signed-in app page. Never copy this into a page's own <style> block
+   again — edit this file, and every page picks it up automatically.
 
-   STRUCTURE, mirroring Supabase's own real dashboard layout (not the
-   earlier PrimeLevel-specific arrangement): ONE full-width topbar owns
-   the entire top strip, logo included, and the rail sits BELOW it,
-   spanning only the remaining height. This is deliberate: the earlier
-   layout had the logo living in a separate "fixed corner cell" that
-   was part of the rail, sitting beside a separately-owned topbar --
-   two boxes that had to independently agree on height and border
-   treatment to look like one continuous strip. That agreement broke
-   three separate times (padding asymmetry, mismatched box-shadows,
-   then a border/topline corner-overlap) because it was never
-   structurally guaranteed, only carefully matched by hand each time.
-   With the topbar as the single owner of the whole top strip, there is
-   no second box left to disagree with -- this class of bug is now
-   impossible by construction, not just fixed again.
+   STRUCTURE: the rail runs the FULL page height, with the logo living
+   at its own top -- this matches Supabase's real org-settings pages
+   (Team, Billing, etc: their logo sits inside their icon rail, with a
+   short divider under it, not in a separate full-width bar). The
+   topbar sits beside the rail (not above it) for the avatar/account
+   menu, which those simpler Supabase pages don't even have.
 
-   Real measured values, unchanged from before: topbar 50px tall, logo
-   cell 50x50 (30x30 icon, 10px padding all sides), rail 50px collapsed
-   / 208px expanded on hover, avatar 30x30 with 10px top/bottom/right
-   padding. topbar-brand's width (50px) MUST stay equal to .rail's
-   width (50px) -- that's what keeps the vertical line down the page
-   flush under the logo cell above it. */
+   The one thing carried over from the brief full-width-topbar version
+   tried earlier tonight: the divider line under the logo/topbar is
+   drawn ONCE, as a single full-width element (.shell-topline) instead
+   of two separately-matched lines on the logo cell and the topbar.
+   That single-line trick is real and worth keeping regardless of
+   which structure holds the logo -- it's what makes the boundary
+   physically impossible to visually crack at the seam where the rail
+   meets the topbar, no matter which element the logo itself lives in.
 
-.shell{ display:flex; flex-direction:column; min-height:100vh; }
+   Real measured values: rail collapsed 50px, expanded 208px on hover,
+   row height 32px, logo cell 50x50 (30x30 icon, 10px padding all
+   sides), topbar 50px, avatar 30x30 (10px top/bottom/right). */
 
-.topbar{
-  height:50px; flex:none; display:flex; align-items:center;
-  background:#1E2633; box-shadow:0 1px 0 rgba(249,249,250,0.14);
-  padding-right:10px;
+.shell{ display:flex; min-height:100vh; position:relative; }
+
+/* One single divider line under the logo cell + topbar, drawn once as
+   its own full-width element. Deliberately NOT two separate lines on
+   .rail-brand-fixed and .topbar that merely compute to the same y --
+   two independently-positioned elements can still land on different
+   physical pixel rows on a scaled/HiDPI display even when their CSS
+   values agree exactly. One element removes that class of bug outright. */
+.shell-topline{
+  position:absolute; top:50px; left:0; right:0; height:1px;
+  background:rgba(249,249,250,0.14); z-index:25; pointer-events:none;
 }
-.topbar-brand{ width:50px; height:50px; flex:none; display:flex; align-items:center; justify-content:center; }
-.topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; padding-left:16px; }
-.topbar-right{
-  position:relative; margin-left:auto; display:flex; align-items:center;
-  /* margin-left:auto pushes this to the far right regardless of how much
-     (or how little -- even nothing) content is in .topbar-crumb, unlike
-     justify-content:space-between, which silently collapsed to the LEFT
-     edge if a sibling was ever missing during the SPA router's page
-     swaps. Robust regardless of what's next to it. */
-}
-.avatar-btn{
-  width:30px; height:30px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0;
-  background:var(--brand-gold); color:#1A1406; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
-  display:flex; align-items:center; justify-content:center;
-}
-.avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-.body-row{
-  display:flex; flex:1; min-height:0;
-  /* Clips .rail-inner's hover box-shadow so its blur can't bleed UP past the
-     topbar boundary (it now sits flush under the topbar, unlike the old
-     structure). Does NOT clip the intended horizontal overflow when the rail
-     expands to 208px -- body-row itself is far wider than that, so nothing
-     visible is cut off sideways, only the shadow's illegal bleed upward. */
-  overflow:hidden;
-}
-.body-row > main{ flex:1; min-width:0; }
 
 .rail{ position:relative; width:50px; flex:none; }
+/* Fixed corner cell — same height as the topbar, never expands, so the
+   rail's hover-expand can never draw over the topbar. */
+.rail-brand-fixed{
+  position:absolute; top:0; left:0; width:50px; height:50px; z-index:22;
+  background:#1E2633; display:flex; align-items:center; justify-content:center;
+}
 .rail-inner{
-  position:absolute; top:0; left:0; bottom:0; width:50px; overflow:hidden;
+  /* top is 51px, not 50 -- one px below .shell-topline's own row, so
+     this element's own border-right (a second, vertical hairline)
+     doesn't start on the exact same row as the horizontal topline and
+     visibly cross it at the corner. */
+  position:absolute; top:51px; left:0; bottom:0; width:50px; overflow:hidden;
   background:#1E2633; display:flex; flex-direction:column; gap:4px; padding:10px 8px;
   border-right:1px solid rgba(249,249,250,0.14);
   transition:width 0.15s ease; z-index:20;
@@ -86,6 +72,27 @@
 .rail-icon{ flex:none; width:18px; text-align:center; font-size:15px; font-weight:600; }
 .rail-label{ font-size:15px; font-weight:500; opacity:0; transition:opacity 0.1s; }
 .rail:hover .rail-label{ opacity:1; transition-delay:0.05s; }
+
+.main-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.topbar{
+  height:50px; flex:none; display:flex; align-items:center;
+  padding:0 10px 0 16px; background:#1E2633;
+}
+.topbar-crumb{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:600; color:#F7F4EC; }
+.topbar-right{
+  position:relative; margin-left:auto; display:flex; align-items:center;
+  /* margin-left:auto pushes this to the far right regardless of how much
+     (or how little -- even nothing) content is in .topbar-crumb, unlike
+     justify-content:space-between, which silently collapsed to the LEFT
+     edge if a sibling was ever missing during the SPA router's page
+     swaps. Robust regardless of what's next to it. */
+}
+.avatar-btn{
+  width:30px; height:30px; border-radius:50%; border:none; cursor:pointer; overflow:hidden; padding:0;
+  background:var(--brand-gold); color:#1A1406; font-family:'Fraunces',serif; font-weight:600; font-size:13px;
+  display:flex; align-items:center; justify-content:center;
+}
+.avatar-btn img{ width:100%; height:100%; object-fit:cover; display:block; }
 
 .account-menu{
   position:absolute; top:40px; right:0; width:256px; background:#1E2633; border:1px solid rgba(249,249,250,0.14);
