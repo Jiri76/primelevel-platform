@@ -142,13 +142,13 @@
   .orbit-ring{ position:absolute; inset:0; width:100%; height:100%; }
   .orbit-hub{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    width:30%; aspect-ratio:1/1; border-radius:50%;
+    width:27%; aspect-ratio:1/1; border-radius:50%;
     background:var(--gold); box-shadow:var(--shadow), var(--glow-gold);
     display:flex; align-items:center; justify-content:center;
   }
   .orbit-hub img{ width:46%; height:46%; display:block; }
   .orbit-node{ position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:9px; width:34%; }
-  .orbit-node svg{ width:26px; height:26px; stroke:var(--gold); flex:none; }
+  .orbit-node svg{ width:24px; height:24px; stroke:var(--gold); flex:none; }
   .orbit-node span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-align:center; line-height:1.3; }
   /* "Time returned" is pinned to right:0 instead of left+translate, so its
      text's right edge lands exactly on the container's own right edge —
@@ -437,20 +437,20 @@
 
       <div class="hero-visual">
         <svg class="orbit-ring" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#B29B68" stroke-width="0.6" stroke-linecap="round" stroke-dasharray="0.1 3" opacity="0.6"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#B29B68" stroke-width="0.6" stroke-linecap="round" stroke-dasharray="0.1 3" opacity="0.6"/>
         </svg>
         <div class="orbit-hub">
           <img src="assets/primelevel-mark-navy.png" alt="PrimeLevel">
         </div>
-        <div class="orbit-node" style="left:50%; top:8%;">
+        <div class="orbit-node" style="left:50%; top:12%;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           <span>Simplicity</span>
         </div>
-        <div class="orbit-node" style="left:86.4%; top:64%;">
+        <div class="orbit-node" style="left:82.9%; top:69%;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         </div>
         <span class="orbit-label-edge" style="top:78%;">Time returned</span>
-        <div class="orbit-node" style="left:13.6%; top:71%;">
+        <div class="orbit-node" style="left:17.1%; top:69%;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
           <span>Business intelligence</span>
         </div>
