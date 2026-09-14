@@ -381,32 +381,20 @@
 
   /* ---------- Final CTA ---------- */
   .final-cta{ padding:0; }
-  .final-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0; align-items:stretch; border-radius:20px; overflow:hidden; box-shadow:var(--shadow); }
+  /* 40/60 copy/photo — the closing section is now a clean headline+CTA+
+     photo composition (the inline signup form moved to its own dedicated
+     page; every "Start free trial" link on this page points there). */
+  .final-grid{ display:grid; grid-template-columns:40fr 60fr; gap:0; align-items:stretch; border-radius:20px; overflow:hidden; box-shadow:var(--shadow); }
   .final-copy{
     background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
     padding:56px 52px; display:flex; flex-direction:column; justify-content:center; position:relative;
   }
   .final-copy h2{ margin-bottom:14px; }
   .final-copy p{ font-size:15px; color:var(--white); margin:0 0 30px; max-width:42ch; }
+  .final-copy .cta-note{ margin-top:12px; }
   .final-tag{ position:absolute; bottom:28px; right:36px; font-style:italic; font-weight:700; font-size:13px; color:var(--gold); text-align:right; line-height:1.4; }
   .final-photo{ position:relative; }
   .final-photo .photo-frame{ height:100%; aspect-ratio:auto; border-radius:0; }
-
-  .signup-card{
-    max-width:420px; margin:56px auto 0; background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
-    box-shadow:var(--shadow), var(--edge-hi); border-radius:16px; padding:26px 28px 28px; text-align:left;
-  }
-  .signup-card .field-lbl{ font-size:11.5px; font-weight:700; color:var(--white); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 6px; }
-  .signup-card input{
-    width:100%; padding:12px 14px; border-radius:9px; border:1px solid var(--white);
-    background:var(--filler); box-shadow:inset 0 1px 3px rgba(0,0,0,0.3); color:var(--white);
-    font-family:'Montserrat',sans-serif; font-size:14px; margin-bottom:16px;
-  }
-  .signup-card input::placeholder{ color:var(--white); opacity:0.55; }
-  .card-note{ text-align:center; font-size:11.5px; color:var(--white); margin-top:12px; }
-  .form-msg{ font-size:13px; border-radius:8px; padding:10px 12px; margin-bottom:14px; display:none; align-items:center; gap:8px; border:1px solid var(--white); }
-  .form-msg.show{ display:flex; }
-  .form-msg svg{ width:15px; height:15px; stroke:var(--white); flex:none; }
 
   /* ---------- Footer ---------- */
   footer{ padding:34px 0; }
@@ -479,7 +467,7 @@
       </nav>
       <div class="header-actions">
         <a class="link-login" href="signin.html">Log in</a>
-        <a class="btn btn-gold btn-sm" href="#signup">Start free trial →</a>
+        <a class="btn btn-gold btn-sm" href="signup.html">Start free trial →</a>
       </div>
     </div>
   </header>
@@ -491,7 +479,7 @@
         <h1>Less admin.<br><span class="accent">More time back.</span><br>Better business decisions.</h1>
         <p class="hero-sub">PrimeLevel handles the repetitive admin and turns your everyday work into useful business insight, giving you more time to focus on the work that matters.</p>
         <div class="hero-cta-row">
-          <a class="btn btn-gold" href="#signup">Start your 14-day free trial →</a>
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
         </div>
         <div class="cta-note">No card required · Set up in under a minute</div>
       </div>
@@ -698,7 +686,7 @@
             <div class="cr-value" id="calcYearly">£10,920</div>
           </div>
         </div>
-        <a class="btn btn-gold btn-block" href="#signup">Start your 14-day free trial →</a>
+        <a class="btn btn-gold btn-block" href="signup.html">Start your 14-day free trial →</a>
       </div>
     </div>
   </section>
@@ -720,7 +708,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Renewal tracking</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 3 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="#signup">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
         </div>
         <div class="price-card featured">
           <div class="price-badge">Most popular</div>
@@ -733,7 +721,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Business performance dashboard</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 10 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="#signup">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
         </div>
         <div class="price-card">
           <h3>Business</h3>
@@ -745,7 +733,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced reporting</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="#signup">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
         </div>
       </div>
     </div>
@@ -788,6 +776,8 @@
         <div class="final-copy">
           <h2>Stop chasing. Start running your business.</h2>
           <p>Less admin. Faster payments. A business that gets smarter with every job you do.</p>
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
+          <div class="cta-note">No card required · full access from day one</div>
           <div class="final-tag">More jobs.<br>Better decisions.</div>
         </div>
         <div class="final-photo">
@@ -796,18 +786,6 @@
           </div>
         </div>
       </div>
-
-      <form class="signup-card" id="signupForm">
-        <div class="form-msg" id="signupMsg"></div>
-        <div class="field-lbl">Business name</div>
-        <input type="text" id="businessName" placeholder="Reeve Plumbing & Heating" required>
-        <div class="field-lbl">Email</div>
-        <input type="email" id="signupEmail" placeholder="you@yourbusiness.co.uk" required autocomplete="email">
-        <div class="field-lbl">Password</div>
-        <input type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password" minlength="8">
-        <button type="submit" class="btn btn-gold btn-block" id="signupBtn">Start my free 14-day trial →</button>
-        <div class="card-note">No card required · full access from day one</div>
-      </form>
     </div>
   </section>
 
@@ -827,11 +805,7 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="js/supabase-client.js"></script>
   <script>
-    wirePasswordToggles();
-
     // What's-your-time-worth calculator — pure client-side math, no data sent anywhere.
     const calcHours = document.getElementById('calcHours');
     const calcRate = document.getElementById('calcRate');
@@ -849,64 +823,6 @@
     calcHours.addEventListener('input', updateCalc);
     calcRate.addEventListener('input', updateCalc);
     updateCalc();
-
-    const signupMsg = document.getElementById('signupMsg');
-    function showSignupMsg(text, iconPath) {
-      signupMsg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + iconPath + '</svg><span></span>';
-      signupMsg.querySelector('span').textContent = text;
-      signupMsg.classList.add('show');
-    }
-    const ICON_OK = '<polyline points="20 6 9 17 4 12"></polyline>';
-    const ICON_ERR = '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>';
-
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = document.getElementById('signupBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating your account…';
-
-      const businessName = document.getElementById('businessName').value.trim();
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-
-      // Explicit redirect, rather than relying solely on the project's
-      // dashboard-configured Site URL default — that default pointed at a
-      // local dev URL for a while after this site went live on GitHub Pages,
-      // silently breaking every confirmation email until caught live.
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { business_name: businessName },
-          emailRedirectTo: `${window.location.origin}${window.location.pathname.replace(/index\.html$/, '')}dashboard.html`,
-        },
-      });
-
-      if (error) {
-        showSignupMsg(
-          error.message.includes('already registered') || error.message.includes('already exists')
-            ? 'That email already has a PrimeLevel account — try signing in instead.'
-            : error.message,
-          ICON_ERR
-        );
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Start my free 14-day trial →';
-        return;
-      }
-
-      if (data.session) {
-        // Email confirmation is off for this project — straight in.
-        window.location.href = 'dashboard.html';
-        return;
-      }
-
-      // Email confirmation required: no session yet until they click the
-      // link in their inbox.
-      showSignupMsg('Almost there — check your email and click the confirmation link, then come back and sign in.', ICON_OK);
-      document.getElementById('signupForm').reset();
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Start my free 14-day trial →';
-    });
   </script>
 
 </body>
