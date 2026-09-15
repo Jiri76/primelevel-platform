@@ -107,7 +107,7 @@
   .btn-block{ width:100%; }
 
   /* ---------- Header ---------- */
-  header{ padding:26px 0; }
+  header{ padding:26px 0; position:relative; }
   header .wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
   .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:none; }
   .brand img{ width:28px; height:28px; display:block; }
@@ -116,6 +116,31 @@
   nav.primary-nav a{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
   .header-actions{ display:flex; align-items:center; gap:22px; flex:none; }
   .link-login{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
+
+  /* Mobile nav — same pattern Stripe/Apple use on their real mobile
+     sites (verified live before building this): the link row disappears
+     below the tablet breakpoint and a single icon button takes over,
+     opening a dropdown panel with the same links. Hidden entirely on
+     desktop; only the 980px query below turns it on. */
+  .menu-toggle{
+    display:none; width:40px; height:40px; border-radius:9px; border:1px solid var(--gold);
+    background:transparent; color:var(--white); align-items:center; justify-content:center;
+    cursor:pointer; flex:none;
+  }
+  .menu-toggle svg{ width:20px; height:20px; stroke:var(--gold); }
+  .mobile-nav{
+    display:none; position:absolute; left:0; right:0; top:100%; z-index:40;
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow), var(--edge-hi); border-radius:0 0 16px 16px;
+    padding:8px var(--container-pad) 20px; flex-direction:column;
+  }
+  .mobile-nav[data-open]{ display:flex; }
+  .mobile-nav a{
+    padding:14px 4px; font-weight:600; font-size:15px; color:var(--white); text-decoration:none;
+    border-bottom:1px solid rgba(249,249,250,0.1);
+  }
+  .mobile-nav a:last-child{ border-bottom:none; }
+  .mobile-nav .btn{ margin-top:14px; }
 
   /* ---------- Hero ---------- */
   .hero{ padding:56px 0 40px; }
@@ -447,6 +472,7 @@
     .hero-visual{ max-width:100%; margin:32px auto 0; }
     .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:repeat(2,1fr); }
     nav.primary-nav{ display:none; }
+    .menu-toggle{ display:flex; }
     .final-tag{ position:static; margin-top:18px; text-align:left; }
     .final-photo{ order:-1; aspect-ratio:16/9; }
     /* "Tablet": the time-back section keeps its two columns down to the
@@ -501,7 +527,18 @@
       <div class="header-actions">
         <a class="link-login" href="signin.html">Log in</a>
         <a class="btn btn-gold btn-sm" href="signup.html">Start free trial →</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
       </div>
+      <nav class="mobile-nav" id="mobileNav">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="signin.html">Log in</a>
+        <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+      </nav>
     </div>
   </header>
 
@@ -839,6 +876,26 @@
   </footer>
 
   <script>
+    // Mobile nav toggle — matches Stripe/Apple's own pattern (checked live
+    // before building this): icon opens a dropdown panel with the same
+    // links the desktop nav has, closes on outside click, on Escape, or
+    // when a link inside is actually clicked (so it can't cover the page
+    // after navigating).
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    function setMenu(open) {
+      mobileNav.toggleAttribute('data-open', open);
+      menuToggle.setAttribute('aria-expanded', String(open));
+    }
+    menuToggle.addEventListener('click', () => setMenu(!mobileNav.hasAttribute('data-open')));
+    mobileNav.addEventListener('click', (e) => { if (e.target.tagName === 'A') setMenu(false); });
+    document.addEventListener('click', (e) => {
+      if (mobileNav.hasAttribute('data-open') && !mobileNav.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+        setMenu(false);
+      }
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
     // What's-your-time-worth calculator — pure client-side math, no data sent anywhere.
     const calcHours = document.getElementById('calcHours');
     const calcRate = document.getElementById('calcRate');
