@@ -27,6 +27,9 @@
        else needs to change when it does. */
     --container-max: clamp(1180px, 78vw, 1600px);
     --container-pad: 64px;
+    /* Shared with .pricing-grid's own gap so the two can't drift apart —
+       the time-back photo/calculator gap is required to match it exactly. */
+    --card-gap: 22px;
     --navy:#1E2633;
     --navy-tint-1:#383F4B;   /* Navy blended 12% toward white */
     --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
@@ -336,14 +339,20 @@
      with the calculator (both are simple fractions of the same bounded
      content width) and its right edge matches the final CTA section's
      photo exactly, confirmed live: content-right = 1238.5px at a 1425px
-     viewport for both. */
+     viewport for both.
+     Calc and photo columns are equal width (each half of the content
+     width minus the gap), and the middle column is --card-gap — the
+     exact same variable .pricing-grid's own gap uses — so the two
+     "cards" (calculator + photo) sit apart by precisely the same gap
+     as the pricing cards below them, matching on request instead of by
+     coincidence. */
   .timeback-grid{
     display:grid;
     grid-template-columns:
       calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad))
-      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.52))
-      0px
-      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.48))
+      minmax(0, calc(((var(--container-max) - (var(--container-pad) * 2)) - var(--card-gap)) / 2))
+      var(--card-gap)
+      minmax(0, calc(((var(--container-max) - (var(--container-pad) * 2)) - var(--card-gap)) / 2))
       calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad));
     grid-template-areas:
       ". label label label ."
@@ -443,7 +452,7 @@
   .calc-result-primary{ box-shadow:var(--shadow-sm), 0 0 32px rgba(178,155,104,0.22); }
 
   /* ---------- Pricing ---------- */
-  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:stretch; }
+  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--card-gap); align-items:stretch; }
   .price-card{
     background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:16px; padding:30px 26px;
