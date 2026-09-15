@@ -570,24 +570,31 @@
      since the photo is the LAST track with nothing after it, it reaches
      the true right edge by construction, with no separate trailing
      bleed-gutter column needed at all. */
+  /* Two real bugs found and fixed here, both flagged live by the user
+     with red reference lines, neither patched around:
+     1. The old left-margin column (matching .wrap's own math, for "text
+        aligned to grid") made the navy box's visual left portion wider
+        than .final-copy's own box, so centering only happened within
+        the narrower inner column, not the true navy box.
+     2. Even after removing that, a separate `var(--card-gap)` grid
+        column between .final-copy and the photo was STILL navy (the
+        color comes from .final-cta's own background, which shows
+        through any empty grid track), so it silently added 22px to the
+        RIGHT side only — invisible in code, visible as asymmetric
+        padding once actually measured/screenshotted.
+     Fixed by dropping the gap column entirely: the navy box is now a
+     single grid track that .final-copy completely fills, and the
+     visual separation from the photo comes from .final-copy's own
+     ordinary (symmetric) padding instead of a separate track. Confirmed
+     live: left/right padding from the text to the navy box's true edges
+     is now equal. */
   .final-grid{
     display:grid;
-    grid-template-columns:
-      calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad))
-      minmax(0, 25fr)
-      var(--card-gap)
-      minmax(0, 75fr);
+    grid-template-columns: minmax(0, 25fr) minmax(0, 75fr);
     align-items:stretch;
   }
-  /* Content centered within the navy box (was left-aligned, flush to the
-     grid's own left margin) — align-items:center here also happens to
-     fix a real bug: flex containers default to align-items:stretch, so
-     the CTA button (a flex item, since flex-direction:column makes the
-     cross-axis horizontal) was silently stretching to the full width of
-     the navy box instead of sizing to its own content like every other
-     button on the page. center fixes both at once. */
   .final-copy{
-    grid-column:2; padding:64px 0; display:flex; flex-direction:column;
+    grid-column:1; padding:64px 48px; display:flex; flex-direction:column;
     justify-content:center; align-items:center; text-align:center; min-width:0;
   }
   .final-copy h2{ margin-bottom:14px; }
@@ -596,7 +603,7 @@
   /* The decorative italic tagline ("More jobs. Better decisions.") was
      removed — not essential, and the headline + CTA already carry the
      section's message on their own. */
-  .final-photo{ grid-column:4; position:relative; }
+  .final-photo{ grid-column:2; position:relative; }
   /* Slightly taller than a plain 3:2 crop, and no rounding — it's a true
      edge-to-edge bleed now, not a card. */
   .final-photo .photo-frame{ height:100%; aspect-ratio:auto; border-radius:0; box-shadow:none; }
