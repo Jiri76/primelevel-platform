@@ -105,6 +105,14 @@
   .btn-gold:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(178,155,104,0.5), 0 2px 4px rgba(0,0,0,0.3); }
   .btn-sm{ padding:11px 20px; font-size:14px; }
   .btn-block{ width:100%; }
+  /* Calculator's CTA: same size as the hero's own button (plain .btn,
+     not .btn-block) instead of stretching edge-to-edge, centered within
+     the card. display:flex (needed so margin:auto can center it like any
+     other block-level box) alone isn't enough — a block-level flex
+     container still defaults to filling the available width. width:
+     fit-content is what actually keeps it sized to its own content,
+     matching the hero button, instead of stretching to the card. */
+  .calc-cta{ display:flex; width:fit-content; margin:0 auto; }
 
   /* ---------- Header ---------- */
   header{ padding:26px 0; position:relative; }
@@ -329,7 +337,7 @@
     grid-template-columns:
       calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad))
       minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.52))
-      16px
+      0px
       minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.40))
       minmax(24px,1fr);
     grid-template-areas:
@@ -357,19 +365,19 @@
        column plus the flexible right gutter — so it bleeds to the true
        right edge, the mirror of the old left-bleed span. */
     grid-column:4 / 6; border-radius:16px 0 0 16px;
-    /* Real cap on the photo's own rendered WIDTH, mirroring the earlier
-       left-bleed fix exactly (same bug, same cause: an uncapped flexible
-       bleed column grows without bound on very wide screens). Capped to
-       its own base column (40%) plus a genuine 200px bleed allowance. */
-    /* width:100% is required, not optional — with justify-self:end and
-       no in-flow content (the <img> fix above), the box has nothing left
-       to propose a size from and collapses to 0 width without it. Same
-       failure mode hit earlier on .hero-visual this session. max-width
-       is what actually caps it; width:100% just gives it something to
-       be capped FROM. */
+    /* No max-width cap here (deliberately, unlike the old left-bleed
+       version this comment used to describe): the grid area (column 4
+       + the flexible column-5 gutter) IS exactly "calc's right edge to
+       the true page right edge" by construction. Filling it completely
+       — width:100%, no cap, no justify-self:end — is what makes the
+       photo touch the calculator with zero gap AND bleed to the true
+       edge at every viewport, with no magic-number formula to drift out
+       of sync. width:100% is still required (not optional): with no
+       in-flow content (the <img> fix below takes it out of flow), an
+       unconstrained box has nothing to propose a size from and collapses
+       to 0 width without it — same failure mode hit earlier on
+       .hero-visual this session. */
     width:100%;
-    max-width:calc((var(--container-max) - (var(--container-pad) * 2)) * 0.40 + 200px);
-    justify-self:end;
   }
 
   .photo-frame{
@@ -791,7 +799,7 @@
             <div class="cr-value" id="calcYearly">£10,920</div>
           </div>
         </div>
-        <a class="btn btn-gold btn-block" href="signup.html">Start your 14-day free trial →</a>
+        <a class="btn btn-gold calc-cta" href="signup.html">Start your 14-day free trial →</a>
       </div>
     </div>
   </section>
