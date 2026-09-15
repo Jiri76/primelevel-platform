@@ -315,36 +315,41 @@
      2. Areas let mobile use a completely different reading order (photo
         moves from first to fourth) without touching the HTML at all. */
   /* v6 (flipped): text+calculator now anchor LEFT (same left line as the
-     logo/headline/everything else), photo moved to the RIGHT and bleeds
-     to the true right edge instead. The label/heading/copy row spans the
-     full normal content width (columns 2-4, i.e. up to where a plain
-     .wrap right edge would sit) since nothing else occupies that row
-     anymore; only the final row splits into calc (left) + photo (right).
+     logo/headline/everything else), photo moved to the RIGHT. The label/
+     heading/copy row spans the full normal content width (columns 2-4,
+     i.e. up to where a plain .wrap right edge would sit) since nothing
+     else occupies that row anymore; only the final row splits into calc
+     (left) + photo (right).
      Photo's height:100% now resolves against THAT ROW's own height —
      which is sized by the calculator card, its only row-mate — so the
      photo top/bottom match the CALCULATOR's top/bottom exactly, not the
      full label-to-calc stack like the previous (left-bleed) version did.
-     Column1 is a FIXED left margin (matches what .wrap's own margin+
-     padding would produce at any viewport — not a flexible 1fr, since
-     nothing bleeds left anymore); column5 is the flexible right gutter
-     the photo bleeds into, mirroring the old left-bleed technique
-     exactly, including the same overflow risk and the same fix (a real
-     max-width cap on the photo itself, not an uncapped flexible track —
-     see the "grew to 1199px on a 2560px screen" bug from the left-bleed
-     version, same mechanism, same fix, just mirrored). */
+     Columns 1 and 5 are a matched pair of FIXED margins — both equal to
+     what .wrap's own margin+padding would produce at any viewport — so
+     the photo's right edge lands exactly on the same content-right line
+     as everything else on the page (header button, final CTA photo),
+     not a true edge-to-edge bleed. That was tried first (full-bleed past
+     the container into column 5 as a flexible 1fr gutter) but rejected:
+     it left the photo unbounded on wide screens (~49% of a 2560px
+     screen) and out of sync with the calculator's own bounded growth.
+     Confining the photo to column 4 fixes both at once — it now scales
+     with the calculator (both are simple fractions of the same bounded
+     content width) and its right edge matches the final CTA section's
+     photo exactly, confirmed live: content-right = 1238.5px at a 1425px
+     viewport for both. */
   .timeback-grid{
     display:grid;
     grid-template-columns:
       calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad))
       minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.52))
       0px
-      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.40))
-      minmax(24px,1fr);
+      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.48))
+      calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad));
     grid-template-areas:
       ". label label label ."
       ". heading heading heading ."
       ". copy copy copy ."
-      ". calc . photo photo";
+      ". calc . photo .";
     align-items:stretch;
   }
   .tb-label{ grid-area:label; align-self:start; }
@@ -361,19 +366,12 @@
        respecting the grid column. This selector form can't lose to
        source order regardless of where either rule sits in the file. */
     grid-area:photo; aspect-ratio:auto; height:100%; min-height:0; min-width:0;
-    /* Widens past the area's own column (4) to span 4/6 — its own base
-       column plus the flexible right gutter — so it bleeds to the true
-       right edge, the mirror of the old left-bleed span. */
-    grid-column:4 / 6; border-radius:16px 0 0 16px;
-    /* No max-width cap here (deliberately, unlike the old left-bleed
-       version this comment used to describe): the grid area (column 4
-       + the flexible column-5 gutter) IS exactly "calc's right edge to
-       the true page right edge" by construction. Filling it completely
-       — width:100%, no cap, no justify-self:end — is what makes the
-       photo touch the calculator with zero gap AND bleed to the true
-       edge at every viewport, with no magic-number formula to drift out
-       of sync. width:100% is still required (not optional): with no
-       in-flow content (the <img> fix below takes it out of flow), an
+    /* Confined to its own column (4) now — no longer spans into column 5.
+       border-radius is the plain, all-corners 16px from the base
+       .photo-frame rule below (not overridden here) since this photo no
+       longer bleeds past a rounded edge. */
+    /* width:100% is still required (not optional): with no in-flow
+       content (the <img> fix below takes it out of flow), an
        unconstrained box has nothing to propose a size from and collapses
        to 0 width without it — same failure mode hit earlier on
        .hero-visual this session. */
@@ -401,7 +399,7 @@
      out of normal flow so .tb-photo itself has no content proposing a
      size at all — an empty, purely percentage-sized box can't inflate
      its own row. */
-  .photo-frame.tb-photo img{ position:absolute; inset:0; }
+  .photo-frame.tb-photo img{ position:absolute; inset:0; object-position:center top; }
   .photo-frame::after{
     /* Ties the photo into the same Navy palette as the rest of the page
        instead of sitting on it as a flat inserted rectangle — a bottom-up
