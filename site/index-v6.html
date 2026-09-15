@@ -310,9 +310,9 @@
      it can never trigger the scrollbar-driven overflow bug that vw units
      cause). Left flexible column absorbs whatever space sits outside the
      content max-width; the photo spans that flexible column PLUS its own
-     45%-of-content column, so its left edge always reaches the true
+     36%-of-content column, so its left edge always reaches the true
      section edge while its right edge still lines up exactly where the
-     text column's own 45% mark would be inside the normal grid.
+     text column's own 36% mark would be inside the normal grid.
      Both outer gutters are matching 1fr — capping only the LEFT one was
      tried and reverted: it broke the right-edge symmetry every other
      element on the page relies on (measured live: a 336px gap opened up
@@ -326,9 +326,9 @@
     display:grid;
     grid-template-columns:
       minmax(24px,1fr)
-      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.45))
-      56px
-      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.55 - 56px))
+      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.36))
+      16px
+      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.64 - 16px))
       minmax(24px,1fr);
     grid-template-areas:
       ". photo . label ."
@@ -339,7 +339,7 @@
   }
   .tb-label{ grid-area:label; align-self:start; }
   .tb-heading{ grid-area:heading; align-self:start; }
-  .tb-copy{ grid-area:copy; align-self:start; font-size:15px; margin:0 0 28px; max-width:44ch; }
+  .tb-copy{ grid-area:copy; align-self:start; font-size:15px; margin:0 0 28px; max-width:78ch; }
   .tb-calc{ grid-area:calc; align-self:end; }
   .photo-frame.tb-photo{
     /* Compound selector, not just .tb-photo — with equal specificity the
@@ -348,23 +348,28 @@
        compound selector, .photo-frame's aspect-ratio:3/2 won, and
        combined with height:100% the browser derived a computed WIDTH
        from that ratio (637px tall * 1.5 = 955.9px) instead of respecting
-       the 45% grid column — the photo spilled 300+px into the text
+       the 36% grid column — the photo spilled 300+px into the text
        column. This selector form can't lose to source order. */
-    grid-area:photo; aspect-ratio:auto; height:100%;
+    grid-area:photo; aspect-ratio:auto;
+    /* Height dropped from 100% to 80% per direct feedback — "too tall",
+       not too wide. align-self default (stretch) degrades to start when
+       the item's own size is smaller than its area, so the photo stays
+       pinned to the label's top edge (unchanged) and simply falls 20%
+       short of the calculator's bottom instead of matching it exactly —
+       that gap is neutral matching-navy background, not a visible seam. */
+    height:80%;
     /* Widens past the area's own single column (2) to span 1/3 — the
-       flexible left gutter plus the photo's 45% column — so it bleeds to
+       flexible left gutter plus the photo's 36% column — so it bleeds to
        the true left edge. Set in this same rule, not a separate later
        one, for the exact reason in the comment above. */
     grid-column:1 / 3; border-radius:0 16px 16px 0;
-    /* Real cap on the photo's own rendered size — its own 45% column
+    /* Real cap on the photo's own rendered WIDTH — its own 36% column
        plus a genuine 200px bleed allowance, not "the entire outer
        margin of whatever monitor this is." Without this, the left 1fr
        gutter (needed for right-edge symmetry, see above) let the photo
        grow to 1199px wide on a 2560px screen — measured live, nearly
-       half the display. With the cap: 862px at that same width, still
-       touching the true left edge, height-match unaffected (still
-       0px top/bottom diff against the text column, also reverified). */
-    max-width:calc((var(--container-max) - (var(--container-pad) * 2)) * 0.45 + 200px);
+       half the display. */
+    max-width:calc((var(--container-max) - (var(--container-pad) * 2)) * 0.36 + 200px);
     justify-self:start;
   }
 
@@ -411,8 +416,11 @@
      to"), so it gets a touch more emphasis than per-week — still the
      same gold, same card, just larger and with the existing gold glow
      token already used elsewhere on this page, not a new effect. */
+  /* Per-year no longer gets a bigger font than per-week — a larger size
+     pushed its baseline lower than per-week's, so the two numbers didn't
+     sit level with each other (flagged live). Keeps the glow as the only
+     distinction; both values now share the same .cr-value font-size. */
   .calc-result-primary{ box-shadow:var(--shadow-sm), 0 0 32px rgba(178,155,104,0.22); }
-  .calc-result-primary .cr-value{ font-size:29px; }
 
   /* ---------- Pricing ---------- */
   .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:stretch; }
