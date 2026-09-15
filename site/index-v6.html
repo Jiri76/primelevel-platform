@@ -17,6 +17,16 @@
      used only for glow/lighting — never a genuinely new hue. index.html
      stays untouched as the flat/restrained version for comparison. */
   :root{
+    /* Fluid container, not a fixed stop — grows with the viewport (78vw)
+       between a floor (won't get cramped below tablet-ish widths) and a
+       ceiling (won't run away on a 4K/ultrawide monitor either). Every
+       consumer of the container width (.wrap and the time-back bleed
+       grid's own math) reads these two variables, so they can never
+       silently drift apart the way two independently-hardcoded numbers
+       would. --container-pad is reassigned per breakpoint below; nothing
+       else needs to change when it does. */
+    --container-max: clamp(1180px, 78vw, 1600px);
+    --container-pad: 64px;
     --navy:#1E2633;
     --navy-tint-1:#383F4B;   /* Navy blended 12% toward white */
     --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
@@ -71,7 +81,7 @@
      scaling down at each breakpoint below (not just shrinking content —
      the padding itself steps down: 64 -> 40 -> 24px). Every section on
      the page uses this same .wrap, so this one rule is the whole grid. */
-  .wrap{ max-width:1360px; margin:0 auto; padding:0 64px; }
+  .wrap{ max-width:var(--container-max); margin:0 auto; padding:0 var(--container-pad); }
 
   /* ---------- Buttons ---------- */
   .btn{
@@ -283,9 +293,9 @@
     display:grid;
     grid-template-columns:
       minmax(24px,1fr)
-      minmax(0, calc((1360px - 128px) * 0.45))
+      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.45))
       56px
-      minmax(0, calc((1360px - 128px) * 0.55 - 56px))
+      minmax(0, calc((var(--container-max) - (var(--container-pad) * 2)) * 0.55 - 56px))
       minmax(24px,1fr);
     grid-template-areas:
       ". photo . label ."
@@ -429,7 +439,7 @@
   .footer-tag{ font-size:12.5px; font-weight:500; }
 
   @media (max-width:980px){
-    .wrap{ padding:0 40px; }
+    :root{ --container-pad:40px; }
     .hero-grid, .final-grid{ grid-template-columns:1fr; }
     /* v4's flow graphic is normal document flow (no position:absolute),
        so unlike v1-v3 it needs no special-casing here at all — it just
@@ -459,7 +469,7 @@
     .photo-frame.tb-photo{ grid-column:1; aspect-ratio:3/2; height:auto; border-radius:16px; }
   }
   @media (max-width:640px){
-    .wrap{ padding:0 24px; }
+    :root{ --container-pad:24px; }
     h1{ font-size:34px; }
     .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:1fr; }
     /* flex-wrap can't wrap a tile+arrow pair as a unit, so under 640px
