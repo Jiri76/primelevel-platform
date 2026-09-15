@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel (v6 — grid system + bleed)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PrimeLevel handles the admin that eats your evenings, and turns every job into insight — so running your trade business gets simpler over time, not more complicated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* PrimeLevel homepage — "v2": same three brand hues (Navy/Gold/White),
+     same structure and copy as index.html, but with real tonal depth —
+     gradients and glow instead of one flat shade. Every extra stop here
+     is still a blend of Navy-toward-white/black or Gold-toward-white/black
+     (computed with a script, not eyeballed) or Gold/White at reduced alpha
+     used only for glow/lighting — never a genuinely new hue. index.html
+     stays untouched as the flat/restrained version for comparison. */
+  :root{
+    --navy:#1E2633;
+    --navy-tint-1:#383F4B;   /* Navy blended 12% toward white */
+    --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
+    --navy-tint-3:#60656F;   /* Navy blended 30% toward white — brighter spot */
+    --navy-tint-4:#767A83;   /* Navy blended 40% toward white — hottest spot */
+    --filler:#12171F;        /* Navy x0.6 — locked page-canvas shade */
+    --filler-deep:#0E1117;   /* Navy x0.45 — deeper canvas for gradient floor */
+    --gold:#B29B68;
+    --gold-light:#C4B38D;    /* Gold blended 25% toward white */
+    --gold-lighter:#CEC1A2;  /* Gold blended 40% toward white — glow core */
+    --white:#F9F9FA;
+    --shadow: 0 2px 4px rgba(0,0,0,0.45), 0 28px 56px rgba(0,0,0,0.48);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 14px 28px rgba(0,0,0,0.36);
+    --glow-gold: 0 0 60px rgba(178,155,104,0.38);
+    --edge-hi: inset 0 1px 0 rgba(249,249,250,0.1);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ scroll-behavior:smooth; }
+  html,body{ margin:0; padding:0; }
+  body{
+    /* v3: instead of one long fade, the page floor drops to near-black
+       fast (higher contrast range than v2), and individual sections carry
+       their own spotlight glow further down (see .section-glow) — closer
+       to how a film is actually lit scene-by-scene, still built entirely
+       from tints/shades of the one locked Navy hue plus Gold glows. */
+    background:
+      radial-gradient(1200px 700px at 50% 0%, var(--navy-tint-3) 0%, transparent 58%),
+      linear-gradient(180deg, var(--navy) 0%, var(--filler) 28%, var(--filler-deep) 100%);
+    background-color:var(--filler-deep);
+    color:var(--white);
+    font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif;
+    font-size:16px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* Per-section spotlight glow — applied to specific sections below so the
+     page reads as a series of deliberately lit scenes rather than one
+     blend. Each is a radial Navy or Gold tint sitting behind that
+     section's own content (z-index kept below it). */
+  .section-glow{ position:relative; isolation:isolate; }
+  .section-glow::before{
+    content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  }
+  .section-glow.glow-navy::before{
+    background:radial-gradient(900px 420px at 50% 20%, var(--navy-tint-2) 0%, transparent 65%);
+  }
+  .section-glow.glow-gold::before{
+    background:radial-gradient(900px 460px at 50% 30%, rgba(178,155,104,0.16) 0%, transparent 65%);
+  }
+  a{ color:inherit; }
+  section, header, footer{ scroll-margin-top:88px; }
+  /* Container grid: 1360px max, 64px min horizontal padding on desktop,
+     scaling down at each breakpoint below (not just shrinking content —
+     the padding itself steps down: 64 -> 40 -> 24px). Every section on
+     the page uses this same .wrap, so this one rule is the whole grid. */
+  .wrap{ max-width:1360px; margin:0 auto; padding:0 64px; }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:'Montserrat',sans-serif; font-weight:600; font-size:16px;
+    border-radius:10px; border:none; cursor:pointer; text-decoration:none;
+    padding:14px 28px;
+  }
+  .btn-gold{
+    position:relative; overflow:hidden;
+    background:linear-gradient(180deg, var(--gold-lighter) 0%, var(--gold) 100%); color:var(--navy);
+    box-shadow:0 8px 22px rgba(178,155,104,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn-gold::before{
+    /* Faint diagonal gloss — same gold family, just a brighter tint at an
+       angle, not a new hue. */
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(115deg, rgba(249,249,250,0.22) 0%, transparent 35%);
+  }
+  .btn-gold:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(178,155,104,0.5), 0 2px 4px rgba(0,0,0,0.3); }
+  .btn-sm{ padding:11px 20px; font-size:14px; }
+  .btn-block{ width:100%; }
+
+  /* ---------- Header ---------- */
+  header{ padding:26px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:none; }
+  .brand img{ width:28px; height:28px; display:block; }
+  .brand-word{ font-weight:800; font-size:19px; letter-spacing:-0.01em; color:var(--white); }
+  nav.primary-nav{ display:flex; align-items:center; gap:36px; }
+  nav.primary-nav a{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
+  .header-actions{ display:flex; align-items:center; gap:22px; flex:none; }
+  .link-login{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding:56px 0 40px; }
+  .hero-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold-light); border:1px solid var(--gold); padding:7px 14px; border-radius:100px;
+    background:rgba(178,155,104,0.10); margin-bottom:22px;
+  }
+  h1{ font-weight:800; font-size:49px; line-height:1.14; letter-spacing:-0.01em; margin:0 0 20px; }
+  h1 .accent{ color:var(--gold-light); text-shadow:0 0 30px rgba(178,155,104,0.45); }
+  .hero-sub{ font-size:17px; color:var(--white); opacity:1; line-height:1.65; max-width:46ch; margin:0 0 30px; font-weight:400; }
+  .hero-cta-row{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:12px; }
+  .cta-note{ font-size:13px; font-weight:500; color:var(--white); }
+
+  /* Hero visual v4 (orbit revision) — PrimeLevel at the literal center,
+     three outcomes orbiting it on a subtle dotted ring. Everything is
+     positioned in percentages inside a fixed-aspect square (no fixed px,
+     no negative insets), so unlike the earlier chip-based hero this
+     layout is structurally incapable of escaping its container at any
+     width — it never needed a mobile-breakpoint special case at all. */
+  .hero-visual{
+    /* Explicit width:100%, not just max-width — every child here is
+       position:absolute (none contribute to intrinsic sizing), so the
+       box has nothing to size itself from except the grid column's own
+       stretch; width:100% makes that definite before aspect-ratio uses
+       it to derive the height. Without this the box silently collapsed
+       to 0x0 (confirmed live) despite looking correct in the CSS.
+       No max-width/auto-margin here on purpose — a capped, centered box
+       left unused space on its right, so its right edge landed 29px
+       short of the button/logo's own right edge (measured live). Filling
+       the full grid column makes it land on the exact same right edge,
+       and the wrap's max-width:1180px already ceilings it at any
+       viewport size, so nothing here can grow unbounded. */
+    position:relative; width:100%; aspect-ratio:1/1;
+  }
+  .orbit-ring{ position:absolute; inset:0; width:100%; height:100%; }
+  .orbit-hub{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:27%; aspect-ratio:1/1; border-radius:50%;
+    background:var(--gold); box-shadow:var(--shadow), var(--glow-gold);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .orbit-hub img{ width:46%; height:46%; display:block; }
+  .orbit-node{ position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:9px; width:34%; }
+  .orbit-node svg{ width:24px; height:24px; stroke:var(--gold); flex:none; }
+  .orbit-node span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-align:center; line-height:1.3; }
+  /* "Time returned" is pinned to right:0 instead of left+translate, so its
+     text's right edge lands exactly on the container's own right edge —
+     the same edge the header button and hero circle already sit on
+     (confirmed live, byte-for-byte) — regardless of the label's own text
+     width. Its icon stays a separate element positioned ON the ring
+     itself, so the ring's geometry isn't compromised by pulling the
+     label out to the edge. */
+  .orbit-label-edge{
+    position:absolute; right:0; transform:translateY(-50%); width:34%;
+    text-align:right; font-size:12.5px; font-weight:700; letter-spacing:0.02em; line-height:1.3;
+  }
+
+  /* ---------- Value pill strip ---------- */
+  /* padding-top/bottom only, NOT the shorthand — this element also
+     carries .wrap's own padding:0 24px for its left/right gutter. The
+     shorthand form used to overwrite that with 0, so this whole row sat
+     24px further out than every other .wrap on the page (confirmed live:
+     first icon at 102.5px vs 126.5px everywhere else, and the last item
+     overshooting the right edge by 9.5px) — same root cause, both
+     symptoms. */
+  .value-strip{ padding-top:46px; padding-bottom:56px; display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .value-pill{ display:flex; align-items:flex-start; gap:12px; }
+  .value-pill .vp-icon{
+    flex:none; width:38px; height:38px; border-radius:10px; border:1px solid var(--gold);
+    background:rgba(178,155,104,0.08);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .value-pill .vp-icon svg{ width:19px; height:19px; stroke:var(--gold); }
+  .value-pill h5{ font-size:14.5px; font-weight:700; margin:0 0 3px; }
+  .value-pill p{ font-size:12.5px; color:var(--white); margin:0; line-height:1.45; }
+
+  /* ---------- Generic section chrome ---------- */
+  .section{ padding:88px 0; }
+  .section-head{ max-width:640px; margin:0 auto 48px; text-align:center; }
+  .section-label{
+    font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 14px;
+  }
+  h2{ font-weight:800; font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .section-head p{ font-size:16px; color:var(--white); line-height:1.65; margin:0; }
+  .section-link{ display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:14.5px; color:var(--gold); text-decoration:none; margin-top:18px; }
+  .section-link svg{ width:15px; height:15px; stroke:var(--gold); }
+
+  /* ---------- Problem cards ---------- */
+  .card-grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .plain-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px; padding:24px 22px;
+  }
+  .plain-card .pc-icon{
+    width:38px; height:38px; border-radius:10px; border:1px solid var(--white);
+    background:rgba(249,249,250,0.06);
+    display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+  }
+  .plain-card .pc-icon svg{ width:19px; height:19px; stroke:var(--white); }
+  .plain-card h4{ font-size:15px; font-weight:700; margin:0 0 6px; }
+  .plain-card p{ font-size:13px; color:var(--white); margin:0; line-height:1.55; }
+
+  /* ---------- How it works steps ---------- */
+  .step-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-bottom:36px; }
+  .step-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px; padding:26px 24px;
+  }
+  .step-num{ font-weight:800; font-size:13px; color:var(--gold); margin-bottom:12px; }
+  .step-card h3{ font-size:16px; font-weight:700; margin:0 0 8px; }
+  .step-card p{ font-size:13.5px; color:var(--white); line-height:1.6; margin:0; }
+  .checklist-row{ display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
+  .checklist-row span{ display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; }
+  .checklist-row svg{ width:16px; height:16px; stroke:var(--white); flex:none; }
+
+  /* ---------- Flow graphic (Job -> Admin handled -> Time back -> Insights) ---------- */
+  .flow-row{ position:relative; display:flex; justify-content:space-between; max-width:760px; margin:0 auto; padding:20px 10px 0; }
+  .flow-row::before{
+    /* 52px = 20px row padding-top + 32px (half the 64px node circle) — lines
+       up exactly with every circle's center, not an eyeballed number. */
+    content:""; position:absolute; left:60px; right:60px; top:52px; height:1px; background:var(--gold);
+  }
+  .flow-node{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; width:110px; }
+  .flow-node .fn-circle{
+    width:64px; height:64px; border-radius:50%; border:1px solid var(--white);
+    background:radial-gradient(circle at 35% 30%, var(--navy-tint-1), var(--navy) 70%);
+    box-shadow:var(--shadow-sm);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flow-node .fn-circle svg{ width:26px; height:26px; stroke:var(--white); }
+  .flow-node span{ font-size:13px; font-weight:700; text-align:center; }
+
+  /* ---------- Advantage chain (Job -> Invoice -> Payment -> Business insights) ---------- */
+  .chain-row{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:26px; }
+  .chain-tile{
+    width:130px; background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px;
+    padding:20px 12px; text-align:center;
+  }
+  .chain-tile .ct-icon{
+    width:40px; height:40px; margin:0 auto 12px; border-radius:10px; border:1px solid var(--white);
+    background:rgba(249,249,250,0.06);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .chain-tile .ct-icon svg{ width:20px; height:20px; stroke:var(--white); }
+  .chain-tile span{ font-size:12.5px; font-weight:700; }
+  .chain-arrow{ flex:none; }
+  .chain-arrow svg{ width:20px; height:20px; stroke:var(--gold); }
+  .advantage-tag{ text-align:center; font-size:14.5px; font-weight:700; color:var(--gold); margin:0; }
+
+  /* ---------- Photo / time-worth calculator band (v5 revision) ----------
+     Named grid areas instead of a plain 2-column flow, for two reasons:
+     1. The photo (tb-photo) spans all four right-column rows and gets
+        height:100% instead of a fixed aspect-ratio, so its rendered
+        height is dictated by the right column's own content stack —
+        that's what makes its top edge land on the eyebrow's top and its
+        bottom edge land on the calculator card's bottom, without any
+        manual height guessing.
+     2. Areas let mobile use a completely different reading order (photo
+        moves from first to fourth) without touching the HTML at all. */
+  /* v6: full-bleed-left photo. Not .wrap anymore — this section's own
+     grid spans the full section width (block-level 100%, never 100vw, so
+     it can never trigger the scrollbar-driven overflow bug that vw units
+     cause). Left flexible column absorbs whatever space sits outside the
+     1360px content max-width; the photo spans that flexible column PLUS
+     its own 45%-of-content column, so its left edge always reaches the
+     true section edge while its right edge still lines up exactly where
+     the text column's own 45% mark would be inside the normal grid — the
+     text itself stays in the content-width column, fully unaffected. */
+  .timeback-grid{
+    display:grid;
+    grid-template-columns:
+      minmax(24px,1fr)
+      minmax(0, calc((1360px - 128px) * 0.45))
+      56px
+      minmax(0, calc((1360px - 128px) * 0.55 - 56px))
+      minmax(24px,1fr);
+    grid-template-areas:
+      ". photo . label ."
+      ". photo . heading ."
+      ". photo . copy ."
+      ". photo . calc .";
+    align-items:stretch;
+  }
+  .tb-label{ grid-area:label; align-self:start; }
+  .tb-heading{ grid-area:heading; align-self:start; }
+  .tb-copy{ grid-area:copy; align-self:start; font-size:15px; margin:0 0 28px; max-width:44ch; }
+  .tb-calc{ grid-area:calc; align-self:end; }
+  .photo-frame.tb-photo{
+    /* Compound selector, not just .tb-photo — with equal specificity the
+       LATER rule in the file wins regardless of intent, and .photo-frame
+       (below) is declared after this block. Confirmed live: without the
+       compound selector, .photo-frame's aspect-ratio:3/2 won, and
+       combined with height:100% the browser derived a computed WIDTH
+       from that ratio (637px tall * 1.5 = 955.9px) instead of respecting
+       the 45% grid column — the photo spilled 300+px into the text
+       column. This selector form can't lose to source order. */
+    grid-area:photo; aspect-ratio:auto; height:100%;
+    /* Widens past the area's own single column (2) to span 1/3 — the
+       flexible left gutter plus the photo's 45% column — so it bleeds to
+       the true left edge. Set in this same rule, not a separate later
+       one, for the exact reason in the comment above. */
+    grid-column:1 / 3; border-radius:0 16px 16px 0;
+  }
+
+  .photo-frame{
+    /* Base treatment shared by both photo slots on the page. Matches the
+       real photo's own 3:2 shape by default — no cropping needed unless
+       a more specific rule (like .tb-photo above) overrides it. */
+    position:relative; aspect-ratio:3/2; border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .photo-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-frame::after{
+    /* Ties the photo into the same Navy palette as the rest of the page
+       instead of sitting on it as a flat inserted rectangle — a bottom-up
+       Navy fade, the same technique film posters use over a photo. */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(0deg, rgba(18,23,31,0.55) 0%, transparent 45%);
+  }
+
+  .calc-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow), var(--edge-hi); border-radius:16px; padding:32px 30px;
+  }
+  .calc-card h3{ font-size:18px; font-weight:800; margin:0 0 24px; }
+  .calc-row{ margin-bottom:26px; }
+  .calc-row-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .calc-row-head label{ font-size:13.5px; font-weight:600; }
+  .calc-row-head .calc-live-val{ font-size:13.5px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:2px; background:var(--white); border-radius:2px; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--gold); border:none; cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{ width:20px; height:20px; border-radius:50%; background:var(--gold); border:none; cursor:pointer; }
+  input[type=range]::-moz-range-track{ height:2px; background:var(--white); border-radius:2px; }
+  .calc-results{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:6px 0 26px; }
+  .calc-result{
+    text-align:center; padding:18px 10px; border:1px solid var(--gold); border-radius:12px;
+    background:rgba(178,155,104,0.08);
+  }
+  .calc-result .cr-label{ font-size:11.5px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--white); margin-bottom:6px; }
+  .calc-result .cr-value{ font-size:24px; font-weight:800; color:var(--gold); font-variant-numeric:tabular-nums; }
+  /* Per-year carries the weight of the story ("this is what it adds up
+     to"), so it gets a touch more emphasis than per-week — still the
+     same gold, same card, just larger and with the existing gold glow
+     token already used elsewhere on this page, not a new effect. */
+  .calc-result-primary{ box-shadow:var(--shadow-sm), 0 0 32px rgba(178,155,104,0.22); }
+  .calc-result-primary .cr-value{ font-size:29px; }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:stretch; }
+  .price-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:16px; padding:30px 26px;
+    display:flex; flex-direction:column; position:relative;
+  }
+  .price-card.featured{
+    border:1.5px solid var(--gold);
+    background:linear-gradient(160deg, var(--navy-tint-4) 0%, var(--navy) 55%);
+    box-shadow:var(--shadow), var(--glow-gold), var(--edge-hi);
+  }
+  .price-badge{
+    position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:var(--navy); font-size:11px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;
+    padding:5px 14px; border-radius:100px;
+  }
+  .price-card h3{ font-size:17px; font-weight:800; margin:0 0 4px; }
+  .price-card .plan-sub{ font-size:13px; color:var(--white); margin:0 0 20px; }
+  .price-card .plan-price{ font-size:34px; font-weight:800; margin:0 0 22px; }
+  .price-card .plan-price span{ font-size:14px; font-weight:600; }
+  .plan-features{ list-style:none; margin:0 0 26px; padding:0; flex:1; }
+  .plan-features li{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; margin-bottom:12px; line-height:1.4; }
+  .plan-features svg{ width:16px; height:16px; stroke:var(--white); flex:none; margin-top:1px; }
+
+  /* ---------- FAQ ---------- */
+  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+  details.faq-item{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:12px; padding:18px 22px;
+  }
+  details.faq-item summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    font-size:15px; font-weight:700;
+  }
+  details.faq-item summary::-webkit-details-marker{ display:none; }
+  details.faq-item summary svg{ width:16px; height:16px; stroke:var(--white); flex:none; transition:transform 0.15s ease; }
+  details.faq-item[open] summary svg{ transform:rotate(90deg); }
+  details.faq-item p{ font-size:13.5px; color:var(--white); line-height:1.6; margin:14px 0 0; }
+
+  /* ---------- Final CTA ---------- */
+  .final-cta{ padding:0; }
+  /* 40/60 copy/photo — the closing section is now a clean headline+CTA+
+     photo composition (the inline signup form moved to its own dedicated
+     page; every "Start free trial" link on this page points there). */
+  .final-grid{ display:grid; grid-template-columns:40fr 60fr; gap:0; align-items:stretch; border-radius:20px; overflow:hidden; box-shadow:var(--shadow); }
+  .final-copy{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    padding:56px 52px; display:flex; flex-direction:column; justify-content:center; position:relative;
+  }
+  .final-copy h2{ margin-bottom:14px; }
+  .final-copy p{ font-size:15px; color:var(--white); margin:0 0 30px; max-width:42ch; }
+  .final-copy .cta-note{ margin-top:12px; }
+  .final-tag{ position:absolute; bottom:28px; right:36px; font-style:italic; font-weight:700; font-size:13px; color:var(--gold); text-align:right; line-height:1.4; }
+  .final-photo{ position:relative; }
+  .final-photo .photo-frame{ height:100%; aspect-ratio:auto; border-radius:0; }
+
+  /* ---------- Footer ---------- */
+  footer{ padding:34px 0; }
+  footer .wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+  .footer-left{ display:flex; align-items:center; gap:10px; }
+  .footer-left img{ width:20px; height:20px; }
+  .footer-left span{ font-size:13px; font-weight:600; }
+  footer nav{ display:flex; gap:26px; }
+  footer nav a{ font-size:13px; font-weight:600; text-decoration:none; }
+  .footer-tag{ font-size:12.5px; font-weight:500; }
+
+  @media (max-width:980px){
+    .wrap{ padding:0 40px; }
+    .hero-grid, .final-grid{ grid-template-columns:1fr; }
+    /* v4's flow graphic is normal document flow (no position:absolute),
+       so unlike v1-v3 it needs no special-casing here at all — it just
+       naturally centers and stacks with the column. */
+    .hero-visual{ max-width:100%; margin:32px auto 0; }
+    .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:repeat(2,1fr); }
+    nav.primary-nav{ display:none; }
+    .final-tag{ position:static; margin-top:18px; text-align:left; }
+    .final-photo{ order:-1; aspect-ratio:16/9; }
+    /* "Tablet": the time-back section keeps its two columns down to the
+       next breakpoint below, just tighter — matches the brief's "preserve
+       two-column where sufficient width exists, reduce gap/typography." */
+    .tb-heading{ font-size:26px; }
+    .calc-card{ padding:26px 24px; }
+  }
+  @media (max-width:720px){
+    /* Below this, two 45/55 columns for a photo + a full calculator card
+       have no room left — stack instead. Named grid-template-areas (not
+       a DOM reorder) put the photo between the copy and the calculator,
+       matching the requested mobile reading order without duplicating
+       any markup. */
+    .timeback-grid{
+      grid-template-columns:1fr;
+      grid-template-areas: "label" "heading" "copy" "photo" "calc";
+      row-gap:20px;
+    }
+    .photo-frame.tb-photo{ grid-column:1; aspect-ratio:3/2; height:auto; border-radius:16px; }
+  }
+  @media (max-width:640px){
+    .wrap{ padding:0 24px; }
+    h1{ font-size:34px; }
+    .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:1fr; }
+    /* flex-wrap can't wrap a tile+arrow pair as a unit, so under 640px
+       arrows and tiles wrapped independently into an incoherent order.
+       Simpler and robust: drop the connectors, lay tiles out as a plain
+       2-column grid instead of trying to rescale the connected-chain
+       layout at every width (same approach as .hero-visual above). */
+    .chain-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .chain-arrow{ display:none; }
+    .chain-tile{ width:auto; }
+    header .wrap{ flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+
+  <header id="top">
+    <div class="wrap">
+      <a class="brand" href="#top">
+        <img src="assets/primelevel-mark-transparent.png" alt="PrimeLevel">
+        <span class="brand-word">PrimeLevel</span>
+      </a>
+      <nav class="primary-nav">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a class="link-login" href="signin.html">Log in</a>
+        <a class="btn btn-gold btn-sm" href="signup.html">Start free trial →</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Built for UK tradespeople</span>
+        <h1>Less admin.<br><span class="accent">More time back.</span><br>Better business decisions.</h1>
+        <p class="hero-sub">PrimeLevel handles the repetitive admin and turns your everyday work into useful business insight, giving you more time to focus on the work that matters.</p>
+        <div class="hero-cta-row">
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
+        </div>
+        <div class="cta-note">No card required · Set up in under a minute</div>
+      </div>
+
+      <div class="hero-visual">
+        <svg class="orbit-ring" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#B29B68" stroke-width="0.6" stroke-linecap="round" stroke-dasharray="0.1 3" opacity="0.6"/>
+        </svg>
+        <div class="orbit-hub">
+          <img src="assets/primelevel-mark-navy.png" alt="PrimeLevel">
+        </div>
+        <div class="orbit-node" style="left:50%; top:12%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Simplicity</span>
+        </div>
+        <div class="orbit-node" style="left:82.9%; top:69%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <span class="orbit-label-edge" style="top:78%;">Time returned</span>
+        <div class="orbit-node" style="left:17.1%; top:69%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          <span>Business intelligence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap value-strip">
+    <div class="value-pill">
+      <div class="vp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+      <div><h5>Built for UK trades</h5><p>Simple, practical, focused.</p></div>
+    </div>
+    <div class="value-pill">
+      <div class="vp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+      <div><h5>Less admin</h5><p>Repetitive work handled automatically.</p></div>
+    </div>
+    <div class="value-pill">
+      <div class="vp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+      <div><h5>More time back</h5><p>More time on the work that matters.</p></div>
+    </div>
+    <div class="value-pill">
+      <div class="vp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+      <div><h5>Better decisions</h5><p>Useful insight from everyday work.</p></div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">The problem</div>
+        <h2>You didn't start your business to chase invoices.</h2>
+        <p>You're good at your trade. But admin, late payments and forgotten renewals get in the way.</p>
+      </div>
+      <div class="card-grid-4">
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div>
+          <h4>Invoices pile up</h4>
+          <p>Admin eats into your evenings.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+          <h4>Customers pay late</h4>
+          <p>And you end up chasing money.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+          <h4>Renewals get forgotten</h4>
+          <p>Licenses, insurance, MOTs and other dates slip through.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+          <h4>Pricing is guesswork</h4>
+          <p>You know what you charge — but not always what you should.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">How it works</div>
+        <h2>Simple. Automated. Built for trades.</h2>
+        <p>Get set up in minutes and let PrimeLevel do the heavy lifting.</p>
+      </div>
+      <div class="step-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3>Send the job</h3>
+          <p>Create and send invoices in seconds.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3>Let PrimeLevel chase</h3>
+          <p>Automatic reminders go out when payments are due.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3>Learn from every job</h3>
+          <p>Turn your business activity into useful insights.</p>
+        </div>
+      </div>
+      <div class="checklist-row">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No spreadsheets</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No chasing</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No complicated setup</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-glow glow-navy" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Everything you need</div>
+        <h2>One platform. All your trade business in one place.</h2>
+        <p>From invoicing to payment chasing, renewals and pricing intelligence — PrimeLevel gives you the tools to run a stronger, more profitable business.</p>
+        <a class="section-link" href="#pricing">Explore all plans <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node">
+          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+          <span>Job</span>
+        </div>
+        <div class="flow-node">
+          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+          <span>Admin handled</span>
+        </div>
+        <div class="flow-node">
+          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+          <span>Time back</span>
+        </div>
+        <div class="flow-node">
+          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Useful insights</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-glow glow-navy">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">The PrimeLevel advantage</div>
+        <h2>Every job makes your business smarter.</h2>
+        <p>Most invoicing software stops when the invoice is sent. PrimeLevel doesn't. Every job creates useful business information that helps you understand your pricing, payments and business performance.</p>
+        <a class="section-link" href="#how">See how it works <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+      </div>
+      <div class="chain-row">
+        <div class="chain-tile">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+          <span>Job</span>
+        </div>
+        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+          <span>Invoice</span>
+        </div>
+        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+          <span>Payment</span>
+        </div>
+        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Business insights</span>
+        </div>
+      </div>
+      <p class="advantage-tag">Better information. Better decisions. A more profitable business.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="timeback-grid">
+      <div class="section-label tb-label">More time for what matters</div>
+      <h2 class="tb-heading">Your time is worth more than admin.</h2>
+      <p class="tb-copy">You didn't get into this trade to spend your evenings on paperwork. See what admin is really costing you — and what getting that time back could be worth.</p>
+      <div class="photo-frame tb-photo">
+        <img src="assets/photo-timeback.png" alt="Tradesperson checking a tablet, tool belt visible, mid-job">
+      </div>
+      <div class="calc-card tb-calc">
+        <h3>What's your time worth?</h3>
+        <div class="calc-row">
+          <div class="calc-row-head">
+            <label for="calcHours">Hours per week on admin</label>
+            <span class="calc-live-val" id="calcHoursVal">6 hrs</span>
+          </div>
+          <input type="range" id="calcHours" min="1" max="20" step="1" value="6">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-head">
+            <label for="calcRate">Value of your time</label>
+            <span class="calc-live-val" id="calcRateVal">£35 / hr</span>
+          </div>
+          <input type="range" id="calcRate" min="15" max="150" step="5" value="35">
+        </div>
+        <div class="calc-results">
+          <div class="calc-result">
+            <div class="cr-label">Per week</div>
+            <div class="cr-value" id="calcWeekly">£210</div>
+          </div>
+          <div class="calc-result calc-result-primary">
+            <div class="cr-label">Per year</div>
+            <div class="cr-value" id="calcYearly">£10,920</div>
+          </div>
+        </div>
+        <a class="btn btn-gold btn-block" href="signup.html">Start your 14-day free trial →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-glow glow-gold" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Simple plans. No surprises.</div>
+        <h2>Choose the plan that fits your business.</h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Starter</h3>
+          <p class="plan-sub">Ideal for solo tradespeople</p>
+          <p class="plan-price">£69<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Invoicing & payment chasing</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic pricing insights</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Renewal tracking</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 3 users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">Most popular</div>
+          <h3>Pro</h3>
+          <p class="plan-sub">Best for growing businesses</p>
+          <p class="plan-price">£99<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Everything in Starter</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced pricing insights</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Business performance dashboard</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 10 users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+        </div>
+        <div class="price-card">
+          <h3>Business</h3>
+          <p class="plan-sub">For established teams</p>
+          <p class="plan-price">£149<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Everything in Pro</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Full business intelligence</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced reporting</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Frequently asked questions</div>
+        <h2>Got questions? We've got answers.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Is there a contract? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No. PrimeLevel is month-to-month — cancel or downgrade any time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need a credit card? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No. Start your 14-day free trial with no card required.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can my team use it? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>Yes — every plan includes multiple users, with no per-seat charge.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I export my data? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>Yes. Your data is always yours — export it any time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is PrimeLevel only for plumbers? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No — PrimeLevel works for any UK trade business: plumbers, electricians, builders and more.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section final-cta section-glow glow-gold" id="signup">
+    <div class="wrap">
+      <div class="final-grid">
+        <div class="final-copy">
+          <h2>Stop chasing. Start running your business.</h2>
+          <p>Less admin. Faster payments. A business that gets smarter with every job you do.</p>
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
+          <div class="cta-note">No card required · full access from day one</div>
+          <div class="final-tag">More jobs.<br>Better decisions.</div>
+        </div>
+        <div class="final-photo">
+          <div class="photo-frame">
+            <img src="assets/photo-final-cta.png" alt="Tradesperson walking away carrying a tool case, tool belt visible">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-left">
+        <img src="assets/primelevel-mark-transparent.png" alt="PrimeLevel">
+        <span>PrimeLevel · Built for UK tradespeople</span>
+      </div>
+      <nav>
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="footer-tag">Your business data stays yours.</div>
+    </div>
+  </footer>
+
+  <script>
+    // What's-your-time-worth calculator — pure client-side math, no data sent anywhere.
+    const calcHours = document.getElementById('calcHours');
+    const calcRate = document.getElementById('calcRate');
+    const gbp = (n) => '£' + Math.round(n).toLocaleString('en-GB');
+    function updateCalc() {
+      const hours = Number(calcHours.value);
+      const rate = Number(calcRate.value);
+      const weekly = hours * rate;
+      const yearly = weekly * 52;
+      document.getElementById('calcHoursVal').textContent = hours + (hours === 1 ? ' hr' : ' hrs');
+      document.getElementById('calcRateVal').textContent = gbp(rate) + ' / hr';
+      document.getElementById('calcWeekly').textContent = gbp(weekly);
+      document.getElementById('calcYearly').textContent = gbp(yearly);
+    }
+    calcHours.addEventListener('input', updateCalc);
+    calcRate.addEventListener('input', updateCalc);
+    updateCalc();
+  </script>
+
+</body>
+</html>
