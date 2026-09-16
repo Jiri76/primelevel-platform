@@ -53,8 +53,9 @@
     --shadow: 0 2px 4px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.28);
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.32), 0 6px 14px rgba(0,0,0,0.22);
     /* Gold glow toned down sitewide ("gold sparingly", "shadows subtle") —
-       same hue, smaller/softer spread. Used by the orbit hub and the
-       featured pricing card, so one change keeps both consistent. */
+       same hue, smaller/softer spread. Used by the hero's resting logo
+       mark and the featured pricing card, so one change keeps both
+       consistent. */
     --glow-gold: 0 0 30px rgba(178,155,104,0.22);
     --edge-hi: inset 0 1px 0 rgba(249,249,250,0.1);
   }
@@ -220,52 +221,81 @@
   .hero-cta-row{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:12px; }
   .cta-note{ font-size:13px; font-weight:500; color:var(--white); }
 
-  /* Hero visual v4 (orbit revision) — PrimeLevel at the literal center,
-     three outcomes orbiting it on a subtle dotted ring. Everything is
-     positioned in percentages inside a fixed-aspect square (no fixed px,
-     no negative insets), so unlike the earlier chip-based hero this
-     layout is structurally incapable of escaping its container at any
-     width — it never needed a mobile-breakpoint special case at all. */
-  .hero-visual{
-    /* Explicit width:100%, not just max-width — every child here is
-       position:absolute (none contribute to intrinsic sizing), so the
-       box has nothing to size itself from except the grid column's own
-       stretch; width:100% makes that definite before aspect-ratio uses
-       it to derive the height. Without this the box silently collapsed
-       to 0x0 (confirmed live) despite looking correct in the CSS.
-       No max-width/auto-margin here on purpose — a capped, centered box
-       left unused space on its right, so its right edge landed 29px
-       short of the button/logo's own right edge (measured live). Filling
-       the full grid column makes it land on the exact same right edge,
-       and the wrap's max-width:1180px already ceilings it at any
-       viewport size, so nothing here can grow unbounded. */
-    position:relative; width:100%; aspect-ratio:1/1;
+  /* Hero visual v9 (typographic entrance) — replaces the old v4 orbit
+     graphic (dotted ring + 3 orbit labels) entirely, per direct
+     instruction. Same box: width:100%/aspect-ratio:1/1, same reasoning
+     as before (every child is absolutely positioned so the box needs an
+     explicit width before aspect-ratio can derive a height from it; no
+     max-width/auto-margin so its right edge still lands on the same
+     edge as the header button/logo). Sequence: "Simple" / "Time" /
+     "Smarter" assemble letter by letter, hold, then converge toward
+     center while fading — then the existing gold PrimeLevel monogram
+     (unchanged from the old orbit hub, just no longer inside a ring)
+     fades in, followed by the "PrimeLevel" wordmark. Runs once on page
+     load; resting state is always the logo, with or without motion. */
+  .hero-visual{ position:relative; width:100%; aspect-ratio:1/1; }
+
+  /* Hidden by default (and permanently, for prefers-reduced-motion) —
+     only shown/animated inside the no-preference media query below, so
+     a reduced-motion or non-JS render never flashes it. */
+  .word-stage{ display:none; }
+  .word-line{
+    font-weight:800; letter-spacing:-0.01em; line-height:1; color:var(--white);
+    font-size:clamp(34px, 7vw, 64px);
   }
-  .orbit-ring{ position:absolute; inset:0; width:100%; height:100%; }
-  .orbit-hub{
-    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  .letter{ display:inline-block; }
+
+  .logo-reveal{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
+  }
+  /* Exactly the old .orbit-hub's own look (gold circle, same shadow/glow
+     tokens, same 46%-scaled monogram image) — just no longer sitting
+     inside a ring, so renamed to describe what it is now: the resting
+     logo mark. */
+  .logo-hub{
     width:24.3%; aspect-ratio:1/1; border-radius:50%;
     background:var(--gold);
-    /* Heavy shadow removed per the refinement brief — --shadow-sm (already
-       tightened, see :root) instead of the page's heaviest token. */
     box-shadow:var(--shadow-sm), var(--glow-gold);
     display:flex; align-items:center; justify-content:center;
   }
-  .orbit-hub img{ width:46%; height:46%; display:block; }
-  /* Icons removed from the three orbit items per direct feedback — title
-     only now. .orbit-node keeps its flex-column shell (still used for
-     centering/positioning the label at each ring point) even with just
-     one child. */
-  .orbit-node{ position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:9px; width:34%; }
-  .orbit-node span{ font-size:17.6px; font-weight:700; letter-spacing:0.02em; text-align:center; line-height:1.3; }
-  /* "Time returned" is pinned to right:0 instead of left+translate, so its
-     text's right edge lands exactly on the container's own right edge —
-     the same edge the header button and hero circle already sit on
-     (confirmed live, byte-for-byte) — regardless of the label's own text
-     width. */
-  .orbit-label-edge{
-    position:absolute; right:0; transform:translateY(-50%); width:34%;
-    text-align:right; font-size:17.6px; font-weight:700; letter-spacing:0.02em; line-height:1.3;
+  .logo-hub img{ width:46%; height:46%; display:block; }
+  .logo-reveal-word{ font-weight:800; font-size:clamp(20px, 3.6vw, 26px); letter-spacing:-0.01em; color:var(--white); }
+
+  @media (prefers-reduced-motion: no-preference){
+    .word-stage{
+      display:flex; position:absolute; inset:0; flex-direction:column;
+      align-items:center; justify-content:center; gap:clamp(6px, 1.5vw, 14px);
+    }
+    /* Each letter fades/rises in on its own inline transition-delay (set
+       in the markup) once .is-animating is added — one class flip
+       drives the whole letter-by-letter sequence for all three words,
+       the same "single trigger, per-element delay" pattern already used
+       for the how-it-works circle-and-line sequence. Plain ease-out,
+       no bounce, matching every other animation on this page. */
+    .letter{
+      opacity:0; transform:translateY(0.22em);
+      transition:opacity 380ms ease-out, transform 380ms ease-out;
+    }
+    .word-stage.is-animating .letter{ opacity:1; transform:translateY(0); }
+    /* Convergence: each word fades out while drifting toward the shared
+       center line — the top/bottom words travel a little, the middle
+       one barely moves — a gentle pull inward, not a literal meeting
+       point (they're fully transparent well before that would matter). */
+    .word-line{ transition:opacity 700ms ease-out, transform 700ms ease-out; }
+    .word-stage.is-converging .word-line{ opacity:0; }
+    .word-stage.is-converging .word-line[data-word="simple"]{ transform:translateY(0.9em) scale(0.94); }
+    .word-stage.is-converging .word-line[data-word="time"]{ transform:scale(0.94); }
+    .word-stage.is-converging .word-line[data-word="smarter"]{ transform:translateY(-0.9em) scale(0.94); }
+
+    /* Logo mark fades in first (its gold is the one deliberate accent
+       in the whole convergence — everything else here is white), then
+       the wordmark follows shortly after — two separate classes so they
+       sequence rather than fade together. */
+    .logo-hub{ opacity:0; transition:opacity 600ms ease-out; }
+    .logo-reveal-word{ opacity:0; transition:opacity 500ms ease-out; }
+    .logo-reveal.show-mark .logo-hub{ opacity:1; }
+    .logo-reveal.show-word .logo-reveal-word{ opacity:1; }
   }
 
   /* ---------- Value pill strip ---------- */
@@ -828,18 +858,24 @@
       </div>
 
       <div class="hero-visual">
-        <svg class="orbit-ring" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <circle cx="50" cy="50" r="38" fill="none" stroke="#B29B68" stroke-width="0.6" stroke-linecap="round" stroke-dasharray="0.1 3" opacity="0.6"/>
-        </svg>
-        <div class="orbit-hub">
-          <img src="assets/primelevel-mark-navy.png" alt="PrimeLevel">
+        <!-- Typographic entrance: "Simple" / "Time" / "Smarter" assemble
+             letter by letter (each letter's own transition-delay below,
+             all relative to .is-animating being added by the script near
+             the end of the body), hold, then converge/fade — followed by
+             the existing gold logo mark, then the wordmark. See the
+             .word-stage/.logo-reveal CSS above for the full choreography;
+             gated behind prefers-reduced-motion like every other
+             animation on this page. -->
+        <div class="word-stage" id="heroWordStage" aria-hidden="true">
+          <span class="word-line" data-word="simple"><span class="letter" style="transition-delay:0ms">S</span><span class="letter" style="transition-delay:45ms">i</span><span class="letter" style="transition-delay:90ms">m</span><span class="letter" style="transition-delay:135ms">p</span><span class="letter" style="transition-delay:180ms">l</span><span class="letter" style="transition-delay:225ms">e</span></span>
+          <span class="word-line" data-word="time"><span class="letter" style="transition-delay:1055ms">T</span><span class="letter" style="transition-delay:1100ms">i</span><span class="letter" style="transition-delay:1145ms">m</span><span class="letter" style="transition-delay:1190ms">e</span></span>
+          <span class="word-line" data-word="smarter"><span class="letter" style="transition-delay:2020ms">S</span><span class="letter" style="transition-delay:2065ms">m</span><span class="letter" style="transition-delay:2110ms">a</span><span class="letter" style="transition-delay:2155ms">r</span><span class="letter" style="transition-delay:2200ms">t</span><span class="letter" style="transition-delay:2245ms">e</span><span class="letter" style="transition-delay:2290ms">r</span></span>
         </div>
-        <div class="orbit-node" style="left:50%; top:12%;">
-          <span>Simplicity</span>
-        </div>
-        <span class="orbit-label-edge" style="top:69%;">Time returned</span>
-        <div class="orbit-node" style="left:17.1%; top:69%;">
-          <span>Business intelligence</span>
+        <div class="logo-reveal" id="heroLogoReveal">
+          <div class="logo-hub">
+            <img src="assets/primelevel-mark-navy.png" alt="PrimeLevel">
+          </div>
+          <div class="logo-reveal-word">PrimeLevel</div>
         </div>
       </div>
     </div>
@@ -1163,6 +1199,33 @@
         });
       }, { threshold: 0.3 });
       document.querySelectorAll('.reveal-stagger').forEach((el) => revealObserver.observe(el));
+    }
+
+    // Hero typographic entrance — runs once on page load (not scroll,
+    // since the hero is already in view on arrival). Each letter's own
+    // transition-delay (set in the markup) does the actual per-letter
+    // stagger; this timeline only needs to flip three classes at the
+    // right moments: start the letters, start the words' converge/fade,
+    // then reveal the logo mark and (shortly after) the wordmark.
+    // Skipped entirely for prefers-reduced-motion — those users see the
+    // resting logo immediately, nothing hidden and nothing to wait for.
+    if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      const wordStage = document.getElementById('heroWordStage');
+      const logoReveal = document.getElementById('heroLogoReveal');
+      if (wordStage && logoReveal) {
+        const ASSEMBLE_START = 300;       // brief settle before "Simple" starts
+        const LAST_LETTER_DELAY = 2290;   // "Smarter"'s own last letter, see markup
+        const LETTER_DURATION = 380;
+        const HOLD_ALL_THREE = 700;       // all three words held together before converging
+        const CONVERGE_START = ASSEMBLE_START + LAST_LETTER_DELAY + LETTER_DURATION + HOLD_ALL_THREE;
+        const LOGO_START = CONVERGE_START + 400;  // slight overlap with the words' own fade-out
+        const WORDMARK_START = LOGO_START + 250;
+
+        setTimeout(() => wordStage.classList.add('is-animating'), ASSEMBLE_START);
+        setTimeout(() => wordStage.classList.add('is-converging'), CONVERGE_START);
+        setTimeout(() => logoReveal.classList.add('show-mark'), LOGO_START);
+        setTimeout(() => logoReveal.classList.add('show-word'), WORDMARK_START);
+      }
     }
   </script>
 
