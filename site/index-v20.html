@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PrimeLevel (v20 — filler-into-navy gradient everywhere)</title>
+<title>PrimeLevel (v20 — flat bands, gradient cards)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="PrimeLevel handles the admin that eats your evenings, and turns every job into insight — so running your trade business gets simpler over time, not more complicated.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,24 +44,21 @@
        version). Per direct instruction, after looking at v10 (whose
        cards/bands used a flat #12171F against the navy canvas — "I
        really like this contrast"): #12171F, kept exactly as it was on
-       v10 ("authentic," untouched, not recomputed), is now the LIGHT
-       stop of a linear-gradient(160deg, var(--dark-filler) 0%,
-       var(--navy) <65 or 70>%) applied broadly — every card (Problem/
-       calculator/pricing, including the featured variant), FAQ rows,
-       the final-CTA band, and the hero ("the front") all use it now.
-       #how keeps it too, so this really does replace --band-flat
-       everywhere that token was used.
-       Flagged plainly before building, then built anyway as a
-       deliberate experiment: #12171F sits only 27.7 RGB-distance units
-       from Navy, and this gradient's own convention clamps to solid
-       Navy from its stop percentage onward — meaning any full-bleed
-       band whose bottom edge lands in that clamped zone will likely
-       repeat the exact "boundary disappears against the navy canvas"
-       bug already found and fixed once between v11 and v12. Cards are
-       lower-risk (they have their own border/shadow/gap giving them a
-       real edge regardless of fill colour); the full-bleed bands
-       (#how/.final-cta/hero) are the ones actually at risk — verify
-       live, don't assume either way. */
+       v10 ("authentic," untouched, not recomputed).
+       First tried as a gradient (linear-gradient(160deg,
+       var(--dark-filler) 0%, var(--navy) 65-70%)) everywhere, including
+       the full-bleed bands — confirmed live (direct pixel sampling)
+       that this clamps to solid Navy from its stop percentage onward,
+       so the hero/#how/.final-cta's far edge disappeared into the navy
+       canvas exactly like the bug already found once between v11 and
+       v12. Per direct follow-up instruction, the fix actually applied:
+       the gradient stays ONLY on the cards (Problem/calculator/pricing,
+       including the featured variant) and FAQ rows, where a border/
+       shadow/gap gives them a real edge regardless of fill colour. The
+       three full-bleed bands — the hero, #how ("how it works"), and
+       .final-cta ("stop chasing...") — use --dark-filler FLAT instead,
+       exactly like v10 did, so their edges stay genuinely visible
+       everywhere, not just at the gradient's light end. */
     --dark-filler:#12171F;
     /* v16: independent of v9 — v9 kept exactly as it is, the ONE change
        is this token's value: the page-canvas shade is now the real
@@ -257,7 +254,7 @@
      in, so a reduced-motion visitor sees the resting page immediately,
      nothing hidden and nothing to wait for. */
   .hero{
-    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 70%);
+    background:var(--dark-filler);
     padding:120px 0;
     margin-bottom:calc(var(--section-gap-y) / 2);
   }
@@ -372,7 +369,7 @@
      tension (its own full-bleed band padding vs. the shared inter-section
      rhythm). */
   #how{
-    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 70%);
+    background:var(--dark-filler);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
@@ -682,7 +679,7 @@
        spacing logic"). Matching margin-bottom keeps the same gap before
        the footer. */
     margin:calc(var(--section-gap-y) / 2) 0;
-    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 70%);
+    background:var(--dark-filler);
   }
   /* Same fix as the time-back grid above, same reason: fr tracks for the
      copy/photo ratio instead of a fixed calc() off --container-max, so
