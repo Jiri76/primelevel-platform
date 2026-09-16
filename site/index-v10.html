@@ -34,17 +34,23 @@
     /* Shared with .pricing-grid's own gap so the two can't drift apart —
        the time-back photo/calculator gap is required to match it exactly. */
     --card-gap: 22px;
+    /* v10: independent of v9 — a deliberately two-blue palette, per
+       direct instruction. --navy is now the page's own CANVAS colour
+       (body background), not just an accent/gradient-endpoint like on
+       every earlier version. --filler keeps its original value
+       (#12171F, darker than --navy) but changes ROLE entirely: instead
+       of being the page canvas, it's now the flat background for every
+       "surface" element that used to gradient from a lighter tint down
+       to --navy — the how-it-works/final-cta bands, the mobile-nav
+       dropdown, and every card/tile (Problem cards, the calculator
+       card, pricing cards, FAQ rows). No tint gradients anywhere on
+       this version — exactly two blues (navy canvas, filler surfaces)
+       plus gold on buttons, nothing else. --navy-tint-1/-2/-3/-4 are
+       gone as a result — their only uses were those now-flattened
+       gradients and the FAQ hover effect, which is redone below using
+       navy/filler themselves instead of a third tint. */
     --navy:#1E2633;
-    --navy-tint-1:#383F4B;   /* Navy blended 12% toward white */
-    --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
-    --navy-tint-3:#60656F;   /* Navy blended 30% toward white — brighter spot */
-    --navy-tint-4:#767A83;   /* Navy blended 40% toward white — hottest spot */
-    /* v10: independent of v9 — the page-canvas shade is now the real
-       locked brand Navy itself (#1E2633), not the darker Navy x0.6
-       derivative used everywhere else on the site (see v9/v8's own
-       --filler:#12171F). Every var(--filler) usage is untouched — this
-       is a single-token value swap, nothing else changed. */
-    --filler:#1E2633;
+    --filler:#12171F;
     --gold:#B29B68;
     --gold-light:#C4B38D;    /* Gold blended 25% toward white */
     --gold-lighter:#CEC1A2;  /* Gold blended 40% toward white — glow core */
@@ -68,14 +74,14 @@
   html{ scroll-behavior:smooth; }
   html,body{ margin:0; padding:0; }
   body{
-    /* v8: the old v3 fade-to-near-black floor (--filler-deep) is gone —
-       flagged live as a "black shadow" around the pricing section. The
-       top radial highlight (gold/white glow behind the header and
-       orbit) was removed too, per direct follow-up feedback — the page
-       is now one genuinely flat, consistent shade (--filler) top to
-       bottom, no gradient at all, matching every section equally
-       instead of the hero getting different treatment from the rest. */
-    background:var(--filler);
+    /* v10: page canvas is --navy directly (was --filler on every
+       earlier version) — per direct instruction, the true brand Navy
+       is now what you see as "the background," with --filler demoted
+       to the surface colour for bands/cards/tabs instead (see the
+       :root comment above). Still one flat, consistent shade top to
+       bottom, no gradient at all — that part of the v8 rationale still
+       holds, just with the two roles swapped. */
+    background:var(--navy);
     color:var(--white);
     font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif;
     font-size:16px; line-height:1.5;
@@ -189,7 +195,7 @@
   .menu-toggle svg{ width:20px; height:20px; stroke:var(--gold); }
   .mobile-nav{
     display:none; position:absolute; left:0; right:0; top:100%; z-index:40;
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    background:var(--filler);
     box-shadow:var(--shadow), var(--edge-hi); border-radius:0 0 16px 16px;
     padding:8px var(--container-pad) 20px; flex-direction:column;
   }
@@ -217,10 +223,14 @@
      (icon + wordmark, the same asset the header/footer use — NOT the
      gold-circle mark used elsewhere on this page) fades in, followed by
      the two-line copy, the primary CTA and its note.
-     Same full-bleed charcoal-band background already used for #how/
-     .final-cta (byte-identical gradient) — a plain <section> is already
-     100% viewport width by default, so putting the background directly
-     on it needs no grid/margin tricks. Its own top/bottom padding is
+     Same full-bleed flat-filler band background already used for #how/
+     .final-cta (byte-identical, and — per direct instruction on this
+     version specifically — flat var(--filler), not the tint-1-to-navy
+     gradient v9 and every earlier version use, and a full step darker
+     than the page's own var(--navy) canvas around it) — a plain
+     <section> is already 100% viewport width by default, so putting
+     the background directly on it needs no grid/margin tricks. Its own
+     top/bottom padding is
      independent of --section-gap-y (this is the hero, nothing precedes
      it to share a gap with), but the BOTTOM still hands off the
      standard half-share via margin so Hero->Problem keeps the site's
@@ -232,7 +242,7 @@
      in, so a reduced-motion visitor sees the resting page immediately,
      nothing hidden and nothing to wait for. */
   .hero{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    background:var(--filler);
     padding:120px 0;
     margin-bottom:calc(var(--section-gap-y) / 2);
   }
@@ -347,18 +357,19 @@
      tension (its own full-bleed band padding vs. the shared inter-section
      rhythm). */
   #how{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    background:var(--filler);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
 
   /* ---------- Problem cards ---------- */
   /* Scaled up for more presence, per the refinement brief — bigger type,
-     bigger icon plate, more internal padding; same shape/shadow/gradient
-     treatment otherwise. */
+     bigger icon plate, more internal padding; same shape/shadow treatment
+     otherwise. v10: flat var(--filler), not a gradient — see the :root
+     comment above. */
   .card-grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
   .plain-card{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    background:var(--filler);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px; padding:30px 26px;
   }
   .plain-card .pc-icon{
@@ -507,7 +518,7 @@
   /* Compact per the brief — less panel weight, less vertical padding,
      same content. */
   .calc-card{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    background:var(--filler);
     box-shadow:var(--shadow), var(--edge-hi); border-radius:16px; padding:24px 24px;
   }
   .calc-card h3{ font-size:17px; font-weight:800; margin:0 0 16px; }
@@ -543,7 +554,7 @@
   /* ---------- Pricing ---------- */
   .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--card-gap); align-items:stretch; }
   .price-card{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    background:var(--filler);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:16px; padding:36px 30px;
     display:flex; flex-direction:column; position:relative;
     /* Transparent border reserves the same 1.5px of space the featured
@@ -553,7 +564,7 @@
   }
   .price-card.featured{
     border-color:var(--gold);
-    background:linear-gradient(160deg, var(--navy-tint-4) 0%, var(--navy) 55%);
+    background:var(--filler);
     box-shadow:var(--shadow), var(--glow-gold), var(--edge-hi);
   }
   /* ---------- Pricing card hover (desktop only) ----------
@@ -598,7 +609,7 @@
      comfortable single reading column, wider would hurt scanability). */
   .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
   details.faq-item{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    background:var(--filler);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:12px; padding:26px 28px;
     /* Transparent border, same reasoning as the pricing cards above —
        reserves the space so hover only ever changes color, not layout. */
@@ -615,9 +626,10 @@
   /* ---------- FAQ row hover (desktop only) ----------
      A touch weaker than the pricing card hover above (smaller lift,
      smaller shadow bump) — both restrained, but pricing reads as the
-     stronger of the two per direct instruction. Background lightens by
-     stepping each gradient stop up one tint (tint-1->tint-2, navy->
-     tint-1) rather than a filter/brightness trick, which would also
+     stronger of the two per direct instruction. v10: no third tint —
+     background lightens by stepping straight from --filler (its resting
+     state) to --navy, the same two blues used everywhere else on this
+     version, rather than a filter/brightness trick, which would also
      wash out the text sitting on top of it. */
   @media (hover:hover) and (pointer:fine){
     details.faq-item{
@@ -625,7 +637,7 @@
     }
     details.faq-item:hover{
       transform:translateY(-2.5px);
-      background:linear-gradient(160deg, var(--navy-tint-2) 0%, var(--navy-tint-1) 65%);
+      background:var(--navy);
       border-color:rgba(249,249,250,0.16);
       box-shadow:0 2px 6px rgba(0,0,0,0.32), 0 10px 22px rgba(0,0,0,0.24), var(--edge-hi);
     }
@@ -639,15 +651,16 @@
   /* ---------- Final CTA ---------- */
   /* ---------- Final CTA ----------
      v8: a genuine full-width band, not a rounded card inside .wrap — the
-     navy fill is the SECTION's own background (so it's automatically
-     100vw, no grid trickery needed for the color), while the text and
-     photo sit in a grid that keeps the copy aligned to the same grid
-     line as every other section (col 1 matches .wrap's own margin) and
-     lets the photo bleed all the way to the true right edge (col 5, a
-     flexible bleed gutter — the same proven technique used elsewhere on
-     this page). No outer padding on the band itself; the section-to-
-     section spacing is handled by margin instead (see below), so the
-     navy fill still touches the viewport edge with nothing outside it. */
+     fill (var(--filler) on v10, see :root) is the SECTION's own
+     background (so it's automatically 100vw, no grid trickery needed
+     for the color), while the text and photo sit in a grid that keeps
+     the copy aligned to the same grid line as every other section
+     (col 1 matches .wrap's own margin) and lets the photo bleed all the
+     way to the true right edge (col 5, a flexible bleed gutter — the
+     same proven technique used elsewhere on this page). No outer
+     padding on the band itself; the section-to-section spacing is
+     handled by margin instead (see below), so the fill still touches
+     the viewport edge with nothing outside it. */
   .final-cta{
     padding:0;
     /* Same spacing logic as any two adjacent .section elements: FAQ's
@@ -657,7 +670,7 @@
        spacing logic"). Matching margin-bottom keeps the same gap before
        the footer. */
     margin:calc(var(--section-gap-y) / 2) 0;
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    background:var(--filler);
   }
   /* Same fix as the time-back grid above, same reason: fr tracks for the
      copy/photo ratio instead of a fixed calc() off --container-max, so
