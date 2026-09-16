@@ -61,17 +61,13 @@
   html,body{ margin:0; padding:0; }
   body{
     /* v8: the old v3 fade-to-near-black floor (--filler-deep) is gone —
-       flagged live as a "black shadow" around the pricing section, where
-       the page had scrolled deep enough into that gradient's tail to
-       read as visibly off-navy rather than a lighting effect. The page
-       now settles at one consistent shade (--filler, the same "locked
-       page-canvas" navy used site-wide) for its entire lower portion;
-       only the top keeps its radial highlight + fade down to that one
-       shade, instead of continuing further into near-black. */
-    background:
-      radial-gradient(1200px 700px at 50% 0%, var(--navy-tint-3) 0%, transparent 58%),
-      linear-gradient(180deg, var(--navy) 0%, var(--filler) 28%, var(--filler) 100%);
-    background-color:var(--filler);
+       flagged live as a "black shadow" around the pricing section. The
+       top radial highlight (gold/white glow behind the header and
+       orbit) was removed too, per direct follow-up feedback — the page
+       is now one genuinely flat, consistent shade (--filler) top to
+       bottom, no gradient at all, matching every section equally
+       instead of the hero getting different treatment from the rest. */
+    background:var(--filler);
     color:var(--white);
     font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif;
     font-size:16px; line-height:1.5;
