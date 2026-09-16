@@ -255,9 +255,13 @@
   .hero-word[data-word="time"]{ color:var(--gold); }
 
   .hero-reveal{ display:flex; flex-direction:column; align-items:center; gap:28px; }
-  .hero-logo{ display:flex; align-items:center; gap:clamp(12px, 1.5vw, 18px); opacity:1; }
-  .hero-logo img{ width:clamp(38px, 5vw, 56px); height:clamp(38px, 5vw, 56px); display:block; }
-  .hero-logo-word{ font-weight:800; font-size:clamp(26px, 4vw, 38px); letter-spacing:-0.01em; color:var(--white); }
+  /* The genuine master logo file (icon + "PRIMELEVEL" wordmark already
+     built into one image, background chroma-keyed to transparent from
+     the source file — the artwork itself is untouched, not redrawn or
+     recoloured) — sized by width only, height:auto, so its real 625:467
+     proportions are preserved exactly, never stretched. */
+  .hero-logo{ opacity:1; }
+  .hero-logo img{ display:block; width:clamp(160px, 22vw, 320px); height:auto; }
   .hero-below-logo{ display:flex; flex-direction:column; align-items:center; gap:20px; opacity:1; }
   h1.hero-tagline{ font-weight:700; font-size:clamp(19px, 2.3vw, 25px); line-height:1.4; letter-spacing:-0.01em; margin:0; color:var(--white); }
   .hero-description{ font-size:clamp(15px, 1.6vw, 17px); line-height:1.65; color:var(--white); margin:0; max-width:46ch; font-weight:400; }
@@ -836,8 +840,7 @@
       </div>
       <div class="hero-reveal">
         <div class="hero-logo">
-          <img src="assets/primelevel-mark-transparent.png" alt="PrimeLevel">
-          <span class="hero-logo-word">PrimeLevel</span>
+          <img src="assets/primelevel-logo-master-transparent.png" alt="PrimeLevel">
         </div>
         <div class="hero-below-logo">
           <h1 class="hero-tagline">A simple business platform for UK trades.</h1>
