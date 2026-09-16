@@ -37,8 +37,7 @@
     --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
     --navy-tint-3:#60656F;   /* Navy blended 30% toward white — brighter spot */
     --navy-tint-4:#767A83;   /* Navy blended 40% toward white — hottest spot */
-    --filler:#12171F;        /* Navy x0.6 — locked page-canvas shade */
-    --filler-deep:#0E1117;   /* Navy x0.45 — deeper canvas for gradient floor */
+    --filler:#12171F;        /* Navy x0.6 — locked page-canvas shade, used for the whole page floor now */
     --gold:#B29B68;
     --gold-light:#C4B38D;    /* Gold blended 25% toward white */
     --gold-lighter:#CEC1A2;  /* Gold blended 40% toward white — glow core */
@@ -61,15 +60,18 @@
   html{ scroll-behavior:smooth; }
   html,body{ margin:0; padding:0; }
   body{
-    /* v3: instead of one long fade, the page floor drops to near-black
-       fast (higher contrast range than v2), and individual sections carry
-       their own spotlight glow further down (see .section-glow) — closer
-       to how a film is actually lit scene-by-scene, still built entirely
-       from tints/shades of the one locked Navy hue plus Gold glows. */
+    /* v8: the old v3 fade-to-near-black floor (--filler-deep) is gone —
+       flagged live as a "black shadow" around the pricing section, where
+       the page had scrolled deep enough into that gradient's tail to
+       read as visibly off-navy rather than a lighting effect. The page
+       now settles at one consistent shade (--filler, the same "locked
+       page-canvas" navy used site-wide) for its entire lower portion;
+       only the top keeps its radial highlight + fade down to that one
+       shade, instead of continuing further into near-black. */
     background:
       radial-gradient(1200px 700px at 50% 0%, var(--navy-tint-3) 0%, transparent 58%),
-      linear-gradient(180deg, var(--navy) 0%, var(--filler) 28%, var(--filler-deep) 100%);
-    background-color:var(--filler-deep);
+      linear-gradient(180deg, var(--navy) 0%, var(--filler) 28%, var(--filler) 100%);
+    background-color:var(--filler);
     color:var(--white);
     font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif;
     font-size:16px; line-height:1.5;
@@ -83,11 +85,20 @@
   .section-glow::before{
     content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
   }
+  /* Both end stops use an explicit zero-alpha version of the SAME color
+     instead of the `transparent` keyword. `transparent` is actually
+     rgba(0,0,0,0) — transparent BLACK — so a gradient fading an opaque
+     color to `transparent` interpolates its RGB channels toward black
+     along the way, not just its alpha. That produced a real, visible
+     dark vignette ringing each spotlight (flagged live around "Choose
+     the plan that fits your business", screenshotted as a "black
+     shadow"), not a rendering glitch. Keeping the RGB constant and only
+     fading alpha removes it. */
   .section-glow.glow-navy::before{
-    background:radial-gradient(900px 420px at 50% 20%, var(--navy-tint-2) 0%, transparent 65%);
+    background:radial-gradient(900px 420px at 50% 20%, var(--navy-tint-2) 0%, rgba(74,80,91,0) 65%);
   }
   .section-glow.glow-gold::before{
-    background:radial-gradient(900px 460px at 50% 30%, rgba(178,155,104,0.16) 0%, transparent 65%);
+    background:radial-gradient(900px 460px at 50% 30%, rgba(178,155,104,0.16) 0%, rgba(178,155,104,0) 65%);
   }
   a{ color:inherit; }
   section, header, footer{ scroll-margin-top:88px; }
@@ -590,11 +601,23 @@
      is now equal. */
   .final-grid{
     display:grid;
-    grid-template-columns: minmax(0, 25fr) minmax(0, 75fr);
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
     align-items:stretch;
   }
+  /* Vertical padding tuned to 92px top/bottom per direct request
+     ("reduce the height by 10%") — took three live measurements to land
+     on, worth recording so a future session doesn't repeat the same
+     miscalculation: widening this column (25fr -> 40fr, previous
+     commit) changed how the heading wraps, so the content's own height
+     isn't fixed the way it was under the original 25/75 layout — two
+     earlier guesses (40px, then 74px) were each computed against a
+     content-height reading taken before the reflow had actually
+     settled at the new column width. Final numbers, measured clean
+     after a fresh reload: content height (heading+paragraph+button+
+     note, all margins included) is 247.5px; target total is 90% of the
+     original 479px band = 431px; (431 - 247.5) / 2 = 91.8px. */
   .final-copy{
-    grid-column:1; padding:64px 48px; display:flex; flex-direction:column;
+    grid-column:1; padding:92px 48px; display:flex; flex-direction:column;
     justify-content:center; align-items:center; text-align:center; min-width:0;
   }
   .final-copy h2{ margin-bottom:14px; }
