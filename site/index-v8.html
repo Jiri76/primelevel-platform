@@ -121,7 +121,10 @@
     /* v8: strong glow removed per the refinement brief — a soft, close
        contact shadow instead of the old wide 22px/0.4-alpha glow. */
     box-shadow:0 3px 8px rgba(178,155,104,0.22), 0 1px 2px rgba(0,0,0,0.22);
-    transition:transform 0.12s ease, box-shadow 0.12s ease;
+    /* 220ms governs the release (hover-out, press-release) — :active
+       below sets its own faster transition for the press itself, so the
+       button snaps down quickly but eases back up gently. */
+    transition:transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
   }
   .btn-gold::before{
     /* Faint diagonal gloss — same gold family, just a brighter tint at an
@@ -130,7 +133,32 @@
     content:""; position:absolute; inset:0;
     background:linear-gradient(115deg, rgba(249,249,250,0.14) 0%, transparent 35%);
   }
-  .btn-gold:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(178,155,104,0.3), 0 2px 4px rgba(0,0,0,0.22); }
+  /* The arrow "->" in every CTA's own text is wrapped in this span so it
+     can nudge independently of the label on hover — same one global
+     interaction pattern on every primary button site-wide. */
+  .btn-arrow{ display:inline-block; transition:transform 220ms ease; }
+  /* Desktop-hover-only, same reasoning as the pricing/FAQ hovers above:
+     (hover:hover) + (pointer:fine) excludes touch, where a tap would
+     otherwise leave the lifted state "stuck" after the finger lifts. */
+  @media (hover:hover) and (pointer:fine){
+    .btn-gold:hover{
+      transform:translateY(-2.5px);
+      filter:brightness(0.97);
+      box-shadow:0 3px 8px rgba(178,155,104,0.22), 0 1px 2px rgba(0,0,0,0.22), 0 12px 20px rgba(0,0,0,0.22);
+    }
+    .btn-gold:hover .btn-arrow{ transform:translateX(2.5px); }
+  }
+  /* Press feedback works everywhere, including touch (a tap's own brief
+     :active state) — only the lingering hover-lift above is desktop-only.
+     Its own faster transition (120ms) is what makes the press snap down
+     quickly while the release (governed by .btn-gold's 220ms) eases back
+     out gently. */
+  .btn-gold:active{
+    transform:translateY(0) scale(0.97);
+    filter:brightness(0.94);
+    box-shadow:0 1px 3px rgba(178,155,104,0.2), 0 1px 2px rgba(0,0,0,0.2);
+    transition:transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  }
   .btn-block{ width:100%; }
   /* The one deliberate, defined exception to "every CTA is identical" —
      the header's own inline CTA, which shares the header bar with the
@@ -524,11 +552,36 @@
     background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:16px; padding:36px 30px;
     display:flex; flex-direction:column; position:relative;
+    /* Transparent border reserves the same 1.5px of space the featured
+       card's real border already takes up, so sharpening it on hover is
+       a pure color change — never a layout shift. */
+    border:1.5px solid transparent;
   }
   .price-card.featured{
-    border:1.5px solid var(--gold);
+    border-color:var(--gold);
     background:linear-gradient(160deg, var(--navy-tint-4) 0%, var(--navy) 55%);
     box-shadow:var(--shadow), var(--glow-gold), var(--edge-hi);
+  }
+  /* ---------- Pricing card hover (desktop only) ----------
+     Restrained on purpose: a lift, a slightly deeper/softer shadow, and
+     a sharpened border — no scale, no added glow (--glow-gold on the
+     featured card stays exactly as it is at rest). (hover:hover) and
+     (pointer:fine) scope this to real mouse hover, not touch — a tap on
+     a phone/tablet would otherwise "stick" the hover state after the
+     user's finger lifts. */
+  @media (hover:hover) and (pointer:fine){
+    .price-card{
+      transition:transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+    }
+    .price-card:hover{
+      transform:translateY(-7px);
+      border-color:rgba(249,249,250,0.22);
+      box-shadow:0 4px 10px rgba(0,0,0,0.36), 0 18px 36px rgba(0,0,0,0.3), var(--edge-hi);
+    }
+    .price-card.featured:hover{
+      border-color:var(--gold-light);
+      box-shadow:0 6px 14px rgba(0,0,0,0.42), 0 26px 46px rgba(0,0,0,0.34), var(--glow-gold), var(--edge-hi);
+    }
   }
   /* "Most popular" label made precise/comfortable — slightly more padding
      and a touch bigger, still restrained (uppercase, small caps weight). */
@@ -553,6 +606,9 @@
   details.faq-item{
     background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:12px; padding:26px 28px;
+    /* Transparent border, same reasoning as the pricing cards above —
+       reserves the space so hover only ever changes color, not layout. */
+    border:1px solid transparent;
   }
   details.faq-item summary{
     cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:16px;
@@ -562,6 +618,29 @@
   details.faq-item summary svg{ width:17px; height:17px; stroke:var(--white); flex:none; transition:transform 0.15s ease; }
   details.faq-item[open] summary svg{ transform:rotate(90deg); }
   details.faq-item p{ font-size:14.5px; color:var(--white); line-height:1.65; margin:16px 0 0; }
+  /* ---------- FAQ row hover (desktop only) ----------
+     A touch weaker than the pricing card hover above (smaller lift,
+     smaller shadow bump) — both restrained, but pricing reads as the
+     stronger of the two per direct instruction. Background lightens by
+     stepping each gradient stop up one tint (tint-1->tint-2, navy->
+     tint-1) rather than a filter/brightness trick, which would also
+     wash out the text sitting on top of it. */
+  @media (hover:hover) and (pointer:fine){
+    details.faq-item{
+      transition:transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+    }
+    details.faq-item:hover{
+      transform:translateY(-2.5px);
+      background:linear-gradient(160deg, var(--navy-tint-2) 0%, var(--navy-tint-1) 65%);
+      border-color:rgba(249,249,250,0.16);
+      box-shadow:0 2px 6px rgba(0,0,0,0.32), 0 10px 22px rgba(0,0,0,0.24), var(--edge-hi);
+    }
+    /* Tiny response on the chevron itself — a color shift only, no
+       transform beyond the existing open/close rotation, so hover and
+       "open" state never fight each other. */
+    details.faq-item summary svg{ transition:transform 0.15s ease, stroke 200ms ease; }
+    details.faq-item:hover summary svg{ stroke:var(--gold-light); }
+  }
 
   /* ---------- Final CTA ---------- */
   /* ---------- Final CTA ----------
@@ -738,7 +817,7 @@
       </nav>
       <div class="header-actions">
         <a class="link-login" href="signin.html">Log in</a>
-        <a class="btn btn-gold btn-nav" href="signup.html">Start free trial →</a>
+        <a class="btn btn-gold btn-nav" href="signup.html">Start free trial <span class="btn-arrow">→</span></a>
         <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
@@ -749,7 +828,7 @@
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="signin.html">Log in</a>
-        <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+        <a class="btn btn-gold btn-block" href="signup.html">Start free trial <span class="btn-arrow">→</span></a>
       </nav>
     </div>
   </header>
@@ -761,7 +840,7 @@
         <h1>Less admin.<br><span class="accent">More time back.</span><br>Better business decisions.</h1>
         <p class="hero-sub">PrimeLevel handles the repetitive admin and turns your everyday work into useful business insight, giving you more time to focus on the work that matters.</p>
         <div class="hero-cta-row">
-          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
         </div>
         <div class="cta-note">No card required · Set up in under a minute</div>
       </div>
@@ -975,7 +1054,7 @@
             <div class="cr-value" id="calcYearly">£10,920</div>
           </div>
         </div>
-        <a class="btn btn-gold calc-cta" href="signup.html">Start your 14-day free trial →</a>
+        <a class="btn btn-gold calc-cta" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
       </div>
     </div>
   </section>
@@ -997,7 +1076,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Renewal tracking</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 3 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Choose Starter →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Starter <span class="btn-arrow">→</span></a>
         </div>
         <div class="price-card featured">
           <div class="price-badge">Most popular</div>
@@ -1010,7 +1089,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Business performance dashboard</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 10 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Choose Pro →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Pro <span class="btn-arrow">→</span></a>
         </div>
         <div class="price-card">
           <h3>Business</h3>
@@ -1022,7 +1101,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced reporting</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Choose Business →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Business <span class="btn-arrow">→</span></a>
         </div>
       </div>
     </div>
@@ -1064,7 +1143,7 @@
       <div class="final-copy">
         <h2>Stop chasing. Start running your business.</h2>
         <p>Less admin. Faster payments. A business that gets smarter with every job you do.</p>
-        <a class="btn btn-gold" href="signup.html">Start your 14-day free trial →</a>
+        <a class="btn btn-gold" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
         <div class="cta-note">No card required · full access from day one</div>
       </div>
       <div class="final-photo">
