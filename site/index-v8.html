@@ -350,43 +350,11 @@
   .plain-card p{ font-size:14.5px; color:var(--white); margin:0; line-height:1.55; }
 
 
-  /* ---------- Flow graphic (Job -> Admin handled -> Time back -> Insights) ----------
-     This is the page's "four-stage journey" — scaled up significantly and
-     anchored to the real grid (was an arbitrary 760px cap floating inside
-     the section, unrelated to .wrap; now it fills the wrap's own content
-     width like everything else). --flow-node-w is a real shared variable
-     (not a guessed number) so the connecting line's endpoints are always
-     exactly each end circle's own center, however wide the node is. */
-  .flow-row{
-    --flow-node-w: 150px;
-    position:relative; display:flex; justify-content:space-between; padding:0;
-  }
-  .flow-row::before{
-    /* top = exactly half the 92px circle, since .flow-row itself now has
-       no extra padding-top to account for. */
-    content:""; position:absolute; left:calc(var(--flow-node-w) / 2); right:calc(var(--flow-node-w) / 2); top:46px; height:1px; background:var(--gold);
-  }
-  .flow-node{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:16px; width:var(--flow-node-w); }
-  .flow-node .fn-circle{
-    width:92px; height:92px; border-radius:50%; border:1px solid var(--white);
-    background:radial-gradient(circle at 35% 30%, var(--navy-tint-1), var(--navy) 70%);
-    /* Tonal shadow kept (--shadow-sm), already tightened sitewide to a
-       shallow contact shadow rather than a wide U-wrap — no separate
-       treatment needed here. */
-    box-shadow:var(--shadow-sm);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .flow-node .fn-circle svg{ width:36px; height:36px; stroke:var(--white); }
-  .flow-node span{ font-size:16px; font-weight:700; text-align:center; }
-  /* Tightened per the brief — this section's own head-to-graphic gap,
-     specifically (the shared .section-head default stays 48px elsewhere). */
-  #features .section-head{ margin-bottom:32px; }
-
   /* ---------- Advantage chain (Job -> Invoice -> Payment -> Business insights) ----------
      Enlarged per the brief, and the closing line strengthened (bigger,
      more margin) so it reads as the section's actual conclusion rather
      than a small caption. */
-  .chain-row{ display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; margin-bottom:30px; }
+  .chain-row{ display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
   .chain-tile{
     width:168px; background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px;
@@ -401,7 +369,13 @@
   .chain-tile span{ font-size:14.5px; font-weight:700; }
   .chain-arrow{ flex:none; }
   .chain-arrow svg{ width:24px; height:24px; stroke:var(--gold); }
-  .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:0; }
+  /* margin-top lives here, not on .chain-row's own margin-bottom — that
+     used to be shared, which silently added 30px of extra space after
+     "How it works"' own chain-row too (it reuses the same component but
+     has no advantage-tag after it), breaking the uniform section-to-
+     section rhythm. Scoping the gap to the element that actually needs
+     it fixes that without a special-case override elsewhere. */
+  .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:30px 0 0; }
 
   /* ---------- Sequential reveal (How it works + PrimeLevel Advantage) ----------
      Fires once per visit as each chain scrolls into view — a settle-in,
@@ -789,14 +763,6 @@
     .chain-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
     .chain-arrow{ display:none; }
     .chain-tile{ width:auto; }
-    /* Same fix, same reason, for the flow-row: at its scaled-up v8 size
-       (4 fixed 150px nodes = 600px) it overflowed a 375px phone screen
-       (confirmed live: scrollWidth 392px vs clientWidth 375px). The
-       connecting line makes no sense once nodes wrap to a grid, so it's
-       hidden here too. */
-    .flow-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
-    .flow-row::before{ display:none; }
-    .flow-node{ width:auto; }
     header .wrap{ flex-wrap:wrap; }
   }
 </style>
@@ -811,7 +777,6 @@
       </a>
       <nav class="primary-nav">
         <a href="#how">How it works</a>
-        <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </nav>
@@ -824,7 +789,6 @@
       </div>
       <nav class="mobile-nav" id="mobileNav">
         <a href="#how">How it works</a>
-        <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="signin.html">Log in</a>
@@ -946,38 +910,6 @@
         <div class="chain-tile reveal-item">
           <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
           <span>You get paid</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section-glow glow-navy" id="features">
-    <div class="wrap">
-      <div class="section-head">
-        <div class="section-label">Everything you need</div>
-        <h2>One platform. All your trade business in one place.</h2>
-        <p>From invoicing to renewals and everyday operations — PrimeLevel gives you the tools to run a stronger, more profitable business.</p>
-        <a class="section-link" href="#pricing">Explore all plans <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
-      </div>
-      <div class="flow-row">
-        <div class="flow-node">
-          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
-          <span>Job</span>
-        </div>
-        <div class="flow-node">
-          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
-          <span>Admin handled</span>
-        </div>
-        <div class="flow-node">
-          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-          <span>Time back</span>
-        </div>
-        <div class="flow-node">
-          <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-          <!-- Was "Useful insights" — renamed since that idea now belongs
-               solely to the PrimeLevel Advantage section below; each
-               section gets a single idea, not a repeated one. -->
-          <span>Real results</span>
         </div>
       </div>
     </div>
@@ -1162,7 +1094,6 @@
       </div>
       <nav>
         <a href="#how">How it works</a>
-        <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </nav>
