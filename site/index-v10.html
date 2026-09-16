@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PrimeLevel (v10 — navy page canvas)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PrimeLevel handles the admin that eats your evenings, and turns every job into insight — so running your trade business gets simpler over time, not more complicated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* PrimeLevel homepage — "v2": same three brand hues (Navy/Gold/White),
+     same structure and copy as index.html, but with real tonal depth —
+     gradients and glow instead of one flat shade. Every extra stop here
+     is still a blend of Navy-toward-white/black or Gold-toward-white/black
+     (computed with a script, not eyeballed) or Gold/White at reduced alpha
+     used only for glow/lighting — never a genuinely new hue. index.html
+     stays untouched as the flat/restrained version for comparison. */
+  :root{
+    /* v8: fixed 1360px container per the explicit refinement brief — v6's
+       fluid clamp() is deliberately NOT reused here (v6 stays exactly as
+       it was, this is a separate, independent version). --container-pad
+       still steps 64/40/24px per breakpoint below; nothing else needs to
+       change when it does. */
+    --container-max: 1360px;
+    --container-pad: 64px;
+    /* Consistent vertical rhythm between major sections — each .section
+       carries HALF of this as its own top/bottom padding, so two adjacent
+       sections combine to the full 128px gap on desktop, 92px on tablet,
+       72px on mobile (~15% up from the previous 112/80/64, per direct
+       instruction — the two breakpoints below reassign this same
+       variable, same pattern as --container-pad). */
+    --section-gap-y: 128px;
+    /* Shared with .pricing-grid's own gap so the two can't drift apart —
+       the time-back photo/calculator gap is required to match it exactly. */
+    --card-gap: 22px;
+    --navy:#1E2633;
+    --navy-tint-1:#383F4B;   /* Navy blended 12% toward white */
+    --navy-tint-2:#4A505B;   /* Navy blended 20% toward white */
+    --navy-tint-3:#60656F;   /* Navy blended 30% toward white — brighter spot */
+    --navy-tint-4:#767A83;   /* Navy blended 40% toward white — hottest spot */
+    /* v10: independent of v9 — the page-canvas shade is now the real
+       locked brand Navy itself (#1E2633), not the darker Navy x0.6
+       derivative used everywhere else on the site (see v9/v8's own
+       --filler:#12171F). Every var(--filler) usage is untouched — this
+       is a single-token value swap, nothing else changed. */
+    --filler:#1E2633;
+    --gold:#B29B68;
+    --gold-light:#C4B38D;    /* Gold blended 25% toward white */
+    --gold-lighter:#CEC1A2;  /* Gold blended 40% toward white — glow core */
+    --white:#F9F9FA;
+    /* v8: same rgba colors as before (asked to keep the color, "just the
+       shape") but with the huge 28-56px secondary blur radius cut way
+       down. That big blur was what made the shadow wrap around rounded
+       cards/circles into a visible "U" cupping underneath them (flagged
+       live on the flow-node circles and chain-tiles) — a tight, shallow
+       blur sits as a contact shadow directly under the shape instead. */
+    --shadow: 0 2px 4px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.28);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.32), 0 6px 14px rgba(0,0,0,0.22);
+    /* Gold glow toned down sitewide ("gold sparingly", "shadows subtle") —
+       same hue, smaller/softer spread. Used by the hero's resting logo
+       mark and the featured pricing card, so one change keeps both
+       consistent. */
+    --glow-gold: 0 0 30px rgba(178,155,104,0.22);
+    --edge-hi: inset 0 1px 0 rgba(249,249,250,0.1);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ scroll-behavior:smooth; }
+  html,body{ margin:0; padding:0; }
+  body{
+    /* v8: the old v3 fade-to-near-black floor (--filler-deep) is gone —
+       flagged live as a "black shadow" around the pricing section. The
+       top radial highlight (gold/white glow behind the header and
+       orbit) was removed too, per direct follow-up feedback — the page
+       is now one genuinely flat, consistent shade (--filler) top to
+       bottom, no gradient at all, matching every section equally
+       instead of the hero getting different treatment from the rest. */
+    background:var(--filler);
+    color:var(--white);
+    font-family:'Montserrat',ui-sans-serif,system-ui,sans-serif;
+    font-size:16px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  section, header, footer{ scroll-margin-top:88px; }
+  /* Container grid: 1360px max, 64px min horizontal padding on desktop,
+     scaling down at each breakpoint below (not just shrinking content —
+     the padding itself steps down: 64 -> 40 -> 24px). Every section on
+     the page uses this same .wrap, so this one rule is the whole grid. */
+  .wrap{ max-width:var(--container-max); margin:0 auto; padding:0 var(--container-pad); }
+  /* No divider rules anywhere on this page — the rhythm between sections
+     comes entirely from this one spacing scale (below), never a border
+     line. */
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:'Montserrat',sans-serif; font-weight:600; font-size:16px;
+    border-radius:10px; border:none; cursor:pointer; text-decoration:none;
+    padding:14px 28px;
+  }
+  .btn-gold{
+    position:relative; overflow:hidden;
+    background:linear-gradient(180deg, var(--gold-lighter) 0%, var(--gold) 100%); color:var(--navy);
+    /* v8: strong glow removed per the refinement brief — a soft, close
+       contact shadow instead of the old wide 22px/0.4-alpha glow. */
+    box-shadow:0 3px 8px rgba(178,155,104,0.22), 0 1px 2px rgba(0,0,0,0.22);
+    /* 220ms governs the release (hover-out, press-release) — :active
+       below sets its own faster transition for the press itself, so the
+       button snaps down quickly but eases back up gently. */
+    transition:transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
+  }
+  .btn-gold::before{
+    /* Faint diagonal gloss — same gold family, just a brighter tint at an
+       angle, not a new hue. Toned down further in v8 (0.22 -> 0.14) to
+       match the softer, less "shiny" button treatment. */
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(115deg, rgba(249,249,250,0.14) 0%, transparent 35%);
+  }
+  /* The arrow "->" in every CTA's own text is wrapped in this span so it
+     can nudge independently of the label on hover — same one global
+     interaction pattern on every primary button site-wide. */
+  .btn-arrow{ display:inline-block; transition:transform 220ms ease; }
+  /* Desktop-hover-only, same reasoning as the pricing/FAQ hovers above:
+     (hover:hover) + (pointer:fine) excludes touch, where a tap would
+     otherwise leave the lifted state "stuck" after the finger lifts. */
+  @media (hover:hover) and (pointer:fine){
+    .btn-gold:hover{
+      transform:translateY(-2.5px);
+      filter:brightness(0.97);
+      box-shadow:0 3px 8px rgba(178,155,104,0.22), 0 1px 2px rgba(0,0,0,0.22), 0 12px 20px rgba(0,0,0,0.22);
+    }
+    .btn-gold:hover .btn-arrow{ transform:translateX(2.5px); }
+  }
+  /* Press feedback works everywhere, including touch (a tap's own brief
+     :active state) — only the lingering hover-lift above is desktop-only.
+     Its own faster transition (120ms) is what makes the press snap down
+     quickly while the release (governed by .btn-gold's 220ms) eases back
+     out gently. */
+  .btn-gold:active{
+    transform:translateY(0) scale(0.97);
+    filter:brightness(0.94);
+    box-shadow:0 1px 3px rgba(178,155,104,0.2), 0 1px 2px rgba(0,0,0,0.2);
+    transition:transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  }
+  .btn-block{ width:100%; }
+  /* The one deliberate, defined exception to "every CTA is identical" —
+     the header's own inline CTA, which shares the header bar with the
+     logo, nav links (desktop) and the menu toggle (mobile) at every
+     viewport width, unlike every other CTA on the page which has a full
+     row/column to itself. Confirmed live this is a real space
+     constraint, not a style whim: at 375px, the standard 52px-tall
+     button pushed header-actions to 276px (73% of the viewport) with
+     just Log in + the CTA + the hamburger, crowding the logo. Same
+     color/radius/hover/typography family (still .btn.btn-gold), just
+     smaller — the kind of "secondary button with its own defined style"
+     the CTA-consistency brief itself allows for. */
+  .btn-nav{ padding:11px 20px; font-size:14px; }
+  /* Calculator's CTA: same size as the hero's own button (plain .btn,
+     not .btn-block) instead of stretching edge-to-edge, centered within
+     the card. display:flex (needed so margin:auto can center it like any
+     other block-level box) alone isn't enough — a block-level flex
+     container still defaults to filling the available width. width:
+     fit-content is what actually keeps it sized to its own content,
+     matching the hero button, instead of stretching to the card. */
+  .calc-cta{ display:flex; width:fit-content; margin:0 auto; }
+
+  /* ---------- Header ---------- */
+  header{ padding:26px 0; position:relative; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:none; }
+  .brand img{ width:28px; height:28px; display:block; }
+  .brand-word{ font-weight:800; font-size:19px; letter-spacing:-0.01em; color:var(--white); }
+  nav.primary-nav{ display:flex; align-items:center; gap:36px; }
+  nav.primary-nav a{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
+  .header-actions{ display:flex; align-items:center; gap:22px; flex:none; }
+  .link-login{ font-weight:600; font-size:14.5px; text-decoration:none; color:var(--white); }
+
+  /* Mobile nav — same pattern Stripe/Apple use on their real mobile
+     sites (verified live before building this): the link row disappears
+     below the tablet breakpoint and a single icon button takes over,
+     opening a dropdown panel with the same links. Hidden entirely on
+     desktop; only the 980px query below turns it on. */
+  .menu-toggle{
+    display:none; width:40px; height:40px; border-radius:9px; border:1px solid var(--gold);
+    background:transparent; color:var(--white); align-items:center; justify-content:center;
+    cursor:pointer; flex:none;
+  }
+  .menu-toggle svg{ width:20px; height:20px; stroke:var(--gold); }
+  .mobile-nav{
+    display:none; position:absolute; left:0; right:0; top:100%; z-index:40;
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow), var(--edge-hi); border-radius:0 0 16px 16px;
+    padding:8px var(--container-pad) 20px; flex-direction:column;
+  }
+  .mobile-nav[data-open]{ display:flex; }
+  /* :not(.btn) — found during the CTA button audit: this selector used to
+     match the "Start free trial" link too (it's an <a> like the rest),
+     and being more specific than plain .btn, silently overrode its
+     padding/font-size (14px 4px/15px instead of the standard 14px
+     28px/16px) — a real "same action, different component" violation
+     that had gone unnoticed because it only showed up inside the closed
+     mobile-nav dropdown. */
+  .mobile-nav a:not(.btn){
+    padding:14px 4px; font-weight:600; font-size:15px; color:var(--white); text-decoration:none;
+    border-bottom:1px solid rgba(249,249,250,0.1);
+  }
+  .mobile-nav a:not(.btn):last-child{ border-bottom:none; }
+  .mobile-nav .btn{ margin-top:14px; }
+
+  /* ---------- Hero (v9: full redesign, independent of v8) ----------
+     Replaces the old two-column hero-grid (headline+visual side by
+     side, and v8's own typographic-entrance/orbit hero before it)
+     entirely with one centered sequence: "Simple" -> "Time" (gold) ->
+     "Smarter" cycle in place, each fading in/holding/fading out on its
+     own timer — then, after a pause, the real PrimeLevel master logo
+     (icon + wordmark, the same asset the header/footer use — NOT the
+     gold-circle mark used elsewhere on this page) fades in, followed by
+     the two-line copy, the primary CTA and its note.
+     Same full-bleed charcoal-band background already used for #how/
+     .final-cta (byte-identical gradient) — a plain <section> is already
+     100% viewport width by default, so putting the background directly
+     on it needs no grid/margin tricks. Its own top/bottom padding is
+     independent of --section-gap-y (this is the hero, nothing precedes
+     it to share a gap with), but the BOTTOM still hands off the
+     standard half-share via margin so Hero->Problem keeps the site's
+     normal rhythm — same reconciliation #how/.final-cta already use.
+     Runs once on page load, purely in CSS, no JS: the base (non-media-
+     query) rules ARE the final resting state — words hidden, logo/copy/
+     CTA/note fully visible — and only inside
+     prefers-reduced-motion:no-preference are they hidden-then-animated
+     in, so a reduced-motion visitor sees the resting page immediately,
+     nothing hidden and nothing to wait for. */
+  .hero{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    padding:120px 0;
+    margin-bottom:calc(var(--section-gap-y) / 2);
+  }
+  .hero-stage{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; }
+
+  /* The three words cycle in the exact same spot (position:absolute,
+     inset:0, each one centered within that box) — nothing slides or
+     moves between them, a clean in-place fade only. .hero-reveal sits
+     in NORMAL flow underneath and already reserves its real final
+     height from the very first frame (its content starts at opacity:0,
+     not display:none), so nothing jumps when the words give way to it —
+     the words simply overlay that same space and fade away. */
+  .hero-word-stage{ position:absolute; inset:0; }
+  .hero-word{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    opacity:0;
+    font-weight:800; letter-spacing:-0.01em; line-height:1;
+    /* Solves to ~72px at 980px width and exactly 88px (the cap) from
+       ~1440px up — the stated "72 to 88 on desktop" range — while
+       continuing to scale fluidly down to ~51px at 375px for mobile,
+       not a fixed breakpoint jump. */
+    font-size:clamp(32px, 38px + 3.5vw, 88px);
+    color:var(--white);
+  }
+  .hero-word[data-word="time"]{ color:var(--gold); }
+
+  .hero-reveal{ display:flex; flex-direction:column; align-items:center; gap:28px; }
+  /* The genuine master logo file (icon + "PRIMELEVEL" wordmark already
+     built into one image, background chroma-keyed to transparent from
+     the source file — the artwork itself is untouched, not redrawn or
+     recoloured) — sized by width only, height:auto, so its real 625:467
+     proportions are preserved exactly, never stretched. */
+  .hero-logo{ opacity:1; }
+  .hero-logo img{ display:block; width:clamp(160px, 22vw, 320px); height:auto; }
+  .hero-below-logo{ display:flex; flex-direction:column; align-items:center; gap:20px; opacity:1; }
+  h1.hero-tagline{ font-weight:700; font-size:clamp(19px, 2.3vw, 25px); line-height:1.4; letter-spacing:-0.01em; margin:0; color:var(--white); }
+  .hero-description{ font-size:clamp(15px, 1.6vw, 17px); line-height:1.65; color:var(--white); margin:0; max-width:46ch; font-weight:400; }
+  .cta-note{ font-size:13px; font-weight:500; color:var(--white); }
+
+  @keyframes heroWordCycle{
+    0%{ opacity:0; }
+    26.92%{ opacity:1; }
+    73.08%{ opacity:1; }
+    100%{ opacity:0; }
+  }
+  @keyframes heroWordCycleLong{
+    0%{ opacity:0; }
+    23.33%{ opacity:1; }
+    76.67%{ opacity:1; }
+    100%{ opacity:0; }
+  }
+  @keyframes heroFadeUp{
+    0%{ opacity:0; transform:translateY(10px); }
+    100%{ opacity:1; transform:translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    /* Exact numbers from the brief: 700ms fade in, 1200ms hold, 700ms
+       fade out per word (2600ms total) for "Simple"/"Time"; "Smarter"
+       holds slightly longer (1600ms hold, 3000ms total). Back-to-back,
+       no gap between words — each starts the instant the previous
+       one's full cycle ends. 300ms initial settle before "Simple"
+       begins, matching the same brief settle used elsewhere on this
+       page before a sequence starts. */
+    .hero-word[data-word="simple"]{ animation:heroWordCycle 2600ms ease-out 300ms forwards; }
+    .hero-word[data-word="time"]{ animation:heroWordCycle 2600ms ease-out 2900ms forwards; }
+    .hero-word[data-word="smarter"]{ animation:heroWordCycleLong 3000ms ease-out 5500ms forwards; }
+    /* Smarter's cycle ends at 5500+3000=8500ms; +500ms pause (per the
+       brief) = 9000ms for the logo to start fading in. The copy/CTA/
+       note group follows as its own beat, starting once the logo's own
+       700ms fade-in is done plus a short 300ms stagger (10000ms) —
+       logo first, then everything below it, not all at once. */
+    .hero-logo{ opacity:0; animation:heroFadeUp 700ms ease-out 9000ms forwards; }
+    .hero-below-logo{ opacity:0; animation:heroFadeUp 700ms ease-out 10000ms forwards; }
+  }
+
+  /* ---------- Generic section chrome ---------- */
+  /* Each side is half of --section-gap-y, so two adjacent sections
+     combine to the full major-section gap (108px desktop) — see the
+     --section-gap-y comment in :root. */
+  .section{ padding:calc(var(--section-gap-y) / 2) 0; }
+  .section-head{ max-width:640px; margin:0 auto 48px; text-align:center; }
+  .section-label{
+    font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold);
+    /* Pulled closer to its headline (was 14px) per the refinement brief. */
+    margin:0 0 8px;
+  }
+  h2{ font-weight:800; font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .section-head p{ font-size:16px; color:var(--white); line-height:1.65; margin:0; }
+
+  /* ---------- "How it works" + "PrimeLevel Advantage" full-width charcoal
+     band ----------
+     Both are now ONE merged major section sharing this single band, per
+     direct instruction (previously two separate sections/bands). Same
+     background as the final CTA's own navy block, byte-identical (not a
+     new color) — a plain <section> is already full-bleed by default
+     (only its child .wrap has a max-width), so no grid/margin tricks are
+     needed to make it reach the true edges. No border-radius, no
+     box-shadow/glow, no fixed height — padding + natural content height
+     only.
+     padding (88px) is this band's OWN internal breathing room — band
+     edge to eyebrow, and lowest content to band edge — independent of
+     --section-gap-y. margin is the SEPARATE, deliberately-preserved
+     external gap to Problem/Calculator (the sections now immediately
+     before/after this merged one): since this section no longer uses
+     .section's own shared calc(--section-gap-y / 2) padding, that
+     contribution would otherwise just vanish from the boundary, quietly
+     shrinking the standard 128px major-section gap down to 64px on each
+     side — a real regression "don't change anything else" rules out.
+     Same reconciliation .final-cta already uses for the identical
+     tension (its own full-bleed band padding vs. the shared inter-section
+     rhythm). */
+  #how{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    padding:88px 0;
+    margin:calc(var(--section-gap-y) / 2) 0;
+  }
+
+  /* ---------- Problem cards ---------- */
+  /* Scaled up for more presence, per the refinement brief — bigger type,
+     bigger icon plate, more internal padding; same shape/shadow/gradient
+     treatment otherwise. */
+  .card-grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .plain-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px; padding:30px 26px;
+  }
+  .plain-card .pc-icon{
+    width:50px; height:50px; border-radius:12px; border:1px solid var(--white);
+    background:rgba(249,249,250,0.06);
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  }
+  .plain-card .pc-icon svg{ width:24px; height:24px; stroke:var(--white); }
+  .plain-card h4{ font-size:18px; font-weight:700; margin:0 0 8px; }
+  .plain-card p{ font-size:14.5px; color:var(--white); margin:0; line-height:1.55; }
+
+
+  /* ---------- PrimeLevel Advantage closing line ----------
+     The three chain-tile cards (Job/Invoice/Business insight) that used
+     to sit above this line were removed completely per direct
+     instruction — this tagline is now the section's sole closing
+     statement, directly under its own section-head paragraph. */
+  .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:30px 0 0; }
+  /* Internal breathing room between "How it works" and "PrimeLevel
+     Advantage" now that both live inside one merged section/band — not
+     part of the shared --section-gap-y rhythm (that governs space
+     BETWEEN major sections, not within one), scaled down proportionally
+     at each breakpoint like everything else on the page. */
+  .advantage-head{ margin-top:96px; }
+
+  /* ---------- "How it works" circle-and-line sequence ----------
+     Large white-outlined circles instead of filled cards,
+     connected by a thin gold line that actually draws across (grows in
+     width) rather than a static arrow icon, and a much slower, strictly
+     SEQUENTIAL reveal (each step waits for the previous one to finish)
+     instead of a simultaneous stagger. "Just white on the background":
+     no fill, no gradient — the circle is a plain white ring sitting
+     directly on the band's own charcoal background, with a white icon
+     inside and a white label below; the connecting line is the only
+     gold accent. */
+  .how-circle-row{ display:flex; align-items:flex-start; justify-content:center; }
+  .how-circle{ display:flex; flex-direction:column; align-items:center; gap:14px; flex:none; width:130px; }
+  .how-circle-icon{
+    width:92px; height:92px; border-radius:50%; border:2px solid var(--white);
+    background:transparent;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .how-circle-icon svg{ width:36px; height:36px; stroke:var(--white); }
+  .how-circle span{ font-size:15px; font-weight:700; color:var(--white); text-align:center; }
+  /* Fixed at exactly the circle's own height (92px) so align-items:center
+     centers the thin line at the circle's true vertical middle — the
+     same "half the circle's diameter" math the old flow-row used, just
+     arrived at via flex centering instead of a hardcoded `top` offset. */
+  .how-line-wrap{ flex:1 1 60px; min-width:24px; max-width:120px; height:92px; display:flex; align-items:center; }
+  .how-line{ width:0; height:1px; background:var(--gold); }
+
+  /* Sequential, not simultaneous: each circle fades in over 2s, THEN the
+     line to its right draws over the next 2s, THEN the next circle — see
+     the inline transition-delay on each element in the markup (0, 2000,
+     4000...12000ms). No bounce/elastic easing, no lateral movement — a
+     plain opacity fade for circles, a plain width grow for the line.
+     Gated behind prefers-reduced-motion like every other animation on
+     this page. */
+  @media (prefers-reduced-motion: no-preference){
+    .how-enter-circle{ opacity:0; transition:opacity 2000ms ease-out; }
+    .reveal-stagger.is-visible .how-enter-circle{ opacity:1; }
+    .how-enter-line{ transition:width 2000ms ease-out; }
+    .reveal-stagger.is-visible .how-enter-line{ width:100%; }
+  }
+
+
+  /* ---------- Photo / time-worth calculator band (v8 revision) ----------
+     Per the refinement brief: photo full-bleed on the LEFT, all text
+     (label/heading/copy) plus the calculator on the RIGHT, no forced
+     height-matching between them (v6's elaborate img-out-of-flow /
+     single-row-inflation workaround is gone — see the removed comments
+     in git history if that bug ever needs re-diagnosing elsewhere).
+     Structural note: the photo spans grid-row 1/5 (all four text rows),
+     which is what makes a plain height:100% + normal <img> safe here —
+     the single-row-inflation bug only bites when an image shares exactly
+     ONE row with a sibling; a multi-row span is naturally excluded from
+     that, so no extra workaround is needed.
+     The photo (column 1) starts at the grid's own left edge — true x=0,
+     genuine bleed, no separate gutter track needed — and is sized with
+     fr, not a fixed calc() off --container-max. A fixed-pixel formula
+     was tried first and was a real bug, not just a style choice: with
+     --container-max now a constant 1360px (not v6's fluid clamp()), "46%
+     of container-max" stayed the same fixed px value at every viewport,
+     so once the viewport dropped below ~1360px it stopped shrinking at
+     all and blew out the page (confirmed live at 980px: scrollWidth
+     1024px vs clientWidth 965px). Patching the symptom with min-width:0
+     further down the tree (still kept below, it's good practice
+     regardless) wasn't the real fix — replacing the fixed formula with
+     fr tracks is: fr always sums to exactly the space actually
+     available, at every viewport, so it cannot overflow by
+     construction, and the 46:54 photo:text ratio holds correctly
+     throughout instead of only at the one width it was tested at.
+     Column 4 (the right margin) is the one fixed-formula column left,
+     and deliberately so — it's copied verbatim from .wrap's own
+     margin+pad math, which is the actual definition of "content-right",
+     not an approximation of it. */
+  .timeback-grid{
+    display:grid;
+    grid-template-columns:
+      minmax(0, 46fr)
+      var(--card-gap)
+      minmax(0, 54fr)
+      calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad));
+    row-gap:0;
+    align-items:stretch;
+  }
+  .tb-label{ grid-column:3; grid-row:1; align-self:start; }
+  .tb-heading{ grid-column:3; grid-row:2; align-self:start; }
+  .tb-copy{ grid-column:3; grid-row:3; align-self:start; font-size:15px; margin:0 0 22px; max-width:52ch; }
+  /* min-width:0 on every step of this chain (here, and on .calc-result
+     below) — without it, CSS Grid's default min-width:auto stops a grid
+     item from ever shrinking below its own content's natural minimum
+     width, which doesn't matter at wide viewports but caused a real
+     overflow at 980px (confirmed live: the "£10,920" result card was
+     still 129px wide when its column had far less room, pushing
+     scrollWidth past clientWidth). This lets the whole chain actually
+     shrink instead of blowing out the page. */
+  .tb-calc{ grid-column:3; grid-row:4; align-self:start; min-width:0; }
+  .photo-frame.tb-photo{
+    grid-column:1; grid-row:1 / 5;
+    aspect-ratio:auto; height:100%; width:100%; min-width:0;
+    /* Rounded only on the interior-facing corners — sharp/flush on the
+       true left edge it bleeds into, like the final CTA photo. */
+    border-radius:0 16px 16px 0;
+  }
+
+  .photo-frame{
+    /* Base treatment shared by both photo slots on the page. Matches the
+       real photo's own 3:2 shape by default — no cropping needed unless
+       a more specific rule (like .tb-photo above) overrides it. */
+    position:relative; aspect-ratio:3/2; border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .photo-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  /* Keeps the tradesperson's head in frame instead of the default center
+     crop — a normal in-flow <img> now (no position:absolute needed, see
+     the multi-row-span note above). */
+  .photo-frame.tb-photo img{ object-position:center top; }
+  .photo-frame::after{
+    /* Ties the photo into the same Navy palette as the rest of the page
+       instead of sitting on it as a flat inserted rectangle — a bottom-up
+       Navy fade, the same technique film posters use over a photo. */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(0deg, rgba(18,23,31,0.55) 0%, transparent 45%);
+  }
+
+  /* Compact per the brief — less panel weight, less vertical padding,
+     same content. */
+  .calc-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow), var(--edge-hi); border-radius:16px; padding:24px 24px;
+  }
+  .calc-card h3{ font-size:17px; font-weight:800; margin:0 0 16px; }
+  .calc-row{ margin-bottom:18px; }
+  .calc-row-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .calc-row-head label{ font-size:13.5px; font-weight:600; }
+  .calc-row-head .calc-live-val{ font-size:13.5px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:2px; background:var(--white); border-radius:2px; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--gold); border:none; cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{ width:20px; height:20px; border-radius:50%; background:var(--gold); border:none; cursor:pointer; }
+  input[type=range]::-moz-range-track{ height:2px; background:var(--white); border-radius:2px; }
+  .calc-results{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:6px 0 26px; }
+  .calc-result{
+    text-align:center; padding:18px 10px; border:1px solid var(--gold); border-radius:12px;
+    background:rgba(178,155,104,0.08); min-width:0;
+  }
+  .calc-result .cr-label{ font-size:11.5px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--white); margin-bottom:6px; }
+  .calc-result .cr-value{ font-size:24px; font-weight:800; color:var(--gold); font-variant-numeric:tabular-nums; }
+  /* Per-year carries the weight of the story ("this is what it adds up
+     to"), so it gets a touch more emphasis than per-week — still the
+     same gold, same card, just larger and with the existing gold glow
+     token already used elsewhere on this page, not a new effect. */
+  /* Per-year no longer gets a bigger font than per-week — a larger size
+     pushed its baseline lower than per-week's, so the two numbers didn't
+     sit level with each other (flagged live). Keeps the glow as the only
+     distinction; both values now share the same .cr-value font-size. */
+  .calc-result-primary{ box-shadow:var(--shadow-sm), 0 0 32px rgba(178,155,104,0.22); }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--card-gap); align-items:stretch; }
+  .price-card{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:16px; padding:36px 30px;
+    display:flex; flex-direction:column; position:relative;
+    /* Transparent border reserves the same 1.5px of space the featured
+       card's real border already takes up, so sharpening it on hover is
+       a pure color change — never a layout shift. */
+    border:1.5px solid transparent;
+  }
+  .price-card.featured{
+    border-color:var(--gold);
+    background:linear-gradient(160deg, var(--navy-tint-4) 0%, var(--navy) 55%);
+    box-shadow:var(--shadow), var(--glow-gold), var(--edge-hi);
+  }
+  /* ---------- Pricing card hover (desktop only) ----------
+     Restrained on purpose: a lift, a slightly deeper/softer shadow, and
+     a sharpened border — no scale, no added glow (--glow-gold on the
+     featured card stays exactly as it is at rest). (hover:hover) and
+     (pointer:fine) scope this to real mouse hover, not touch — a tap on
+     a phone/tablet would otherwise "stick" the hover state after the
+     user's finger lifts. */
+  @media (hover:hover) and (pointer:fine){
+    .price-card{
+      transition:transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+    }
+    .price-card:hover{
+      transform:translateY(-7px);
+      border-color:rgba(249,249,250,0.22);
+      box-shadow:0 4px 10px rgba(0,0,0,0.36), 0 18px 36px rgba(0,0,0,0.3), var(--edge-hi);
+    }
+    .price-card.featured:hover{
+      border-color:var(--gold-light);
+      box-shadow:0 6px 14px rgba(0,0,0,0.42), 0 26px 46px rgba(0,0,0,0.34), var(--glow-gold), var(--edge-hi);
+    }
+  }
+  /* "Most popular" label made precise/comfortable — slightly more padding
+     and a touch bigger, still restrained (uppercase, small caps weight). */
+  .price-badge{
+    position:absolute; top:-15px; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:var(--navy); font-size:12px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;
+    padding:7px 18px; border-radius:100px; white-space:nowrap;
+  }
+  .price-card h3{ font-size:20px; font-weight:800; margin:0 0 5px; }
+  .price-card .plan-sub{ font-size:14px; color:var(--white); margin:0 0 22px; }
+  .price-card .plan-price{ font-size:40px; font-weight:800; margin:0 0 26px; }
+  .price-card .plan-price span{ font-size:15px; font-weight:600; }
+  .plan-features{ list-style:none; margin:0 0 28px; padding:0; flex:1; }
+  .plan-features li{ display:flex; align-items:flex-start; gap:12px; font-size:15px; margin-bottom:14px; line-height:1.45; }
+  .plan-features svg{ width:18px; height:18px; stroke:var(--white); flex:none; margin-top:1px; }
+
+  /* ---------- FAQ ---------- */
+  /* Taller rows, slightly larger type, and the same content-width grid as
+     everything else (max-width unchanged — 760px already reads as a
+     comfortable single reading column, wider would hurt scanability). */
+  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+  details.faq-item{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
+    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:12px; padding:26px 28px;
+    /* Transparent border, same reasoning as the pricing cards above —
+       reserves the space so hover only ever changes color, not layout. */
+    border:1px solid transparent;
+  }
+  details.faq-item summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    font-size:16.5px; font-weight:700;
+  }
+  details.faq-item summary::-webkit-details-marker{ display:none; }
+  details.faq-item summary svg{ width:17px; height:17px; stroke:var(--white); flex:none; transition:transform 0.15s ease; }
+  details.faq-item[open] summary svg{ transform:rotate(90deg); }
+  details.faq-item p{ font-size:14.5px; color:var(--white); line-height:1.65; margin:16px 0 0; }
+  /* ---------- FAQ row hover (desktop only) ----------
+     A touch weaker than the pricing card hover above (smaller lift,
+     smaller shadow bump) — both restrained, but pricing reads as the
+     stronger of the two per direct instruction. Background lightens by
+     stepping each gradient stop up one tint (tint-1->tint-2, navy->
+     tint-1) rather than a filter/brightness trick, which would also
+     wash out the text sitting on top of it. */
+  @media (hover:hover) and (pointer:fine){
+    details.faq-item{
+      transition:transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+    }
+    details.faq-item:hover{
+      transform:translateY(-2.5px);
+      background:linear-gradient(160deg, var(--navy-tint-2) 0%, var(--navy-tint-1) 65%);
+      border-color:rgba(249,249,250,0.16);
+      box-shadow:0 2px 6px rgba(0,0,0,0.32), 0 10px 22px rgba(0,0,0,0.24), var(--edge-hi);
+    }
+    /* Tiny response on the chevron itself — a color shift only, no
+       transform beyond the existing open/close rotation, so hover and
+       "open" state never fight each other. */
+    details.faq-item summary svg{ transition:transform 0.15s ease, stroke 200ms ease; }
+    details.faq-item:hover summary svg{ stroke:var(--gold-light); }
+  }
+
+  /* ---------- Final CTA ---------- */
+  /* ---------- Final CTA ----------
+     v8: a genuine full-width band, not a rounded card inside .wrap — the
+     navy fill is the SECTION's own background (so it's automatically
+     100vw, no grid trickery needed for the color), while the text and
+     photo sit in a grid that keeps the copy aligned to the same grid
+     line as every other section (col 1 matches .wrap's own margin) and
+     lets the photo bleed all the way to the true right edge (col 5, a
+     flexible bleed gutter — the same proven technique used elsewhere on
+     this page). No outer padding on the band itself; the section-to-
+     section spacing is handled by margin instead (see below), so the
+     navy fill still touches the viewport edge with nothing outside it. */
+  .final-cta{
+    padding:0;
+    /* Same spacing logic as any two adjacent .section elements: FAQ's
+       own bottom padding (--section-gap-y / 2) plus this margin adds up
+       to the standard 108px major-section gap — explicitly requested
+       ("clear spacing between FAQ and final CTA using the same global
+       spacing logic"). Matching margin-bottom keeps the same gap before
+       the footer. */
+    margin:calc(var(--section-gap-y) / 2) 0;
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+  }
+  /* Same fix as the time-back grid above, same reason: fr tracks for the
+     copy/photo ratio instead of a fixed calc() off --container-max, so
+     it can't overflow or silently stop scaling below 1360px. The left
+     margin is the one fixed-formula column, copied verbatim from
+     .wrap's own math (real "content-left", not an approximation) — and
+     since the photo is the LAST track with nothing after it, it reaches
+     the true right edge by construction, with no separate trailing
+     bleed-gutter column needed at all. */
+  /* Two real bugs found and fixed here, both flagged live by the user
+     with red reference lines, neither patched around:
+     1. The old left-margin column (matching .wrap's own math, for "text
+        aligned to grid") made the navy box's visual left portion wider
+        than .final-copy's own box, so centering only happened within
+        the narrower inner column, not the true navy box.
+     2. Even after removing that, a separate `var(--card-gap)` grid
+        column between .final-copy and the photo was STILL navy (the
+        color comes from .final-cta's own background, which shows
+        through any empty grid track), so it silently added 22px to the
+        RIGHT side only — invisible in code, visible as asymmetric
+        padding once actually measured/screenshotted.
+     Fixed by dropping the gap column entirely: the navy box is now a
+     single grid track that .final-copy completely fills, and the
+     visual separation from the photo comes from .final-copy's own
+     ordinary (symmetric) padding instead of a separate track. Confirmed
+     live: left/right padding from the text to the navy box's true edges
+     is now equal. */
+  .final-grid{
+    display:grid;
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+    align-items:stretch;
+  }
+  /* Vertical padding tuned to 92px top/bottom per direct request
+     ("reduce the height by 10%") — took three live measurements to land
+     on, worth recording so a future session doesn't repeat the same
+     miscalculation: widening this column (25fr -> 40fr, previous
+     commit) changed how the heading wraps, so the content's own height
+     isn't fixed the way it was under the original 25/75 layout — two
+     earlier guesses (40px, then 74px) were each computed against a
+     content-height reading taken before the reflow had actually
+     settled at the new column width. Final numbers, measured clean
+     after a fresh reload: content height (heading+paragraph+button+
+     note, all margins included) is 247.5px; target total is 90% of the
+     original 479px band = 431px; (431 - 247.5) / 2 = 91.8px. */
+  .final-copy{
+    grid-column:1; padding:92px 48px; display:flex; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center; min-width:0;
+  }
+  .final-copy h2{ margin-bottom:14px; }
+  .final-copy p{ font-size:15px; color:var(--white); margin:0 0 30px; max-width:42ch; }
+  .final-copy .cta-note{ margin-top:12px; }
+  /* The decorative italic tagline ("More jobs. Better decisions.") was
+     removed — not essential, and the headline + CTA already carry the
+     section's message on their own. */
+  .final-photo{ grid-column:2; position:relative; }
+  /* Slightly taller than a plain 3:2 crop, and no rounding — it's a true
+     edge-to-edge bleed now, not a card. */
+  .final-photo .photo-frame{ height:100%; aspect-ratio:auto; border-radius:0; box-shadow:none; }
+
+  /* ---------- Footer ---------- */
+  /* Same spacing scale as the rest of the page — half of --section-gap-y
+     above (matching how any two sections meet) for adequate breathing
+     room, not an arbitrary smaller number. */
+  footer{ padding:calc(var(--section-gap-y) / 2) 0 40px; }
+  footer .wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+  .footer-left{ display:flex; align-items:center; gap:10px; }
+  .footer-left img{ width:20px; height:20px; }
+  .footer-left span{ font-size:13px; font-weight:600; }
+  footer nav{ display:flex; gap:26px; }
+  footer nav a{ font-size:13px; font-weight:600; text-decoration:none; }
+  .footer-tag{ font-size:12.5px; font-weight:500; }
+
+  @media (max-width:980px){
+    :root{
+      --container-pad:40px;
+      /* Section spacing scaled down proportionally, not left at the
+         desktop value — 128px -> 92px. */
+      --section-gap-y:92px;
+    }
+    /* Band padding scaled down proportionally — 120px -> 88px, same
+       ratio the charcoal band elsewhere on the page already uses. */
+    .hero{ padding:88px 0; }
+    .card-grid-4, .pricing-grid{ grid-template-columns:repeat(2,1fr); }
+    nav.primary-nav{ display:none; }
+    .menu-toggle{ display:flex; }
+    /* Final CTA band stacks to one column — reset both children off
+       their desktop grid-column placement so they fill it, photo above
+       copy (leads with the human photo on mobile). */
+    .final-grid{ grid-template-columns:1fr; }
+    .final-copy{ grid-column:1; padding:48px var(--container-pad); }
+    .final-photo{ grid-column:1; order:-1; aspect-ratio:16/9; }
+    /* "Tablet": the time-back section keeps its two columns down to the
+       next breakpoint below, just tighter — matches the brief's "preserve
+       two-column where sufficient width exists, reduce gap/typography." */
+    .tb-heading{ font-size:26px; }
+    .calc-card{ padding:20px 22px; }
+    /* Band padding scaled down proportionally too — 88px -> 64px. */
+    #how{ padding:64px 0; }
+    /* Internal How-it-works/Advantage gap scaled down too — 96px -> 72px. */
+    .advantage-head{ margin-top:72px; }
+  }
+  @media (max-width:720px){
+    /* Below this, a full-bleed photo column + a full text/calculator
+       column have no room left — stack instead. The DOM order (label,
+       heading, copy, photo, calc) already matches the requested mobile
+       reading order exactly, so resetting every item to plain auto-flow
+       (grid-column:1, grid-row:auto) is enough — no reordering needed. */
+    .timeback-grid{ grid-template-columns:1fr; row-gap:20px; }
+    .tb-label, .tb-heading, .tb-copy, .tb-calc{ grid-column:1; grid-row:auto; }
+    .photo-frame.tb-photo{ grid-column:1; grid-row:auto; aspect-ratio:3/2; height:auto; border-radius:16px; }
+  }
+  @media (max-width:640px){
+    :root{
+      --container-pad:24px;
+      /* Section spacing scaled down again for phone widths — 92px -> 72px. */
+      --section-gap-y:72px;
+    }
+    /* Band padding scaled down again for phone widths — 88px -> 64px. */
+    .hero{ padding:64px 0; }
+    .card-grid-4, .pricing-grid{ grid-template-columns:1fr; }
+    /* Same reflow logic used elsewhere on this page for a connected-chain
+       layout that has no room on a phone — for the circle-and-line
+       sequence below:
+       4 fixed 92px circles + connecting lines has no room on a 375px
+       phone (confirmed live before adding this: would overflow by a
+       wide margin). The drawing line has no sensible meaning once
+       circles wrap to a grid, so it's hidden — circles still fade in on
+       their existing sequence, just without the connector between them. */
+    .how-circle-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px 14px; }
+    .how-line-wrap{ display:none; }
+    .how-circle{ width:auto; }
+    /* Band padding scaled down again for phone widths — 64px -> 48px. */
+    #how{ padding:48px 0; }
+    /* Internal How-it-works/Advantage gap scaled down again — 72px -> 56px. */
+    .advantage-head{ margin-top:56px; }
+    header .wrap{ flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+
+  <header id="top">
+    <div class="wrap">
+      <a class="brand" href="#top">
+        <img src="assets/primelevel-mark-transparent.png" alt="PrimeLevel">
+        <span class="brand-word">PrimeLevel</span>
+      </a>
+      <nav class="primary-nav">
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <a class="link-login" href="signin.html">Log in</a>
+        <a class="btn btn-gold btn-nav" href="signup.html">Start free trial <span class="btn-arrow">→</span></a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+      <nav class="mobile-nav" id="mobileNav">
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="signin.html">Log in</a>
+        <a class="btn btn-gold btn-block" href="signup.html">Start free trial <span class="btn-arrow">→</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-stage">
+      <!-- "Simple" / "Time" (gold) / "Smarter" cycle in the exact same
+           centered spot — each fades in, holds, fades out on its own
+           timer (see the .hero-word/@keyframes CSS above for the exact
+           numbers). Purely decorative during the animated intro; the
+           real PrimeLevel master logo + copy below (in normal flow the
+           whole time, just invisible until its own turn — see
+           .hero-reveal above) is the content that actually resolves the
+           page, so a reduced-motion visitor sees it immediately with
+           nothing hidden. -->
+      <div class="hero-word-stage" aria-hidden="true">
+        <span class="hero-word" data-word="simple">Simple</span>
+        <span class="hero-word" data-word="time">Time</span>
+        <span class="hero-word" data-word="smarter">Smarter</span>
+      </div>
+      <div class="hero-reveal">
+        <div class="hero-logo">
+          <img src="assets/primelevel-logo-master-transparent.png" alt="PrimeLevel">
+        </div>
+        <div class="hero-below-logo">
+          <h1 class="hero-tagline">A simple business platform for UK trades.</h1>
+          <p class="hero-description">PrimeLevel handles repetitive admin, gives you time back, and turns every job into useful business insight.</p>
+          <a class="btn btn-gold" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
+          <div class="cta-note">No card required · Set up in under a minute</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">The problem</div>
+        <h2>You didn't start your business to do admin.</h2>
+        <p>You're good at your trade, but admin gets in the way.</p>
+      </div>
+      <div class="card-grid-4">
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div>
+          <h4>Invoices pile up</h4>
+          <p>Admin eats into your evenings.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+          <h4>Customers pay late</h4>
+          <p>And you end up chasing money.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+          <h4>Renewals get forgotten</h4>
+          <p>Licenses, insurance, MOTs and other dates slip through.</p>
+        </div>
+        <div class="plain-card">
+          <div class="pc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+          <h4>Pricing is guesswork</h4>
+          <p>You know what you charge — but not always what you should.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- "How it works" and "PrimeLevel Advantage" are now ONE merged major
+       section, sharing a single full-width charcoal band, per direct
+       instruction — previously two separate sections/bands. The band's
+       own top/bottom edge padding (below, on #how) is unchanged; a new
+       .advantage-head margin-top gives the two ideas breathing room from
+       each other inside the shared band. -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">How it works</div>
+        <h2>Simple. Automated. Built for trades.</h2>
+        <p>Get set up in minutes and let PrimeLevel do the heavy lifting.</p>
+      </div>
+      <!-- Four plain operational steps, nothing added beyond them — no
+           insight/analytics language here on purpose, that idea belongs
+           to the PrimeLevel Advantage content below instead (now inside
+           this same band/section). Circle-and-line component: circle
+           fades in, THEN the line to its right draws, THEN the next
+           circle fades in. See .how-circle-row / .how-enter-circle /
+           .how-enter-line in the stylesheet for the timing. -->
+      <div class="how-circle-row reveal-stagger">
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:0ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+          <span>Job done</span>
+        </div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:2000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:4000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+          <span>Invoice sent</span>
+        </div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:6000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:8000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+          <span>PrimeLevel follows up</span>
+        </div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:10000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:12000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+          <span>You get paid</span>
+        </div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:14000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:16000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Business Insight</span>
+        </div>
+      </div>
+
+      <!-- PrimeLevel Advantage, merged into this same band. Its three
+           chain-tile "cards" (Job/Invoice/Business insight) have been
+           removed completely per direct instruction — the closing
+           tagline below is kept as the section's one-line conclusion. -->
+      <div class="section-head advantage-head">
+        <div class="section-label">The PrimeLevel advantage</div>
+        <h2>Every job makes your business smarter.</h2>
+        <p>PrimeLevel turns everyday job information into useful business intelligence. This is the difference.</p>
+      </div>
+      <p class="advantage-tag">Better information. Better decisions. A more profitable business.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="timeback-grid">
+      <div class="section-label tb-label">More time for what matters</div>
+      <h2 class="tb-heading">Your time is worth more than admin.</h2>
+      <p class="tb-copy">You didn't get into this trade to spend your evenings on paperwork. See what admin is really costing you — and what getting that time back could be worth.</p>
+      <div class="photo-frame tb-photo">
+        <img src="assets/photo-timeback.png" alt="Tradesperson checking a tablet, tool belt visible, mid-job">
+      </div>
+      <div class="calc-card tb-calc">
+        <h3>What's your time worth?</h3>
+        <div class="calc-row">
+          <div class="calc-row-head">
+            <label for="calcHours">Hours per week on admin</label>
+            <span class="calc-live-val" id="calcHoursVal">6 hrs</span>
+          </div>
+          <input type="range" id="calcHours" min="1" max="20" step="1" value="6">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-head">
+            <label for="calcRate">Value of your time</label>
+            <span class="calc-live-val" id="calcRateVal">£35 / hr</span>
+          </div>
+          <input type="range" id="calcRate" min="15" max="150" step="5" value="35">
+        </div>
+        <div class="calc-results">
+          <div class="calc-result">
+            <div class="cr-label">Per week</div>
+            <div class="cr-value" id="calcWeekly">£210</div>
+          </div>
+          <div class="calc-result calc-result-primary">
+            <div class="cr-label">Per year</div>
+            <div class="cr-value" id="calcYearly">£10,920</div>
+          </div>
+        </div>
+        <a class="btn btn-gold calc-cta" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Simple plans. No surprises.</div>
+        <h2>Choose the plan that fits your business.</h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Starter</h3>
+          <p class="plan-sub">Ideal for solo tradespeople</p>
+          <p class="plan-price">£69<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Invoicing & payment chasing</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic pricing insights</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Renewal tracking</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 3 users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Starter <span class="btn-arrow">→</span></a>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">Most popular</div>
+          <h3>Pro</h3>
+          <p class="plan-sub">Best for growing businesses</p>
+          <p class="plan-price">£99<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Everything in Starter</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced pricing insights</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Business performance dashboard</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 10 users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Pro <span class="btn-arrow">→</span></a>
+        </div>
+        <div class="price-card">
+          <h3>Business</h3>
+          <p class="plan-sub">For established teams</p>
+          <p class="plan-price">£149<span>/month</span></p>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Everything in Pro</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Full business intelligence</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced reporting</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited users</li>
+          </ul>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Business <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Frequently asked questions</div>
+        <h2>Got questions? We've got answers.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Is there a contract? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No. PrimeLevel is month-to-month — cancel or downgrade any time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need to commit straight away? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No. Start your 14-day trial with no credit card required.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can my team use it? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>Yes — every plan includes multiple users, with no per-seat charge.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I export my data? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>Yes. Your data is always yours — export it any time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is PrimeLevel only for plumbers? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No — PrimeLevel works for any UK trade business: plumbers, electricians, builders and more.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta" id="signup">
+    <div class="final-grid">
+      <div class="final-copy">
+        <h2>Stop chasing. Start running your business.</h2>
+        <p>Less admin. Faster payments. A business that gets smarter with every job you do.</p>
+        <a class="btn btn-gold" href="signup.html">Start your 14-day free trial <span class="btn-arrow">→</span></a>
+        <div class="cta-note">No card required · full access from day one</div>
+      </div>
+      <div class="final-photo">
+        <div class="photo-frame">
+          <img src="assets/photo-final-cta.png" alt="Tradesperson walking away carrying a tool case, tool belt visible">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-left">
+        <img src="assets/primelevel-mark-transparent.png" alt="PrimeLevel">
+        <span>PrimeLevel · Built for UK tradespeople</span>
+      </div>
+      <nav>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="footer-tag">Your business data stays yours.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle — matches Stripe/Apple's own pattern (checked live
+    // before building this): icon opens a dropdown panel with the same
+    // links the desktop nav has, closes on outside click, on Escape, or
+    // when a link inside is actually clicked (so it can't cover the page
+    // after navigating).
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    function setMenu(open) {
+      mobileNav.toggleAttribute('data-open', open);
+      menuToggle.setAttribute('aria-expanded', String(open));
+    }
+    menuToggle.addEventListener('click', () => setMenu(!mobileNav.hasAttribute('data-open')));
+    mobileNav.addEventListener('click', (e) => { if (e.target.tagName === 'A') setMenu(false); });
+    document.addEventListener('click', (e) => {
+      if (mobileNav.hasAttribute('data-open') && !mobileNav.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+        setMenu(false);
+      }
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+    // What's-your-time-worth calculator — pure client-side math, no data sent anywhere.
+    const calcHours = document.getElementById('calcHours');
+    const calcRate = document.getElementById('calcRate');
+    const gbp = (n) => '£' + Math.round(n).toLocaleString('en-GB');
+    function updateCalc() {
+      const hours = Number(calcHours.value);
+      const rate = Number(calcRate.value);
+      const weekly = hours * rate;
+      const yearly = weekly * 52;
+      document.getElementById('calcHoursVal').textContent = hours + (hours === 1 ? ' hr' : ' hrs');
+      document.getElementById('calcRateVal').textContent = gbp(rate) + ' / hr';
+      document.getElementById('calcWeekly').textContent = gbp(weekly);
+      document.getElementById('calcYearly').textContent = gbp(yearly);
+    }
+    calcHours.addEventListener('input', updateCalc);
+    calcRate.addEventListener('input', updateCalc);
+    updateCalc();
+
+    // Sequential reveal for "How it works"' circle-and-line sequence —
+    // adds .is-visible to the .reveal-stagger row the first time it
+    // scrolls into view (CSS handles the actual per-step timing/delays
+    // via .how-enter-circle/.how-enter-line). unobserve() right after
+    // triggering is what makes it run only once per visit, not every
+    // time the user scrolls past it again. Skipped entirely for
+    // prefers-reduced-motion (that CSS is itself gated behind the same
+    // media query, so those users already see every step visible with
+    // nothing to observe).
+    if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.reveal-stagger').forEach((el) => revealObserver.observe(el));
+    }
+  </script>
+
+</body>
+</html>
