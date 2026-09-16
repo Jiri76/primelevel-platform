@@ -75,30 +75,6 @@
     font-size:16px; line-height:1.5;
     -webkit-font-smoothing:antialiased;
   }
-  /* Per-section spotlight glow — applied to specific sections below so the
-     page reads as a series of deliberately lit scenes rather than one
-     blend. Each is a radial Navy or Gold tint sitting behind that
-     section's own content (z-index kept below it). */
-  .section-glow{ position:relative; isolation:isolate; }
-  .section-glow::before{
-    content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  }
-  /* Both end stops use an explicit zero-alpha version of the SAME color
-     instead of the `transparent` keyword. `transparent` is actually
-     rgba(0,0,0,0) — transparent BLACK — so a gradient fading an opaque
-     color to `transparent` interpolates its RGB channels toward black
-     along the way, not just its alpha. That produced a real, visible
-     dark vignette ringing each spotlight (flagged live around "Choose
-     the plan that fits your business", screenshotted as a "black
-     shadow"), not a rendering glitch. Keeping the RGB constant and only
-     fading alpha removes it. */
-  .section-glow.glow-navy::before{
-    background:radial-gradient(900px 420px at 50% 20%, var(--navy-tint-2) 0%, rgba(74,80,91,0) 65%);
-  }
-  /* .glow-gold was removed from its only user (#pricing) in an earlier
-     round — its ::before rule is intentionally gone too, not left as
-     dead code. --glow-gold the variable is unrelated and still used
-     (orbit hub, featured pricing card). */
   a{ color:inherit; }
   section, header, footer{ scroll-margin-top:88px; }
   /* Container grid: 1360px max, 64px min horizontal padding on desktop,
@@ -334,28 +310,29 @@
   }
   h2{ font-weight:800; font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
   .section-head p{ font-size:16px; color:var(--white); line-height:1.65; margin:0; }
-  .section-link{ display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:14.5px; color:var(--gold); text-decoration:none; margin-top:18px; }
-  .section-link svg{ width:15px; height:15px; stroke:var(--gold); }
 
-  /* ---------- "How it works" full-width charcoal band ----------
-     Same background as the final CTA's own navy block, byte-identical
-     (not a new color) — a plain <section> is already full-bleed by
-     default (only its child .wrap has a max-width), so no grid/margin
-     tricks are needed to make it reach the true edges. No border-radius,
-     no box-shadow/glow, no fixed height — padding + natural content
-     height only.
+  /* ---------- "How it works" + "PrimeLevel Advantage" full-width charcoal
+     band ----------
+     Both are now ONE merged major section sharing this single band, per
+     direct instruction (previously two separate sections/bands). Same
+     background as the final CTA's own navy block, byte-identical (not a
+     new color) — a plain <section> is already full-bleed by default
+     (only its child .wrap has a max-width), so no grid/margin tricks are
+     needed to make it reach the true edges. No border-radius, no
+     box-shadow/glow, no fixed height — padding + natural content height
+     only.
      padding (88px) is this band's OWN internal breathing room — band
      edge to eyebrow, and lowest content to band edge — independent of
      --section-gap-y. margin is the SEPARATE, deliberately-preserved
-     external gap to Problem/Advantage: since this section no longer
-     uses .section's own shared calc(--section-gap-y / 2) padding, that
-     contribution would otherwise just vanish from the boundary,
-     quietly shrinking the Problem<->How and How<->Advantage gaps from
-     the site's standard 128px down to 64px (confirmed live before this
-     margin was added) — a real regression "don't change anything else"
-     rules out. Same reconciliation .final-cta already uses for the
-     identical tension (its own full-bleed band padding vs. the shared
-     inter-section rhythm). */
+     external gap to Problem/Calculator (the sections now immediately
+     before/after this merged one): since this section no longer uses
+     .section's own shared calc(--section-gap-y / 2) padding, that
+     contribution would otherwise just vanish from the boundary, quietly
+     shrinking the standard 128px major-section gap down to 64px on each
+     side — a real regression "don't change anything else" rules out.
+     Same reconciliation .final-cta already uses for the identical
+     tension (its own full-bleed band padding vs. the shared inter-section
+     rhythm). */
   #how{
     background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
     padding:88px 0;
@@ -381,64 +358,59 @@
   .plain-card p{ font-size:14.5px; color:var(--white); margin:0; line-height:1.55; }
 
 
-  /* ---------- Advantage chain (Job -> Invoice -> Payment -> Business insights) ----------
-     Enlarged per the brief, and the closing line strengthened (bigger,
-     more margin) so it reads as the section's actual conclusion rather
-     than a small caption. */
-  .chain-row{ display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
-  .chain-tile{
-    width:168px; background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
-    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px;
-    padding:24px 16px; text-align:center;
-  }
-  .chain-tile .ct-icon{
-    width:50px; height:50px; margin:0 auto 14px; border-radius:12px; border:1px solid var(--white);
-    background:rgba(249,249,250,0.06);
+  /* ---------- PrimeLevel Advantage closing line ----------
+     The three chain-tile cards (Job/Invoice/Business insight) that used
+     to sit above this line were removed completely per direct
+     instruction — this tagline is now the section's sole closing
+     statement, directly under its own section-head paragraph. */
+  .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:30px 0 0; }
+  /* Internal breathing room between "How it works" and "PrimeLevel
+     Advantage" now that both live inside one merged section/band — not
+     part of the shared --section-gap-y rhythm (that governs space
+     BETWEEN major sections, not within one), scaled down proportionally
+     at each breakpoint like everything else on the page. */
+  .advantage-head{ margin-top:96px; }
+
+  /* ---------- "How it works" circle-and-line sequence ----------
+     Large white-outlined circles instead of filled cards,
+     connected by a thin gold line that actually draws across (grows in
+     width) rather than a static arrow icon, and a much slower, strictly
+     SEQUENTIAL reveal (each step waits for the previous one to finish)
+     instead of a simultaneous stagger. "Just white on the background":
+     no fill, no gradient — the circle is a plain white ring sitting
+     directly on the band's own charcoal background, with a white icon
+     inside and a white label below; the connecting line is the only
+     gold accent. */
+  .how-circle-row{ display:flex; align-items:flex-start; justify-content:center; }
+  .how-circle{ display:flex; flex-direction:column; align-items:center; gap:14px; flex:none; width:130px; }
+  .how-circle-icon{
+    width:92px; height:92px; border-radius:50%; border:2px solid var(--white);
+    background:transparent;
     display:flex; align-items:center; justify-content:center;
   }
-  .chain-tile .ct-icon svg{ width:24px; height:24px; stroke:var(--white); }
-  .chain-tile span{ font-size:14.5px; font-weight:700; }
-  .chain-arrow{ flex:none; }
-  .chain-arrow svg{ width:24px; height:24px; stroke:var(--gold); }
-  /* margin-top lives here, not on .chain-row's own margin-bottom — that
-     used to be shared, which silently added 30px of extra space after
-     "How it works"' own chain-row too (it reuses the same component but
-     has no advantage-tag after it), breaking the uniform section-to-
-     section rhythm. Scoping the gap to the element that actually needs
-     it fixes that without a special-case override elsewhere. */
-  .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:30px 0 0; }
+  .how-circle-icon svg{ width:36px; height:36px; stroke:var(--white); }
+  .how-circle span{ font-size:15px; font-weight:700; color:var(--white); text-align:center; }
+  /* Fixed at exactly the circle's own height (92px) so align-items:center
+     centers the thin line at the circle's true vertical middle — the
+     same "half the circle's diameter" math the old flow-row used, just
+     arrived at via flex centering instead of a hardcoded `top` offset. */
+  .how-line-wrap{ flex:1 1 60px; min-width:24px; max-width:120px; height:92px; display:flex; align-items:center; }
+  .how-line{ width:0; height:1px; background:var(--gold); }
 
-  /* ---------- Sequential reveal (How it works + PrimeLevel Advantage) ----------
-     Fires once per visit as each chain scrolls into view — a settle-in,
-     not a loop, same "one-time only" philosophy as the v7 orbit entrance
-     animation elsewhere on this page. JS adds .is-visible to the
-     .reveal-stagger container via IntersectionObserver (unobserved
-     immediately after, so it can't re-trigger on a second scroll past)
-     and each .reveal-item (tiles AND the arrows between them, so the
-     arrow's own fade reads as the "brief pause" between labeled steps)
-     fades up in sequence. Vertical movement only (a tiny 16px rise), no
-     lateral slide, no bounce/elastic easing — plain ease-out. Duration
-     raised 550ms -> 650ms per direct feedback ("too quick... aim for
-     roughly 600 to 700ms per step, gentle easing") — stagger delay
-     between items (below) is unchanged, only how long each individual
-     step's own fade-up takes. Gated behind prefers-reduced-motion like
-     every other animation on this page: reduced-motion users see every
-     step visible immediately, with nothing hidden and nothing to wait
-     for. */
+  /* Sequential, not simultaneous: each circle fades in over 2s, THEN the
+     line to its right draws over the next 2s, THEN the next circle — see
+     the inline transition-delay on each element in the markup (0, 2000,
+     4000...12000ms). No bounce/elastic easing, no lateral movement — a
+     plain opacity fade for circles, a plain width grow for the line.
+     Gated behind prefers-reduced-motion like every other animation on
+     this page. */
   @media (prefers-reduced-motion: no-preference){
-    .reveal-stagger .reveal-item{
-      opacity:0; transform:translateY(16px);
-      transition:opacity 650ms ease-out, transform 650ms ease-out;
-    }
-    .reveal-stagger.is-visible .reveal-item{ opacity:1; transform:translateY(0); }
-    .reveal-stagger .reveal-item:nth-child(1){ transition-delay:0ms; }
-    .reveal-stagger .reveal-item:nth-child(2){ transition-delay:140ms; }
-    .reveal-stagger .reveal-item:nth-child(3){ transition-delay:280ms; }
-    .reveal-stagger .reveal-item:nth-child(4){ transition-delay:420ms; }
-    .reveal-stagger .reveal-item:nth-child(5){ transition-delay:560ms; }
-    .reveal-stagger .reveal-item:nth-child(6){ transition-delay:700ms; }
-    .reveal-stagger .reveal-item:nth-child(7){ transition-delay:840ms; }
+    .how-enter-circle{ opacity:0; transition:opacity 2000ms ease-out; }
+    .reveal-stagger.is-visible .how-enter-circle{ opacity:1; }
+    .how-enter-line{ transition:width 2000ms ease-out; }
+    .reveal-stagger.is-visible .how-enter-line{ width:100%; }
   }
+
 
   /* ---------- Photo / time-worth calculator band (v8 revision) ----------
      Per the refinement brief: photo full-bleed on the LEFT, all text
@@ -773,6 +745,8 @@
     .calc-card{ padding:20px 22px; }
     /* Band padding scaled down proportionally too — 88px -> 64px. */
     #how{ padding:64px 0; }
+    /* Internal How-it-works/Advantage gap scaled down too — 96px -> 72px. */
+    .advantage-head{ margin-top:72px; }
   }
   @media (max-width:720px){
     /* Below this, a full-bleed photo column + a full text/calculator
@@ -792,16 +766,21 @@
     }
     h1{ font-size:34px; }
     .value-strip, .card-grid-4, .pricing-grid{ grid-template-columns:1fr; }
-    /* flex-wrap can't wrap a tile+arrow pair as a unit, so under 640px
-       arrows and tiles wrapped independently into an incoherent order.
-       Simpler and robust: drop the connectors, lay tiles out as a plain
-       2-column grid instead of trying to rescale the connected-chain
-       layout at every width (same approach as .hero-visual above). */
-    .chain-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-    .chain-arrow{ display:none; }
-    .chain-tile{ width:auto; }
+    /* Same reflow logic used elsewhere on this page for a connected-chain
+       layout that has no room on a phone (same approach as .hero-visual
+       above) — for the circle-and-line sequence below:
+       4 fixed 92px circles + connecting lines has no room on a 375px
+       phone (confirmed live before adding this: would overflow by a
+       wide margin). The drawing line has no sensible meaning once
+       circles wrap to a grid, so it's hidden — circles still fade in on
+       their existing sequence, just without the connector between them. */
+    .how-circle-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px 14px; }
+    .how-line-wrap{ display:none; }
+    .how-circle{ width:auto; }
     /* Band padding scaled down again for phone widths — 64px -> 48px. */
     #how{ padding:48px 0; }
+    /* Internal How-it-works/Advantage gap scaled down again — 72px -> 56px. */
+    .advantage-head{ margin-top:56px; }
     header .wrap{ flex-wrap:wrap; }
   }
 </style>
@@ -917,6 +896,12 @@
     </div>
   </section>
 
+  <!-- "How it works" and "PrimeLevel Advantage" are now ONE merged major
+       section, sharing a single full-width charcoal band, per direct
+       instruction — previously two separate sections/bands. The band's
+       own top/bottom edge padding (below, on #how) is unchanged; a new
+       .advantage-head margin-top gives the two ideas breathing room from
+       each other inside the shared band. -->
   <section class="section" id="how">
     <div class="wrap">
       <div class="section-head">
@@ -926,66 +911,41 @@
       </div>
       <!-- Four plain operational steps, nothing added beyond them — no
            insight/analytics language here on purpose, that idea belongs
-           to the PrimeLevel Advantage section below instead. Same
-           chain-tile/arrow component as that section, so both sequences
-           share one visual language, and the same .reveal-stagger
-           mechanism so both animate identically. -->
-      <div class="chain-row reveal-stagger">
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+           to the PrimeLevel Advantage content below instead (now inside
+           this same band/section). Circle-and-line component: circle
+           fades in, THEN the line to its right draws, THEN the next
+           circle fades in. See .how-circle-row / .how-enter-circle /
+           .how-enter-line in the stylesheet for the timing. -->
+      <div class="how-circle-row reveal-stagger">
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:0ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
           <span>Job done</span>
         </div>
-        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:2000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:4000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
           <span>Invoice sent</span>
         </div>
-        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:6000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:8000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
           <span>PrimeLevel follows up</span>
         </div>
-        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+        <div class="how-line-wrap"><div class="how-line how-enter-line" style="transition-delay:10000ms;"></div></div>
+        <div class="how-circle">
+          <div class="how-circle-icon how-enter-circle" style="transition-delay:12000ms;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
           <span>You get paid</span>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="section section-glow glow-navy">
-    <div class="wrap">
-      <div class="section-head">
+      <!-- PrimeLevel Advantage, merged into this same band. Its three
+           chain-tile "cards" (Job/Invoice/Business insight) have been
+           removed completely per direct instruction — the closing
+           tagline below is kept as the section's one-line conclusion. -->
+      <div class="section-head advantage-head">
         <div class="section-label">The PrimeLevel advantage</div>
         <h2>Every job makes your business smarter.</h2>
-        <!-- Explicit, one clear line — replaces the old vaguer paragraph.
-             This section's single idea: intelligence gained. No mention
-             of payment as a stage here (that belongs to "How it works"
-             above), and no repeat of the "Useful insights" wording used
-             elsewhere on the page. -->
         <p>PrimeLevel turns everyday job information into useful business intelligence. This is the difference.</p>
-        <a class="section-link" href="#how">See how it works <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
-      </div>
-      <!-- Simplified to three stages — Payment removed as a visual stage
-           per direct instruction, so this chain doesn't overlap with
-           "How it works"'s own Job -> Invoice -> ... -> Paid sequence.
-           Same reveal-stagger mechanism as that section, same timing. -->
-      <div class="chain-row reveal-stagger">
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
-          <span>Job</span>
-        </div>
-        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
-          <span>Invoice</span>
-        </div>
-        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile reveal-item">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-          <span>Business insight</span>
-        </div>
       </div>
       <p class="advantage-tag">Better information. Better decisions. A more profitable business.</p>
     </div>
@@ -1179,15 +1139,15 @@
     calcRate.addEventListener('input', updateCalc);
     updateCalc();
 
-    // Sequential reveal for "How it works" and "PrimeLevel Advantage" —
-    // each .reveal-stagger row's .reveal-item children fade up in
-    // sequence (CSS handles the actual stagger timing/delays) the first
-    // time the row scrolls into view. unobserve() right after triggering
-    // is what makes it run only once per visit, not every time the user
-    // scrolls past it again. Skipped entirely for prefers-reduced-motion
-    // (the CSS for .reveal-item is itself gated behind that same media
-    // query, so those users already see every step visible with nothing
-    // to observe).
+    // Sequential reveal for "How it works"' circle-and-line sequence —
+    // adds .is-visible to the .reveal-stagger row the first time it
+    // scrolls into view (CSS handles the actual per-step timing/delays
+    // via .how-enter-circle/.how-enter-line). unobserve() right after
+    // triggering is what makes it run only once per visit, not every
+    // time the user scrolls past it again. Skipped entirely for
+    // prefers-reduced-motion (that CSS is itself gated behind the same
+    // media query, so those users already see every step visible with
+    // nothing to observe).
     if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
