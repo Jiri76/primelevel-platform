@@ -272,17 +272,25 @@
        drives the whole letter-by-letter sequence for all three words,
        the same "single trigger, per-element delay" pattern already used
        for the how-it-works circle-and-line sequence. Plain ease-out,
-       no bounce, matching every other animation on this page. */
+       no bounce, matching every other animation on this page.
+       Duration/stagger tuned so each WHOLE WORD occupies one 2000ms
+       step — same per-step pace as a single how-it-works circle or line
+       — not so each individual letter takes that long (18 letters at
+       2000ms each would take 36s and read as broken, not calm). Per
+       word: (letters-1) * stagger + 900ms duration = ~2000ms, e.g.
+       "Simple" (6 letters) staggers 220ms apart; see each letter's own
+       transition-delay in the markup for the exact per-word math. */
     .letter{
       opacity:0; transform:translateY(0.22em);
-      transition:opacity 380ms ease-out, transform 380ms ease-out;
+      transition:opacity 900ms ease-out, transform 900ms ease-out;
     }
     .word-stage.is-animating .letter{ opacity:1; transform:translateY(0); }
     /* Convergence: each word fades out while drifting toward the shared
        center line — the top/bottom words travel a little, the middle
        one barely moves — a gentle pull inward, not a literal meeting
-       point (they're fully transparent well before that would matter). */
-    .word-line{ transition:opacity 700ms ease-out, transform 700ms ease-out; }
+       point (they're fully transparent well before that would matter).
+       2000ms, same single-step duration as everything else here. */
+    .word-line{ transition:opacity 2000ms ease-out, transform 2000ms ease-out; }
     .word-stage.is-converging .word-line{ opacity:0; }
     .word-stage.is-converging .word-line[data-word="simple"]{ transform:translateY(0.9em) scale(0.94); }
     .word-stage.is-converging .word-line[data-word="time"]{ transform:scale(0.94); }
@@ -290,10 +298,13 @@
 
     /* Logo mark fades in first (its gold is the one deliberate accent
        in the whole convergence — everything else here is white), then
-       the wordmark follows shortly after — two separate classes so they
-       sequence rather than fade together. */
-    .logo-hub{ opacity:0; transition:opacity 600ms ease-out; }
-    .logo-reveal-word{ opacity:0; transition:opacity 500ms ease-out; }
+       the wordmark follows in its own back-to-back 2000ms step — two
+       separate classes so they sequence rather than fade together, each
+       taking the same single-step duration as every other beat in this
+       sequence (and in the how-it-works one) — one global pace, nothing
+       here rushed relative to anything else on the page. */
+    .logo-hub{ opacity:0; transition:opacity 2000ms ease-out; }
+    .logo-reveal-word{ opacity:0; transition:opacity 2000ms ease-out; }
     .logo-reveal.show-mark .logo-hub{ opacity:1; }
     .logo-reveal.show-word .logo-reveal-word{ opacity:1; }
   }
@@ -861,15 +872,20 @@
         <!-- Typographic entrance: "Simple" / "Time" / "Smarter" assemble
              letter by letter (each letter's own transition-delay below,
              all relative to .is-animating being added by the script near
-             the end of the body), hold, then converge/fade — followed by
-             the existing gold logo mark, then the wordmark. See the
-             .word-stage/.logo-reveal CSS above for the full choreography;
-             gated behind prefers-reduced-motion like every other
-             animation on this page. -->
+             the end of the body), then converge/fade — followed by the
+             existing gold logo mark, then the wordmark. Retimed to a
+             strict 2000ms-per-step relay (each word, the convergence,
+             the mark, and the wordmark each occupy their own back-to-back
+             2000ms slot) so the whole sequence shares the exact same pace
+             as the how-it-works circle-and-line sequence — one global
+             animation rhythm across the page, not a faster hero-only
+             pace. See the .word-stage/.logo-reveal CSS above for the
+             full choreography; gated behind prefers-reduced-motion like
+             every other animation on this page. -->
         <div class="word-stage" id="heroWordStage" aria-hidden="true">
-          <span class="word-line" data-word="simple"><span class="letter" style="transition-delay:0ms">S</span><span class="letter" style="transition-delay:45ms">i</span><span class="letter" style="transition-delay:90ms">m</span><span class="letter" style="transition-delay:135ms">p</span><span class="letter" style="transition-delay:180ms">l</span><span class="letter" style="transition-delay:225ms">e</span></span>
-          <span class="word-line" data-word="time"><span class="letter" style="transition-delay:1055ms">T</span><span class="letter" style="transition-delay:1100ms">i</span><span class="letter" style="transition-delay:1145ms">m</span><span class="letter" style="transition-delay:1190ms">e</span></span>
-          <span class="word-line" data-word="smarter"><span class="letter" style="transition-delay:2020ms">S</span><span class="letter" style="transition-delay:2065ms">m</span><span class="letter" style="transition-delay:2110ms">a</span><span class="letter" style="transition-delay:2155ms">r</span><span class="letter" style="transition-delay:2200ms">t</span><span class="letter" style="transition-delay:2245ms">e</span><span class="letter" style="transition-delay:2290ms">r</span></span>
+          <span class="word-line" data-word="simple"><span class="letter" style="transition-delay:0ms">S</span><span class="letter" style="transition-delay:220ms">i</span><span class="letter" style="transition-delay:440ms">m</span><span class="letter" style="transition-delay:660ms">p</span><span class="letter" style="transition-delay:880ms">l</span><span class="letter" style="transition-delay:1100ms">e</span></span>
+          <span class="word-line" data-word="time"><span class="letter" style="transition-delay:2000ms">T</span><span class="letter" style="transition-delay:2367ms">i</span><span class="letter" style="transition-delay:2734ms">m</span><span class="letter" style="transition-delay:3101ms">e</span></span>
+          <span class="word-line" data-word="smarter"><span class="letter" style="transition-delay:4000ms">S</span><span class="letter" style="transition-delay:4183ms">m</span><span class="letter" style="transition-delay:4366ms">a</span><span class="letter" style="transition-delay:4549ms">r</span><span class="letter" style="transition-delay:4732ms">t</span><span class="letter" style="transition-delay:4915ms">e</span><span class="letter" style="transition-delay:5098ms">r</span></span>
         </div>
         <div class="logo-reveal" id="heroLogoReveal">
           <div class="logo-hub">
@@ -1204,22 +1220,23 @@
     // Hero typographic entrance — runs once on page load (not scroll,
     // since the hero is already in view on arrival). Each letter's own
     // transition-delay (set in the markup) does the actual per-letter
-    // stagger; this timeline only needs to flip three classes at the
+    // stagger; this timeline only needs to flip four classes at the
     // right moments: start the letters, start the words' converge/fade,
-    // then reveal the logo mark and (shortly after) the wordmark.
+    // then reveal the logo mark and (in its own step) the wordmark.
+    // Retimed to a strict back-to-back STEP-ms relay — same per-step
+    // pace as the how-it-works circle-and-line sequence, so neither
+    // animation on the page feels faster/more rushed than the other.
     // Skipped entirely for prefers-reduced-motion — those users see the
     // resting logo immediately, nothing hidden and nothing to wait for.
     if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
       const wordStage = document.getElementById('heroWordStage');
       const logoReveal = document.getElementById('heroLogoReveal');
       if (wordStage && logoReveal) {
-        const ASSEMBLE_START = 300;       // brief settle before "Simple" starts
-        const LAST_LETTER_DELAY = 2290;   // "Smarter"'s own last letter, see markup
-        const LETTER_DURATION = 380;
-        const HOLD_ALL_THREE = 700;       // all three words held together before converging
-        const CONVERGE_START = ASSEMBLE_START + LAST_LETTER_DELAY + LETTER_DURATION + HOLD_ALL_THREE;
-        const LOGO_START = CONVERGE_START + 400;  // slight overlap with the words' own fade-out
-        const WORDMARK_START = LOGO_START + 250;
+        const ASSEMBLE_START = 300;  // brief settle before "Simple" starts
+        const STEP = 2000;           // same per-step duration as how-it-works
+        const CONVERGE_START = ASSEMBLE_START + STEP * 3;  // after all 3 words' own step
+        const LOGO_START = CONVERGE_START + STEP;
+        const WORDMARK_START = LOGO_START + STEP;
 
         setTimeout(() => wordStage.classList.add('is-animating'), ASSEMBLE_START);
         setTimeout(() => wordStage.classList.add('is-converging'), CONVERGE_START);
