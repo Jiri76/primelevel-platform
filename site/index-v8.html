@@ -337,6 +337,31 @@
   .section-link{ display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:14.5px; color:var(--gold); text-decoration:none; margin-top:18px; }
   .section-link svg{ width:15px; height:15px; stroke:var(--gold); }
 
+  /* ---------- "How it works" full-width charcoal band ----------
+     Same background as the final CTA's own navy block, byte-identical
+     (not a new color) — a plain <section> is already full-bleed by
+     default (only its child .wrap has a max-width), so no grid/margin
+     tricks are needed to make it reach the true edges. No border-radius,
+     no box-shadow/glow, no fixed height — padding + natural content
+     height only.
+     padding (88px) is this band's OWN internal breathing room — band
+     edge to eyebrow, and lowest content to band edge — independent of
+     --section-gap-y. margin is the SEPARATE, deliberately-preserved
+     external gap to Problem/Advantage: since this section no longer
+     uses .section's own shared calc(--section-gap-y / 2) padding, that
+     contribution would otherwise just vanish from the boundary,
+     quietly shrinking the Problem<->How and How<->Advantage gaps from
+     the site's standard 128px down to 64px (confirmed live before this
+     margin was added) — a real regression "don't change anything else"
+     rules out. Same reconciliation .final-cta already uses for the
+     identical tension (its own full-bleed band padding vs. the shared
+     inter-section rhythm). */
+  #how{
+    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 70%);
+    padding:88px 0;
+    margin:calc(var(--section-gap-y) / 2) 0;
+  }
+
   /* ---------- Problem cards ---------- */
   /* Scaled up for more presence, per the refinement brief — bigger type,
      bigger icon plate, more internal padding; same shape/shadow/gradient
@@ -746,6 +771,8 @@
        two-column where sufficient width exists, reduce gap/typography." */
     .tb-heading{ font-size:26px; }
     .calc-card{ padding:20px 22px; }
+    /* Band padding scaled down proportionally too — 88px -> 64px. */
+    #how{ padding:64px 0; }
   }
   @media (max-width:720px){
     /* Below this, a full-bleed photo column + a full text/calculator
@@ -773,6 +800,8 @@
     .chain-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
     .chain-arrow{ display:none; }
     .chain-tile{ width:auto; }
+    /* Band padding scaled down again for phone widths — 64px -> 48px. */
+    #how{ padding:48px 0; }
     header .wrap{ flex-wrap:wrap; }
   }
 </style>
