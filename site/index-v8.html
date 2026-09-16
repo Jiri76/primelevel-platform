@@ -26,9 +26,10 @@
     --container-pad: 64px;
     /* Consistent vertical rhythm between major sections — each .section
        carries HALF of this as its own top/bottom padding, so two adjacent
-       sections combine to the full 108px gap (inside the requested
-       96-120px range), scaled down at each breakpoint below. */
-    --section-gap-y: 108px;
+       sections combine to the full 112px gap on desktop, 80px on tablet,
+       64px on mobile (the two breakpoints below reassign this same
+       variable, same pattern as --container-pad). */
+    --section-gap-y: 112px;
     /* Shared with .pricing-grid's own gap so the two can't drift apart —
        the time-back photo/calculator gap is required to match it exactly. */
     --card-gap: 22px;
@@ -298,12 +299,16 @@
      first icon at 102.5px vs 126.5px everywhere else, and the last item
      overshooting the right edge by 9.5px) — same root cause, both
      symptoms. */
-  /* Brought close under the hero (was 46px) so the four benefits read as
-     a continuation of the hero rather than their own section — the full
-     --section-gap-y gap resumes AFTER this strip, provided by the next
-     .section's own top padding. Scaled up significantly per the brief:
-     bigger icon plate, bigger heading, slightly bigger supporting text. */
-  .value-strip{ padding-top:16px; padding-bottom:0; display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
+  /* Brought close under the hero on top (was 46px) so the four benefits
+     read as a continuation of the hero rather than their own section —
+     but the BOTTOM needed its own fair half-share of --section-gap-y
+     restored (was 0), not left to the Problem section's top padding
+     alone. That halved the real Hero-to-Problem gap to 56px instead of
+     the intended 112px — confirmed live and flagged directly ("ensure
+     Hero and Problem have clear, deliberate separation"). Scaled up
+     significantly per the brief: bigger icon plate, bigger heading,
+     slightly bigger supporting text. */
+  .value-strip{ padding-top:16px; padding-bottom:calc(var(--section-gap-y) / 2); display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
   .value-pill{ display:flex; align-items:flex-start; gap:16px; }
   .value-pill .vp-icon{
     flex:none; width:52px; height:52px; border-radius:12px; border:1px solid var(--gold);
@@ -714,7 +719,7 @@
     :root{
       --container-pad:40px;
       /* Section spacing scaled down proportionally, not left at the
-         desktop value — 108px -> 80px. */
+         desktop value — 112px -> 80px. */
       --section-gap-y:80px;
     }
     .hero-grid{ grid-template-columns:1fr; }
@@ -750,8 +755,8 @@
   @media (max-width:640px){
     :root{
       --container-pad:24px;
-      /* Section spacing scaled down again for phone widths — 80px -> 56px. */
-      --section-gap-y:56px;
+      /* Section spacing scaled down again for phone widths — 80px -> 64px. */
+      --section-gap-y:64px;
     }
     h1{ font-size:34px; }
     .value-strip, .card-grid-4, .pricing-grid{ grid-template-columns:1fr; }
@@ -850,8 +855,8 @@
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">The problem</div>
-        <h2>You didn't start your business to chase invoices.</h2>
-        <p>You're good at your trade. But admin, late payments and forgotten renewals get in the way.</p>
+        <h2>You didn't start your business to do admin.</h2>
+        <p>You're good at your trade, but admin gets in the way.</p>
       </div>
       <div class="card-grid-4">
         <div class="plain-card">
