@@ -93,9 +93,10 @@
   .section-glow.glow-navy::before{
     background:radial-gradient(900px 420px at 50% 20%, var(--navy-tint-2) 0%, rgba(74,80,91,0) 65%);
   }
-  .section-glow.glow-gold::before{
-    background:radial-gradient(900px 460px at 50% 30%, rgba(178,155,104,0.16) 0%, rgba(178,155,104,0) 65%);
-  }
+  /* .glow-gold was removed from its only user (#pricing) in an earlier
+     round — its ::before rule is intentionally gone too, not left as
+     dead code. --glow-gold the variable is unrelated and still used
+     (orbit hub, featured pricing card). */
   a{ color:inherit; }
   section, header, footer{ scroll-margin-top:88px; }
   /* Container grid: 1360px max, 64px min horizontal padding on desktop,
@@ -320,18 +321,6 @@
   .plain-card h4{ font-size:18px; font-weight:700; margin:0 0 8px; }
   .plain-card p{ font-size:14.5px; color:var(--white); margin:0; line-height:1.55; }
 
-  /* ---------- How it works steps ---------- */
-  .step-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-bottom:36px; }
-  .step-card{
-    background:linear-gradient(160deg, var(--navy-tint-1) 0%, var(--navy) 65%);
-    box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:14px; padding:26px 24px;
-  }
-  .step-num{ font-weight:800; font-size:13px; color:var(--gold); margin-bottom:12px; }
-  .step-card h3{ font-size:16px; font-weight:700; margin:0 0 8px; }
-  .step-card p{ font-size:13.5px; color:var(--white); line-height:1.6; margin:0; }
-  .checklist-row{ display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
-  .checklist-row span{ display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; }
-  .checklist-row svg{ width:16px; height:16px; stroke:var(--white); flex:none; }
 
   /* ---------- Flow graphic (Job -> Admin handled -> Time back -> Insights) ----------
      This is the page's "four-stage journey" — scaled up significantly and
@@ -385,6 +374,34 @@
   .chain-arrow{ flex:none; }
   .chain-arrow svg{ width:24px; height:24px; stroke:var(--gold); }
   .advantage-tag{ text-align:center; font-size:17px; font-weight:700; color:var(--gold); margin:0; }
+
+  /* ---------- Sequential reveal (How it works + PrimeLevel Advantage) ----------
+     Fires once per visit as each chain scrolls into view — a settle-in,
+     not a loop, same "one-time only" philosophy as the v7 orbit entrance
+     animation elsewhere on this page. JS adds .is-visible to the
+     .reveal-stagger container via IntersectionObserver (unobserved
+     immediately after, so it can't re-trigger on a second scroll past)
+     and each .reveal-item (tiles AND the arrows between them, so the
+     arrow's own fade reads as the "brief pause" between labeled steps)
+     fades up in sequence. Vertical movement only (a tiny 16px rise), no
+     lateral slide, no bounce/elastic easing — plain ease-out. Gated
+     behind prefers-reduced-motion like every other animation on this
+     page: reduced-motion users see every step visible immediately, with
+     nothing hidden and nothing to wait for. */
+  @media (prefers-reduced-motion: no-preference){
+    .reveal-stagger .reveal-item{
+      opacity:0; transform:translateY(16px);
+      transition:opacity 550ms ease-out, transform 550ms ease-out;
+    }
+    .reveal-stagger.is-visible .reveal-item{ opacity:1; transform:translateY(0); }
+    .reveal-stagger .reveal-item:nth-child(1){ transition-delay:0ms; }
+    .reveal-stagger .reveal-item:nth-child(2){ transition-delay:140ms; }
+    .reveal-stagger .reveal-item:nth-child(3){ transition-delay:280ms; }
+    .reveal-stagger .reveal-item:nth-child(4){ transition-delay:420ms; }
+    .reveal-stagger .reveal-item:nth-child(5){ transition-delay:560ms; }
+    .reveal-stagger .reveal-item:nth-child(6){ transition-delay:700ms; }
+    .reveal-stagger .reveal-item:nth-child(7){ transition-delay:840ms; }
+  }
 
   /* ---------- Photo / time-worth calculator band (v8 revision) ----------
      Per the refinement brief: photo full-bleed on the LEFT, all text
@@ -652,7 +669,7 @@
        so unlike v1-v3 it needs no special-casing here at all — it just
        naturally centers and stacks with the column. */
     .hero-visual{ max-width:100%; margin:32px auto 0; }
-    .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:repeat(2,1fr); }
+    .value-strip, .card-grid-4, .pricing-grid{ grid-template-columns:repeat(2,1fr); }
     nav.primary-nav{ display:none; }
     .menu-toggle{ display:flex; }
     /* Final CTA band stacks to one column — reset both children off
@@ -684,7 +701,7 @@
       --section-gap-y:56px;
     }
     h1{ font-size:34px; }
-    .value-strip, .card-grid-4, .step-grid, .pricing-grid{ grid-template-columns:1fr; }
+    .value-strip, .card-grid-4, .pricing-grid{ grid-template-columns:1fr; }
     /* flex-wrap can't wrap a tile+arrow pair as a unit, so under 640px
        arrows and tiles wrapped independently into an incoherent order.
        Simpler and robust: drop the connectors, lay tiles out as a plain
@@ -825,27 +842,32 @@
         <h2>Simple. Automated. Built for trades.</h2>
         <p>Get set up in minutes and let PrimeLevel do the heavy lifting.</p>
       </div>
-      <div class="step-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <h3>Send the job</h3>
-          <p>Create and send invoices in seconds.</p>
+      <!-- Four plain operational steps, nothing added beyond them — no
+           insight/analytics language here on purpose, that idea belongs
+           to the PrimeLevel Advantage section below instead. Same
+           chain-tile/arrow component as that section, so both sequences
+           share one visual language, and the same .reveal-stagger
+           mechanism so both animate identically. -->
+      <div class="chain-row reveal-stagger">
+        <div class="chain-tile reveal-item">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+          <span>Job done</span>
         </div>
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <h3>Let PrimeLevel chase</h3>
-          <p>Automatic reminders go out when payments are due.</p>
+        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile reveal-item">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+          <span>Invoice sent</span>
         </div>
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <h3>Learn from every job</h3>
-          <p>Turn your business activity into useful insights.</p>
+        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile reveal-item">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+          <span>PrimeLevel follows up</span>
         </div>
-      </div>
-      <div class="checklist-row">
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No spreadsheets</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No chasing</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> No complicated setup</span>
+        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile reveal-item">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+          <span>You get paid</span>
+        </div>
       </div>
     </div>
   </section>
@@ -855,7 +877,7 @@
       <div class="section-head">
         <div class="section-label">Everything you need</div>
         <h2>One platform. All your trade business in one place.</h2>
-        <p>From invoicing to payment chasing, renewals and pricing intelligence — PrimeLevel gives you the tools to run a stronger, more profitable business.</p>
+        <p>From invoicing to renewals and everyday operations — PrimeLevel gives you the tools to run a stronger, more profitable business.</p>
         <a class="section-link" href="#pricing">Explore all plans <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
       </div>
       <div class="flow-row">
@@ -873,7 +895,10 @@
         </div>
         <div class="flow-node">
           <div class="fn-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-          <span>Useful insights</span>
+          <!-- Was "Useful insights" — renamed since that idea now belongs
+               solely to the PrimeLevel Advantage section below; each
+               section gets a single idea, not a repeated one. -->
+          <span>Real results</span>
         </div>
       </div>
     </div>
@@ -884,28 +909,32 @@
       <div class="section-head">
         <div class="section-label">The PrimeLevel advantage</div>
         <h2>Every job makes your business smarter.</h2>
-        <p>Most invoicing software stops when the invoice is sent. PrimeLevel doesn't. Every job creates useful business information that helps you understand your pricing, payments and business performance.</p>
+        <!-- Explicit, one clear line — replaces the old vaguer paragraph.
+             This section's single idea: intelligence gained. No mention
+             of payment as a stage here (that belongs to "How it works"
+             above), and no repeat of the "Useful insights" wording used
+             elsewhere on the page. -->
+        <p>PrimeLevel turns everyday job information into useful business intelligence. This is the difference.</p>
         <a class="section-link" href="#how">See how it works <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
       </div>
-      <div class="chain-row">
-        <div class="chain-tile">
+      <!-- Simplified to three stages — Payment removed as a visual stage
+           per direct instruction, so this chain doesn't overlap with
+           "How it works"'s own Job -> Invoice -> ... -> Paid sequence.
+           Same reveal-stagger mechanism as that section, same timing. -->
+      <div class="chain-row reveal-stagger">
+        <div class="chain-tile reveal-item">
           <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
           <span>Job</span>
         </div>
-        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile">
+        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile reveal-item">
           <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
           <span>Invoice</span>
         </div>
-        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile">
-          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
-          <span>Payment</span>
-        </div>
-        <div class="chain-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        <div class="chain-tile">
+        <div class="chain-arrow reveal-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        <div class="chain-tile reveal-item">
           <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-          <span>Business insights</span>
+          <span>Business insight</span>
         </div>
       </div>
       <p class="advantage-tag">Better information. Better decisions. A more profitable business.</p>
@@ -968,7 +997,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Renewal tracking</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 3 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Starter →</a>
         </div>
         <div class="price-card featured">
           <div class="price-badge">Most popular</div>
@@ -981,7 +1010,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Business performance dashboard</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Up to 10 users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Pro →</a>
         </div>
         <div class="price-card">
           <h3>Business</h3>
@@ -993,7 +1022,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Advanced reporting</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited users</li>
           </ul>
-          <a class="btn btn-gold btn-block" href="signup.html">Start free trial →</a>
+          <a class="btn btn-gold btn-block" href="signup.html">Choose Business →</a>
         </div>
       </div>
     </div>
@@ -1011,8 +1040,8 @@
           <p>No. PrimeLevel is month-to-month — cancel or downgrade any time.</p>
         </details>
         <details class="faq-item">
-          <summary>Do I need a credit card? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
-          <p>No. Start your 14-day free trial with no card required.</p>
+          <summary>Do I need to commit straight away? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
+          <p>No. Start your 14-day trial with no credit card required.</p>
         </details>
         <details class="faq-item">
           <summary>Can my team use it? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></summary>
@@ -1100,6 +1129,27 @@
     calcHours.addEventListener('input', updateCalc);
     calcRate.addEventListener('input', updateCalc);
     updateCalc();
+
+    // Sequential reveal for "How it works" and "PrimeLevel Advantage" —
+    // each .reveal-stagger row's .reveal-item children fade up in
+    // sequence (CSS handles the actual stagger timing/delays) the first
+    // time the row scrolls into view. unobserve() right after triggering
+    // is what makes it run only once per visit, not every time the user
+    // scrolls past it again. Skipped entirely for prefers-reduced-motion
+    // (the CSS for .reveal-item is itself gated behind that same media
+    // query, so those users already see every step visible with nothing
+    // to observe).
+    if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.reveal-stagger').forEach((el) => revealObserver.observe(el));
+    }
   </script>
 
 </body>
