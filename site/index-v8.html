@@ -26,10 +26,11 @@
     --container-pad: 64px;
     /* Consistent vertical rhythm between major sections — each .section
        carries HALF of this as its own top/bottom padding, so two adjacent
-       sections combine to the full 112px gap on desktop, 80px on tablet,
-       64px on mobile (the two breakpoints below reassign this same
+       sections combine to the full 128px gap on desktop, 92px on tablet,
+       72px on mobile (~15% up from the previous 112/80/64, per direct
+       instruction — the two breakpoints below reassign this same
        variable, same pattern as --container-pad). */
-    --section-gap-y: 112px;
+    --section-gap-y: 128px;
     /* Shared with .pricing-grid's own gap so the two can't drift apart —
        the time-back photo/calculator gap is required to match it exactly. */
     --card-gap: 22px;
@@ -391,14 +392,18 @@
      and each .reveal-item (tiles AND the arrows between them, so the
      arrow's own fade reads as the "brief pause" between labeled steps)
      fades up in sequence. Vertical movement only (a tiny 16px rise), no
-     lateral slide, no bounce/elastic easing — plain ease-out. Gated
-     behind prefers-reduced-motion like every other animation on this
-     page: reduced-motion users see every step visible immediately, with
-     nothing hidden and nothing to wait for. */
+     lateral slide, no bounce/elastic easing — plain ease-out. Duration
+     raised 550ms -> 650ms per direct feedback ("too quick... aim for
+     roughly 600 to 700ms per step, gentle easing") — stagger delay
+     between items (below) is unchanged, only how long each individual
+     step's own fade-up takes. Gated behind prefers-reduced-motion like
+     every other animation on this page: reduced-motion users see every
+     step visible immediately, with nothing hidden and nothing to wait
+     for. */
   @media (prefers-reduced-motion: no-preference){
     .reveal-stagger .reveal-item{
       opacity:0; transform:translateY(16px);
-      transition:opacity 550ms ease-out, transform 550ms ease-out;
+      transition:opacity 650ms ease-out, transform 650ms ease-out;
     }
     .reveal-stagger.is-visible .reveal-item{ opacity:1; transform:translateY(0); }
     .reveal-stagger .reveal-item:nth-child(1){ transition-delay:0ms; }
@@ -719,8 +724,8 @@
     :root{
       --container-pad:40px;
       /* Section spacing scaled down proportionally, not left at the
-         desktop value — 112px -> 80px. */
-      --section-gap-y:80px;
+         desktop value — 128px -> 92px. */
+      --section-gap-y:92px;
     }
     .hero-grid{ grid-template-columns:1fr; }
     /* v4's flow graphic is normal document flow (no position:absolute),
@@ -755,8 +760,8 @@
   @media (max-width:640px){
     :root{
       --container-pad:24px;
-      /* Section spacing scaled down again for phone widths — 80px -> 64px. */
-      --section-gap-y:64px;
+      /* Section spacing scaled down again for phone widths — 92px -> 72px. */
+      --section-gap-y:72px;
     }
     h1{ font-size:34px; }
     .value-strip, .card-grid-4, .pricing-grid{ grid-template-columns:1fr; }
