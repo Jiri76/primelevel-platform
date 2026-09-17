@@ -811,7 +811,17 @@
      one screen — confirmed live this was a real overflow at a 768px-tall
      viewport before this trim (last question's bottom at 873px), not
      just at very short/mobile heights. */
-  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+  /* overflow-anchor:none disables the browser's automatic scroll-
+     anchoring inside this list. Without it, closing an item by
+     clicking near the top (the summary) left the scroll position
+     alone, but closing the same item by clicking lower down (the
+     answer text, now also click-to-close) could make the browser
+     silently re-anchor scroll to a different node once the original
+     one collapsed away, landing the viewport one panel further down
+     than before — per direct instruction, closing must never move
+     which panel you're looking at, regardless of where inside it you
+     click to close it. */
+  .faq-list{ max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:10px; overflow-anchor:none; }
   details.faq-item{
     background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 65%);
     box-shadow:var(--shadow-sm), var(--edge-hi); border-radius:12px; padding:20px 24px;
