@@ -875,24 +875,21 @@
      ordinary (symmetric) padding instead of a separate track. Confirmed
      live: left/right padding from the text to the navy box's true edges
      is now equal. */
-  /* A left-inset column, matching .wrap's own left-margin math exactly
-     (max(0,(100%-container-max)/2) + container-pad), was reintroduced
-     per direct instruction ("one consistent horizontal content grid...
-     same boundaries for every section") — confirmed live this section
-     was a real outlier: at 1920px, every other section's content
-     started at x=272.5px (the .wrap boundary), but .final-copy started
-     at x=0, flush with the true viewport edge. This is NOT the same
-     "old left-margin column" bug documented below (that one was fixed
-     by removing an extra, redundant inset that double-counted against
-     .final-copy's own padding) — this is a single inset column, doing
-     the same job .wrap does everywhere else on the page. The photo
-     column is untouched and still bleeds to the true right edge. */
+  /* REVERTED per direct instruction: a left-inset column (matching
+     .wrap's own left-margin math) was tried here to align .final-copy's
+     text to the same boundary as every other section — but that inset
+     ate into the fr-based split's own budget, since the 40fr/60fr ratio
+     then only divided the REMAINING space after the inset, not the
+     full band. Confirmed live at 1920px: photo shrank to 49% of the
+     band instead of the intended 60% (measured 33%/49%, not 40%/60%).
+     The "same boundary as every section" rule loses to "60/40, image
+     dominant" for this specific band — restored to the plain 2-column
+     grid (byte-identical to how this section has always worked, and to
+     how v21 still has it), which correctly gives 40%/60% of the FULL
+     band width every time, confirmed live. */
   .final-grid{
     display:grid;
-    grid-template-columns:
-      calc(max(0px, (100% - var(--container-max)) / 2) + var(--container-pad))
-      minmax(0, 40fr)
-      minmax(0, 60fr);
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
     align-items:stretch;
   }
   /* Vertical padding tuned to 92px top/bottom per direct request
@@ -908,7 +905,7 @@
      note, all margins included) is 247.5px; target total is 90% of the
      original 479px band = 431px; (431 - 247.5) / 2 = 91.8px. */
   .final-copy{
-    grid-column:2; padding:92px 48px; display:flex; flex-direction:column;
+    grid-column:1; padding:92px 48px; display:flex; flex-direction:column;
     justify-content:center; align-items:center; text-align:center; min-width:0;
   }
   .final-copy h2{ margin-bottom:14px; }
@@ -917,7 +914,7 @@
   /* The decorative italic tagline ("More jobs. Better decisions.") was
      removed — not essential, and the headline + CTA already carry the
      section's message on their own. */
-  .final-photo{ grid-column:3; position:relative; }
+  .final-photo{ grid-column:2; position:relative; }
   /* Slightly taller than a plain 3:2 crop, and no rounding — it's a true
      edge-to-edge bleed now, not a card. */
   .final-photo .photo-frame{ height:100%; aspect-ratio:auto; border-radius:0; box-shadow:none; }
