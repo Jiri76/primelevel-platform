@@ -254,7 +254,7 @@
      in, so a reduced-motion visitor sees the resting page immediately,
      nothing hidden and nothing to wait for. */
   .hero{
-    background:var(--dark-filler);
+    background:var(--navy);
     padding:120px 0;
     margin-bottom:calc(var(--section-gap-y) / 2);
   }
@@ -369,7 +369,7 @@
      tension (its own full-bleed band padding vs. the shared inter-section
      rhythm). */
   #how{
-    background:var(--dark-filler);
+    background:var(--navy);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
@@ -377,15 +377,34 @@
   /* ---------- Problem section (v21: list, not cards) ----------
      Left-aligned intro + a plain list of four rows — hairline
      separators between them, no card background/shadow/padding-box —
-     plus one real photo on the right. Same 46:54-ish split feel as the
-     time-back section used to have, but without that section's
-     edge-bleed complexity (this photo sits inside the normal .wrap
-     gutter like every other section, no true edge bleed needed here). */
-  .problem-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
-  .problem-copy .section-label{ margin:0 0 10px; }
-  .problem-copy h2{ margin:0 0 14px; }
-  .problem-intro-p{ font-size:16px; color:var(--white); line-height:1.65; margin:0 0 36px; max-width:46ch; }
-  .problem-list{ display:flex; flex-direction:column; }
+     plus one real photo on the right. Same page-wide rhythm as
+     Hero/How-it-works/Time/Advantage (see #advantage's comment): this
+     band is the first "dark" beat, a gradient blend of the SAME two
+     colours used everywhere else on the page (dark-filler -> navy),
+     never a third colour.
+     Photo alignment (per direct instruction): the photo's top edge
+     lines up with the top of the intro paragraph, and its bottom edge
+     with the bottom of the last list row — not just vertically centred
+     against the column as a whole. .problem-head/.problem-intro-p/
+     .problem-list/.problem-photo are now direct grid children (the old
+     .problem-copy wrapper is gone) placed on explicit rows so the photo
+     can span exactly rows 2-3, matching those two edges precisely
+     instead of an approximate visual centring. */
+  #problem{
+    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 65%);
+    padding:88px 0;
+    margin:calc(var(--section-gap-y) / 2) 0;
+  }
+  .problem-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:56px; row-gap:0;
+  }
+  .problem-head{ grid-column:1; grid-row:1; }
+  .problem-head .section-label{ margin:0 0 10px; }
+  .problem-head h2{ margin:0 0 14px; }
+  .problem-intro-p{ grid-column:1; grid-row:2; font-size:16px; color:var(--white); line-height:1.65; margin:0 0 36px; max-width:46ch; }
+  .problem-list{ grid-column:1; grid-row:3; display:flex; flex-direction:column; }
   .problem-item{
     display:flex; align-items:flex-start; gap:18px;
     padding:20px 0; border-bottom:1px solid rgba(249,249,250,0.1);
@@ -400,17 +419,24 @@
   .pi-icon svg{ width:20px; height:20px; stroke:var(--white); }
   .pi-text h4{ font-size:16.5px; font-weight:700; margin:0 0 4px; }
   .pi-text p{ font-size:14px; color:var(--white); margin:0; line-height:1.55; }
-  /* No forced height:100% here — unlike the old full-bleed tb-photo,
-     this photo sits in a plain grid column with align-items:center, so
-     .photo-frame's own aspect-ratio:3/2 governs its size (width fills
-     the column via grid's default stretch, height follows the ratio).
-     A stray height:100% was tried here first and was a real overflow
-     bug, not just unnecessary: with a definite height and aspect-ratio
-     both set, the browser computes width from height via the ratio
-     instead of from the grid column, blowing the box out to ~860px at
-     900px viewport width (confirmed live: scrollWidth exceeded
-     clientWidth by 431px). Removing the height fixes it at every
-     width. */
+  /* Spans rows 2-3 (intro paragraph through the list) and stretches to
+     that exact span via grid's default align-items:stretch — top and
+     bottom land precisely on those rows' edges, no magic-number offsets.
+     aspect-ratio:auto overrides the shared .photo-frame's 3:2 ratio on
+     purpose: with both width (column) and height (row-span) already
+     definite from the grid, a still-active ratio would fight one of
+     them for control (the exact bug fixed above), so it's turned off
+     here rather than relied on to silently lose the fight. */
+  .problem-photo{ grid-column:2; grid-row:2 / 4; }
+  /* Compound selector, not just .problem-photo — the shared .photo-frame
+     rule (below, in the base photo treatment block) sets aspect-ratio:
+     3/2 and is equal specificity but comes later in the cascade, so a
+     plain .problem-photo{aspect-ratio:auto} loses to it silently
+     (confirmed live: computed aspect-ratio stayed "3 / 2" and the photo
+     sized itself to ~206px tall instead of stretching to the row span,
+     leaving a 250px gap before the list's actual bottom). Matching its
+     specificity here is what makes the override actually win. */
+  .photo-frame.problem-photo{ aspect-ratio:auto; }
 
 
   /* ---------- PrimeLevel Advantage closing line ----------
@@ -423,21 +449,33 @@
   .advantage-tag{ text-align:left; font-size:17px; font-weight:700; color:var(--gold); margin:22px 0 0; }
 
   /* ---------- PrimeLevel Advantage section (v21: its own section) ----------
-     Same full-bleed charcoal-band treatment as #how — byte-identical
-     background/padding/margin technique — so "Simple" (#how) and
-     "Smarter" (#advantage) read as two connected chapters, while Problem
-     and Time either side sit on the plain navy canvas. Composition is
-     alternating vs. the Time section above (copy+icon left / calculator
-     right there; data visual left / copy right here) — DOM order already
-     puts .advantage-visual first, so a plain 2-column grid places it on
-     the left with no reordering needed. */
+     Page-wide rhythm (per direct instruction): every major chapter band
+     alternates between exactly two colours, navy and dark-filler, never
+     a third colour — Hero(navy) -> Problem(dark) -> How-it-works(navy)
+     -> Time(dark) -> Advantage(navy). Navy here (not dark-filler, despite
+     matching #how's background/padding/margin technique byte-for-byte)
+     keeps that alternation intact now that Time immediately before it is
+     a dark band — two dark bands back to back would break the rhythm.
+     Composition is alternating vs. the Time section above (copy+icon
+     left / calculator right there; visual left / copy right here) — DOM
+     order already puts .advantage-visual first, so a plain 2-column grid
+     places it on the left with no reordering needed. */
   #advantage{
-    background:var(--dark-filler);
+    background:var(--navy);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
   .advantage-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
-  .advantage-visual svg{ width:100%; height:auto; display:block; }
+  .advantage-visual{ display:flex; justify-content:center; }
+  /* Same structure/proportions as .how-circle-icon (92px ring, 36px
+     icon — a ~2.5:1 ratio), scaled up since this is the section's sole
+     visual rather than one of a row of five. */
+  .advantage-circle{
+    width:220px; height:220px; border-radius:50%; border:2px solid var(--white);
+    background:transparent;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .advantage-circle svg{ width:88px; height:88px; stroke:var(--white); }
   .advantage-copy .section-label{ margin:0 0 10px; }
   .advantage-copy h2{ margin:0 0 14px; }
   .advantage-copy p:not(.advantage-tag){ font-size:16px; color:var(--white); line-height:1.65; margin:0; max-width:46ch; }
@@ -487,17 +525,24 @@
      The tradesperson-with-tablet photo is gone — it didn't communicate
      "time" specifically and wasn't to be replaced with another
      tradesperson photo. A large minimal clock graphic sits directly on
-     the section's own navy canvas instead (not inside a card). No more
+     the section's own background instead (not inside a card). No more
      edge-bleed photo column, so the old fr-based bleed math is gone too
      — a plain 2-column grid is all this needs now. The calculator
-     (unchanged) is the proof of the claim on the right. */
+     (unchanged) is the proof of the claim on the right.
+     align-items:start (not center, per direct instruction) so .tb-lead
+     — now the very first line in the column, the eyebrow label above it
+     removed — starts level with the calculator card's own top edge. */
+  #time{
+    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 65%);
+    padding:88px 0;
+    margin:calc(var(--section-gap-y) / 2) 0;
+  }
   .timeback-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:56px;
-    align-items:center;
+    align-items:start;
   }
-  .tb-copy-col .section-label{ margin:0 0 10px; }
   .tb-lead{ font-size:15px; font-weight:700; color:var(--gold); margin:0 0 10px; }
   .tb-copy-col h2{ margin:0 0 14px; }
   .tb-copy{ font-size:15px; color:var(--white); line-height:1.65; margin:0 0 36px; max-width:52ch; }
@@ -779,15 +824,20 @@
     /* Band padding scaled down proportionally too — 88px -> 64px. */
     #how{ padding:64px 0; }
     #advantage{ padding:64px 0; }
+    #problem{ padding:64px 0; }
+    #time{ padding:64px 0; }
   }
   @media (max-width:720px){
     /* Below this, side-by-side reading columns don't have room left —
        every 2-column section on the page stacks to one column here.
        Each section's DOM order already matches its intended mobile
-       reading order (Problem: copy then photo; Time: copy then calc;
-       Advantage: visual then copy), so a plain grid-template-columns:1fr
-       reset is enough on all three — no reordering needed anywhere. */
+       reading order (Problem: head, intro, list, then photo; Time: copy
+       then calc; Advantage: visual then copy), so resetting the
+       explicit desktop grid-row/column placement back to auto is enough
+       to fall into plain document-order stacking — no reordering
+       anywhere. */
     .problem-grid{ grid-template-columns:1fr; gap:32px; }
+    .problem-head, .problem-intro-p, .problem-list, .problem-photo{ grid-column:1; grid-row:auto; }
     .timeback-grid{ grid-template-columns:1fr; gap:32px; }
     .advantage-grid{ grid-template-columns:1fr; gap:32px; }
   }
@@ -814,6 +864,8 @@
     /* Band padding scaled down again for phone widths — 64px -> 48px. */
     #how{ padding:48px 0; }
     #advantage{ padding:48px 0; }
+    #problem{ padding:48px 0; }
+    #time{ padding:48px 0; }
     header .wrap{ flex-wrap:wrap; }
   }
 </style>
@@ -888,13 +940,14 @@
        copy-then-photo, so mobile's natural single-column stack already
        matches the requested "copy first, image second" — no reordering
        needed. -->
-  <section class="section">
+  <section class="section" id="problem">
     <div class="wrap problem-grid">
-      <div class="problem-copy">
+      <div class="problem-head">
         <div class="section-label">The problem</div>
         <h2>You didn't start your business to do admin.</h2>
-        <p class="problem-intro-p">You're good at your trade, but admin gets in the way.</p>
-        <div class="problem-list">
+      </div>
+      <p class="problem-intro-p">You're good at your trade, but admin gets in the way.</p>
+      <div class="problem-list">
           <div class="problem-item">
             <div class="pi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div>
             <div class="pi-text"><h4>Invoices pile up</h4><p>Admin eats into your evenings.</p></div>
@@ -911,7 +964,6 @@
             <div class="pi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
             <div class="pi-text"><h4>Pricing is guesswork</h4><p>You know what you charge — but not always what you should.</p></div>
           </div>
-        </div>
       </div>
       <!-- Placeholder path — real photo of an exhausted tradesperson to
            be uploaded and dropped in at this exact path. -->
@@ -978,11 +1030,18 @@
        standalone graphic element sitting directly on the section's own
        background, not inside another card. The calculator (unchanged)
        is the proof of the claim on the right: copy says PrimeLevel
-       gives time back, the calculator quantifies what that's worth. -->
-  <section class="section">
+       gives time back, the calculator quantifies what that's worth.
+       The "More time for what matters" eyebrow label is gone per direct
+       instruction — .tb-lead is now the first line in the column, and
+       .timeback-grid uses align-items:start (not center) so its top
+       edge lines up with the calculator card's own top edge, rather
+       than the two columns being centred against each other. This is
+       the second "dark" beat in the page-wide navy/dark-filler rhythm
+       (see #advantage's comment) — the section is now id="time" so it
+       can carry that background like #problem does. -->
+  <section class="section" id="time">
     <div class="wrap timeback-grid">
       <div class="tb-copy-col">
-        <div class="section-label">More time for what matters</div>
         <p class="tb-lead">PrimeLevel gives you time back.</p>
         <h2>Your time is worth more than admin.</h2>
         <p class="tb-copy">Every hour spent chasing paperwork is an hour you don't get back — time that could go into more jobs, or simply home earlier.</p>
@@ -1031,25 +1090,19 @@
        "Smarter" read as two connected chapters, while Problem and Time
        either side sit on the plain navy canvas — deliberate rhythm, no
        new colours. Alternating composition vs. the Time section above
-       (copy+icon left/calculator right there; data visual left/copy
-       right here) — a custom line-chart graphic standing in for
-       "useful business intelligence" rather than a generic icon, drawn
-       with the page's own existing gold/white line-art language. -->
+       (copy+icon left/calculator right there; visual left/copy right
+       here). The visual is now the same circle-and-icon language as the
+       How-it-works row above, not a custom line-chart (per direct
+       instruction — a deliberate callback: How-it-works ends on
+       "Business Insight" using this exact icon, and this section IS
+       that insight, so reusing it ties the two sections together rather
+       than introducing a second, unrelated graphic style). -->
   <section class="section" id="advantage">
     <div class="wrap advantage-grid">
       <div class="advantage-visual" aria-hidden="true">
-        <svg viewBox="0 0 320 200" fill="none">
-          <line x1="0" y1="150" x2="320" y2="150" stroke="rgba(249,249,250,0.14)" stroke-width="1"></line>
-          <line x1="0" y1="100" x2="320" y2="100" stroke="rgba(249,249,250,0.1)" stroke-width="1"></line>
-          <line x1="0" y1="50" x2="320" y2="50" stroke="rgba(249,249,250,0.1)" stroke-width="1"></line>
-          <polyline points="6,158 82,132 158,100 234,58 314,20" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
-          <circle cx="6" cy="158" r="4" fill="var(--gold)"></circle>
-          <circle cx="82" cy="132" r="4" fill="var(--gold)"></circle>
-          <circle cx="158" cy="100" r="4" fill="var(--gold)"></circle>
-          <circle cx="234" cy="58" r="4" fill="var(--gold)"></circle>
-          <circle cx="314" cy="20" r="6" fill="var(--gold)"></circle>
-          <line x1="0" y1="184" x2="320" y2="184" stroke="rgba(249,249,250,0.28)" stroke-width="1.5"></line>
-        </svg>
+        <div class="advantage-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        </div>
       </div>
       <div class="advantage-copy">
         <div class="section-label">The PrimeLevel advantage</div>
