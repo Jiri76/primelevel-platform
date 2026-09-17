@@ -1485,6 +1485,35 @@
       }, { threshold: 0.3 });
       document.querySelectorAll('.reveal-stagger').forEach((el) => revealObserver.observe(el));
     }
+
+    // FAQ accordion: native <details>/<summary> only toggles from a
+    // click on <summary> itself — the revealed answer <p> is a sibling,
+    // not inside <summary>, so a click landing on the answer text (or
+    // the card's own padding) did nothing while open, per direct
+    // instruction this now closes the item too. Also per direct
+    // instruction: an open item auto-closes after 10 seconds with no
+    // mouse movement inside it.
+    document.querySelectorAll('details.faq-item').forEach((item) => {
+      const summary = item.querySelector('summary');
+      let inactivityTimer = null;
+      function clearInactivityTimer() {
+        if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+      }
+      function armInactivityTimer() {
+        clearInactivityTimer();
+        inactivityTimer = setTimeout(() => { item.open = false; }, 10000);
+      }
+      item.addEventListener('click', (e) => {
+        if (item.open && !summary.contains(e.target)) {
+          item.open = false;
+          clearInactivityTimer();
+        }
+      });
+      item.addEventListener('toggle', () => {
+        if (item.open) armInactivityTimer(); else clearInactivityTimer();
+      });
+      item.addEventListener('mousemove', () => { if (item.open) armInactivityTimer(); });
+    });
   </script>
 
 </body>
