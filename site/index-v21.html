@@ -379,9 +379,11 @@
      separators between them, no card background/shadow/padding-box —
      plus one real photo on the right. Same page-wide rhythm as
      Hero/How-it-works/Time/Advantage (see #advantage's comment): this
-     band is the first "dark" beat, a gradient blend of the SAME two
-     colours used everywhere else on the page (dark-filler -> navy),
-     never a third colour.
+     band is the first "dark" beat. Flat dark-filler per direct
+     instruction (a gradient fading toward navy was tried first and
+     read as only partially dark, not "fully dark" — fixed by dropping
+     the gradient for a flat fill, matching how #how/#advantage are flat
+     rather than blended).
      Photo alignment (per direct instruction): the photo's top edge
      lines up with the top of the intro paragraph, and its bottom edge
      with the bottom of the last list row — not just vertically centred
@@ -391,7 +393,7 @@
      can span exactly rows 2-3, matching those two edges precisely
      instead of an approximate visual centring. */
   #problem{
-    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 65%);
+    background:var(--dark-filler);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
@@ -531,9 +533,11 @@
      (unchanged) is the proof of the claim on the right.
      align-items:start (not center, per direct instruction) so .tb-lead
      — now the very first line in the column, the eyebrow label above it
-     removed — starts level with the calculator card's own top edge. */
+     removed — starts level with the calculator card's own top edge.
+     Flat dark-filler, not a gradient (matches #problem's fix — the same
+     "fully dark" instruction applies to both dark beats in the rhythm). */
   #time{
-    background:linear-gradient(160deg, var(--dark-filler) 0%, var(--navy) 65%);
+    background:var(--dark-filler);
     padding:88px 0;
     margin:calc(var(--section-gap-y) / 2) 0;
   }
