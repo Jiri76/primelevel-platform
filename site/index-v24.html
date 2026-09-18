@@ -17,13 +17,20 @@
      used only for glow/lighting — never a genuinely new hue. index.html
      stays untouched as the flat/restrained version for comparison. */
   :root{
-    /* v8: fixed 1360px container per the explicit refinement brief — v6's
+    /* v8: fixed container per the explicit refinement brief — v6's
        fluid clamp() is deliberately NOT reused here (v6 stays exactly as
-       it was, this is a separate, independent version). --container-pad
-       still steps 64/40/24px per breakpoint below; nothing else needs to
-       change when it does. */
-    --container-max: 1360px;
-    --container-pad: 64px;
+       it was, this is a separate, independent version). Widened from the
+       original 1360/64 to 1600/32 per direct instruction — on a wide
+       desktop screen (1920px+) the old values left ~273px of dead space
+       on each side of the nav/hero/content with only 64px of that
+       actually being deliberate inner padding; the new values cut that
+       to ~153px/side while filling noticeably more of the frame,
+       confirmed live via ruler-line measurement before this change.
+       --container-pad still steps down to 40/24px on tablet/phone below
+       (untouched) — only the desktop-width values change here, so
+       responsive behavior on smaller screens is unaffected. */
+    --container-max: 1600px;
+    --container-pad: 32px;
     /* Consistent vertical rhythm between major sections — each .section
        carries HALF of this as its own top/bottom padding, so two adjacent
        sections combine to the full 128px gap on desktop, 92px on tablet,
