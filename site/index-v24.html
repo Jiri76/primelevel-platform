@@ -837,12 +837,13 @@
   details.faq-item summary svg{ width:17px; height:17px; stroke:var(--white); flex:none; transition:transform 0.15s ease; }
   details.faq-item[open] summary svg{ transform:rotate(90deg); }
   details.faq-item p{ font-size:14.5px; color:var(--white); line-height:1.65; margin:16px 0 0; }
-  /* The whole open card is click-to-close (see the JS below), so the
-     pointer cursor now covers the whole open item, not just the
-     summary row — otherwise the cursor changed to a plain arrow the
-     moment it left the question line, even though the answer text
-     below it was already clickable. */
-  details.faq-item[open]{ cursor:pointer; }
+  /* The whole card is click-to-open when closed and click-to-close
+     when open (see the JS below), so the pointer cursor covers the
+     whole item unconditionally, not just the summary text line —
+     otherwise the cursor (and the actual click target) changed to a
+     plain arrow/nothing the moment it left that line, even over the
+     card's own padding, which is still visually "inside the panel". */
+  details.faq-item{ cursor:pointer; }
   /* ---------- FAQ row hover (desktop only) ----------
      A touch weaker than the pricing card hover above (smaller lift,
      smaller shadow bump) — both restrained, but pricing reads as the
@@ -1547,7 +1548,15 @@
           openGraceUntil = Date.now() + 350;
           return;
         }
-        if (item.open && Date.now() >= openGraceUntil) {
+        if (!item.open) {
+          // Closed cards only had their single summary line as a real
+          // click target — the card's own top/bottom padding around it
+          // (still visually "inside the panel") did nothing, per direct
+          // instruction this now opens it too, same as the summary line.
+          item.open = true;
+          return;
+        }
+        if (Date.now() >= openGraceUntil) {
           item.open = false;
           clearInactivityTimer();
         }
