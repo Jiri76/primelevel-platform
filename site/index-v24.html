@@ -307,7 +307,33 @@
     margin-bottom:calc(var(--section-gap-y) / 2);
     min-height:100vh; display:flex; flex-direction:column; justify-content:center;
   }
-  .hero-stage{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  /* transform:translateY, not a min-height/margin adjustment — those
+     resize or reposition the box itself and can silently stop working
+     once content height overtakes the adjusted value (confirmed live: a
+     min-height:calc(100vh - Npx) approach worked at some viewport
+     heights but was overridden by content's own height at others, e.g.
+     900px tall). A transform is a pure visual offset with no layout
+     interaction at all, so it's unconditional at every viewport size.
+     The header sits in normal flow above .hero, so a plain 100vh hero
+     is pushed down by the header's own height (95px, confirmed constant
+     across desktop/tablet/phone) — content centered inside via
+     justify-content:center therefore lands a full 95px BELOW the
+     browser window's true vertical center, not on it (confirmed live:
+     hero-stage center at y=479 in a 768px-tall window vs true center
+     384). Shifting the centered content up by that same 95px lands it
+     exactly on true center — confirmed live afterwards at 0px offset,
+     with justify-content and every gap between the logo/tagline/
+     description/button/note completely untouched.
+     Guarded to short viewports only (max-height:700px, e.g. a phone in
+     landscape at ~375px tall) — confirmed live the fixed -95px shift
+     pushes content 7px under the header there, since a short hero has
+     little vertical slack to begin with; the shift is disabled below
+     that height, falling back to the original (off-true-center but
+     never overlapping) centering. */
+  .hero-stage{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; transform:translateY(-95px); }
+  @media (max-height:700px){
+    .hero-stage{ transform:none; }
+  }
 
   /* The three words cycle in the exact same spot as the logo
      specifically (position:absolute, inset:0 on .hero-logo-slot, each
