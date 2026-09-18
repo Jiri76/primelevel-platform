@@ -1509,6 +1509,29 @@
     // instruction this now closes the item too. Also per direct
     // instruction: an open item auto-closes after 10 seconds with no
     // mouse movement inside it.
+    //
+    // openGraceUntil guards against a real bug this caused: opening an
+    // item pushes every item below it down, so the item that used to
+    // sit at that screen position is now the previous item's own
+    // newly-revealed answer text. A click aimed at the NEXT question
+    // (before the eye/mouse re-settles on its new spot) can land there
+    // instead — and without this guard, that stray click would silently
+    // close the item that just opened, which looked like "clicking the
+    // next question does nothing" (confirmed live: opening item 3 then
+    // clicking item 4's old on-screen position closed item 3 and never
+    // touched item 4). A brief shared grace window after ANY item opens
+    // makes such a stray click a no-op instead of an accidental close,
+    // while a genuine close click — always well after the layout has
+    // settled — is unaffected.
+    //
+    // The grace window is armed directly inside this click handler
+    // (synchronously, the moment a summary is clicked), not from the
+    // 'toggle' event — <details> fires 'toggle' as a queued task, not
+    // synchronously with the click, so relying on it left a real gap
+    // where an immediate follow-up click wasn't covered yet (confirmed
+    // live with a same-tick synthetic click). Arming it synchronously
+    // here closes that gap entirely.
+    let openGraceUntil = 0;
     document.querySelectorAll('details.faq-item').forEach((item) => {
       const summary = item.querySelector('summary');
       let inactivityTimer = null;
@@ -1520,7 +1543,11 @@
         inactivityTimer = setTimeout(() => { item.open = false; }, 10000);
       }
       item.addEventListener('click', (e) => {
-        if (item.open && !summary.contains(e.target)) {
+        if (summary.contains(e.target)) {
+          openGraceUntil = Date.now() + 350;
+          return;
+        }
+        if (item.open && Date.now() >= openGraceUntil) {
           item.open = false;
           clearInactivityTimer();
         }
